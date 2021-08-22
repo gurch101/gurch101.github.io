@@ -6,7 +6,7 @@ export default function Post({ post }: any) {
     return (
         <div>
             <Head>
-                <title>{`post.title | Gurchet's Development Blog`}</title>
+                <title>{`${post.title} | Gurchet's Development Blog`}</title>
                 <meta name="description" content={post.description} />
                 <link rel="icon" href="/favicon.ico" />
             </Head>            
