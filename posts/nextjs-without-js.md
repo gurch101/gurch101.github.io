@@ -9,14 +9,14 @@ Next.js is a React framework that lets you build static and server rendered webs
 
 By default, Next.js preloads a bunch of javascript regardless of whether your site actually needs it. Really simple sites (like this blog), generally don't need any client-side javascript magic. Statically generated emails would also benefit from avoiding client-side javascript since email clients don't execute javascript.
 
-Turns out it's really easy to disable *all* javascript in your Next.js app (provided you are using the canary build and are comfortable with using an experimental feature).
+Turns out it's really easy to disable *all* javascript in your Next.js app (provided you are using the canary build and are comfortable using an experimental feature).
 
 First,
 ```sh
 npm install next@canary
 ```
 
-Then, in your page, add the following:
+Then, add the following to your page:
 ```js
 export const config = {
   unstable_runtimeJS: false
