@@ -3,6 +3,7 @@ title: Building a Next.js Site Without Any Client-Side Javascript
 date: 2020-01-02
 description: Using React without your users *running* React
 category: javascript
+type: post
 ---
 
 Next.js is a React framework that lets you build static and server rendered websites by adopting a few simple conventions to hydrate your components. In doing so, you get the flexibility and familiarity of building a site with React & Javascript while also getting the performance and SEO benefits of statically pre-rendering as much of your site as possible.

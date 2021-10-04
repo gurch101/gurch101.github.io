@@ -10,6 +10,7 @@ export interface Post {
     date: Date
     category: string
     description: string
+    type: string
 }
 
 export interface PostContent {
@@ -39,13 +40,14 @@ const getParsedPostData = (fileName: string): Post => {
         date: matterResult.data.date,
         category: matterResult.data.category,
         description: matterResult.data.description,
+        type: matterResult.data.type,
         ...matterResult.data
     }
 }
 
-export function getSortedPostsData() {
+export function getSortedPostsData(postType: string) {
     const fileNames = fs.readdirSync(postsDirectory);
-    const allPostsData = fileNames.map(getParsedPostData)
+    const allPostsData = fileNames.map(getParsedPostData).filter(post => post.type === postType)
     return allPostsData.sort(({ date: a }, { date: b }) => {
         if (a < b) {
           return 1
@@ -85,7 +87,8 @@ export async function getPostData(id: string): Promise<Post & PostContent> {
       id,
       title: matterResult.data.title,
       category: matterResult.data.category,
-      description: matterResult.data.description,      
+      description: matterResult.data.description, 
+      type: matterResult.data.type,     
       ...matterResult.data,
       date: matterResult.data.date.toDateString(),
       contentHtml,

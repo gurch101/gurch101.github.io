@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { getAllPostIds, getPostData, PostIDRecord } from '../lib/posts';
-import PostMetadata from '../components/PostMetadata';
+import { PostMetadata } from '../components/PostList';
 
 export default function Post({ post }: any) {
     return (

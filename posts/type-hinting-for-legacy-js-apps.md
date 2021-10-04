@@ -3,6 +3,7 @@ title: Type Hinting For Legacy Javascript Applications
 date: 2020-02-06
 description: Getting the benefits of typescript without adding a compilation step to your toolchain
 category: javascript
+type: post
 ---
 
 If you're in the (un)fortunate position of maintaining a legacy javascript application, you may find yourself longing for the benefits of a modern javascript toolchain. 
