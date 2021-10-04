@@ -1,0 +1,17 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Nginx Summary | Gurchet&#x27;s Development Blog</title><meta name="description" content="Ngnix cheat sheet and summary"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/6f8fa91546b2b95fdc3c.css" as="style"/><link rel="stylesheet" href="/_next/static/css/6f8fa91546b2b95fdc3c.css" data-n-g=""/><link rel="preload" href="/_next/static/css/98f64f23ebed96a1b148.css" as="style"/><link rel="stylesheet" href="/_next/static/css/98f64f23ebed96a1b148.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Nginx Summary</h1><div class="meta"><span>Sun Mar 01 2020</span><span>summary</span></div><div class="mt30"><p>Nginx has one master process and several worker processes. The master process reads/evaluates config and maintains workers.
+Workers process requests.</p>
+<h3>CLI</h3>
+<p><code>nginx -s [stop|quit|reload|reopen]</code></p>
+<p>stop - fast shutdown
+quit - graceful shutdown</p>
+<h3>Configuration</h3>
+<p>Config lives in <code>/etc/ngnix</code></p>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">http {
+    server {
+        location / {
+            root /data/www
+        }
+    }
+}</code></pre></div>
+<p>config changes can be applied with <code>nginx -s reload</code></p>
+</div></div></div></div></body></html>

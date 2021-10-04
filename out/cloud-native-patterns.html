@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Cloud Native Patterns | Gurchet&#x27;s Development Blog</title><meta name="description" content="Cloud Native Patterns Summary"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/6f8fa91546b2b95fdc3c.css" as="style"/><link rel="stylesheet" href="/_next/static/css/6f8fa91546b2b95fdc3c.css" data-n-g=""/><link rel="preload" href="/_next/static/css/98f64f23ebed96a1b148.css" as="style"/><link rel="stylesheet" href="/_next/static/css/98f64f23ebed96a1b148.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Cloud Native Patterns</h1><div class="meta"><span>Sat Oct 02 2021</span><span>book summary</span></div><div class="mt30"><p>Cloud = where it runs; Cloud-native = how it runs</p>
+<p>Modern apps need rapid iteration, fast releases, zero downtime and an increase in the volume and variety of devices that connect to it.</p>
+<p>Cloud-native applications remain stable even when the infra they're running on is constantly changing/failing</p>
+<h3>Chapter 2: Running Cloud-Native Applications in Production</h3>
+<p>In most orgs, getting software deployed to prod is challenging - process designed to reduce risk and improve efficiency has the opposite effect</p>
+<p>inconsistencies in artifacts, configuration, and environments lead to system instability</p>
+<p>goal should be easy and frequent releases into production</p>
+<p>continuous delivery = the newest possible version of the software is deployable at any time (trunk is always deployable)</p>
+<ul>
+<li>advantages: can deploy at any time (first mover advantage), allows you to gather feedback early. If you miss dates,
+you can release less features</li>
+</ul>
+<p>traditional delivery = SDLC is front-loaded with development, followed by extensive testing and packaging</p>
+<ul>
+<li>disadvantages: if you miss dates, testing is compressed (at the expense of quality) or you push dates</li>
+</ul>
+<p>Before: tested extensively before going to production and were left scrambling on go-live.
+After: Plan for failure and intentionally create a retreat path to make failures non-events. Monitor for crashes, latency changes, changes in click-through rates, etc.</p>
+</div></div></div></div></body></html>
