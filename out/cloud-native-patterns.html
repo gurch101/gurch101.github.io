@@ -14,6 +14,20 @@ you can release less features</li>
 <ul>
 <li>disadvantages: if you miss dates, testing is compressed (at the expense of quality) or you push dates</li>
 </ul>
-<p>Before: tested extensively before going to production and were left scrambling on go-live.
-After: Plan for failure and intentionally create a retreat path to make failures non-events. Monitor for crashes, latency changes, changes in click-through rates, etc.</p>
+<p>Before: tested extensively before going to production and were left scrambling on go-live.</p>
+<p>After: Plan for failure and intentionally create a retreat path to make failures non-events. Monitor for crashes, latency changes, changes in click-through rates, etc.</p>
+<h3>Chapter 3: The Platform for Cloud-Native Software</h3>
+<p>AWS uses commodity hardware to offer services at a lower price but with a higher rate of failure. Exposes primitives as a service.</p>
+<p>Google app engine doesnt provide raw access to resources.</p>
+<p>For cloud-native apps, operators are interested in the application and <em>not</em> the hosts the app is running on/directories involved</p>
+<p>The popularity of containers was driven by the need to support cloud-native applications. Multiple containers run on a single host sharing the host's operating system.</p>
+<p>The platform creates app instances, monitors application health, distributes app instances across the infrastructure, assigns IP addresses to the containers, dynamically routes to app instances, and injects configuration</p>
+<p>challenges of highly distributed architectures:
+- coordinating configuration changes
+- tracing/monitoring execution flows
+- retry logic - circuit breakers prevent inadvertent internal DDoS
+- service discovery - each component needs to know URLs/IPs of all components it calls
+- rolling upgrades</p>
+<p>each team is responsible for deployment, configuration, monitoring, scaling, and upgrading its products</p>
+<h3>Chapter 4: Event-Driven Microservices</h3>
 </div></div></div></div></body></html>
