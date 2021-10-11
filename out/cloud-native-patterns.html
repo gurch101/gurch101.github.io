@@ -22,12 +22,14 @@ you can release less features</li>
 <p>For cloud-native apps, operators are interested in the application and <em>not</em> the hosts the app is running on/directories involved</p>
 <p>The popularity of containers was driven by the need to support cloud-native applications. Multiple containers run on a single host sharing the host's operating system.</p>
 <p>The platform creates app instances, monitors application health, distributes app instances across the infrastructure, assigns IP addresses to the containers, dynamically routes to app instances, and injects configuration</p>
-<p>challenges of highly distributed architectures:
-- coordinating configuration changes
-- tracing/monitoring execution flows
-- retry logic - circuit breakers prevent inadvertent internal DDoS
-- service discovery - each component needs to know URLs/IPs of all components it calls
-- rolling upgrades</p>
+<p>challenges of highly distributed architectures:</p>
+<ul>
+<li>coordinating configuration changes</li>
+<li>tracing/monitoring execution flows</li>
+<li>retry logic - circuit breakers prevent inadvertent internal DDoS</li>
+<li>service discovery - each component needs to know URLs/IPs of all components it calls</li>
+<li>rolling upgrades</li>
+</ul>
 <p>each team is responsible for deployment, configuration, monitoring, scaling, and upgrading its products</p>
 <h3>Chapter 4: Event-Driven Microservices</h3>
 </div></div></div></div></body></html>
