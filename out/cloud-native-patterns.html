@@ -32,4 +32,11 @@ you can release less features</li>
 </ul>
 <p>each team is responsible for deployment, configuration, monitoring, scaling, and upgrading its products</p>
 <h3>Chapter 4: Event-Driven Microservices</h3>
+<p>Request-response = procedural/top-down - service request waits for responses from each dependent service and does some sort of aggregation to respond. Aggregation occurs in response to request.</p>
+<p>Event-driven = fire and forget - code execution has an effect and the outcome may cause other things to happen but the entity that triggered the execution doesnt expect a response. Aggregation occurs whenever data in the system changes - its asynchronous.</p>
+<p>Even-driven is less coupled and does not depend on other systems working correctly. Dependent services execute events to the aggregate service which maintains its own data store. Each service is independent of the other.</p>
+<p>Command Query Responsibility Segregation (CQRS) - separates write logic (commands) rom read logic (queries). Splitting controllers by read/write allows for different models on read/write.</p>
+<p>Events need message queues (RabbitMQ/Kafka) to store events through network partitions and handle downtimes in services</p>
+<p>https://github.com/cdavisafc/cloudnative-abundantsunshine</p>
+<h3>Chapter 5: App Redundancy: Scale-Out and Statelessness</h3>
 </div></div></div></div></body></html>
