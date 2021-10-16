@@ -60,3 +60,71 @@ Good tech lead:
 - communicate - your productivity is less important than the productivity of the team
 
 ### Managing People
+
+build trust and rapport - why did you decide to work here? what are you excited about? do you have any career goals that I should know about so that I can help you achieve them? any surprises since you've joined, good or bad?
+
+create a 30/60/90 day plan with the developer
+
+get new hires to work through and update the new hire documentation
+
+communicate expectations early
+
+get feedback
+
+have regular 1-1s
+
+1-1 types:
+- todo list meeting: both parties come with objectives to cover in order of importance. Updates are given, decisions are made, planning happens
+- the catch-up: listen to anything the report wants to discuss. Don't allow the discussion to turn into therapy
+- the feedback meeting: review progress on goals, discuss performance issues
+- the progress report: only use the 1-1 as a status meeting for side projects without oversight.
+- getting to know you: ask about long-term goals. Let them talk about personal lives.
+
+Keep 1-1 notes in a shared document
+
+don't micromanage; autonomy is an important element of motivation - devs to have control over some part of their work. Conversly, delegation is not the same as abdication - talk about which meetings to attend to help, provide guidance for escalations, point out responsibilities, provide measurable goals and a plan.
+
+gather info from the system before going to the people
+
+create a culture of continuous feedback - regularly share positive and corrective feedback rather than saving these comments for the review cycle. Adopt a habit of identifying people who deserve praise.
+
+There should be no surprises to feedback - especially negative ones. You should coach and guide a bunch before formalizing a pip.
+
+Many organizations have an "up or out" culture for early-career employees.
+
+### Managing a Team
+
+Management is not a natural progression of the skills of a senior engineer, it's an entirely new set of skills and challenges.
+
+Need to hold people accountable for their decisions, make sure that decisions pass the technical smell test and have been blaanced against the overall context of the team and the business.
+
+Its important for technical managers to still be in the code - should be able to identify and prioritize technical debt, guide what is/isn't possible, identify the shortest path to implement new features.
+
+Common problems in dysfunctional teams:
+- not shipping: find and remove bottlenecks in the tools and processes.
+- people drama: let go or transfer toxic employees.
+- overwork: slow down product roadmap, deal with tech debt, cut features
+- collaboration problems: gather actionable feedback and have productive conversations about possible improvements. Find opportunities for team building/social events
+
+Rather than focusing on shielding people from wider politics/drama, help the team understand important goals
+
+create a data-driven culture by gathering stats on team productivity, quality (time spent on outages, number of bugs found by QA or after releases). Understand what will have the greatest impact.
+
+hold retrospectives
+
+how to manage conflict:
+- don't rely exclusively on concensus or voting
+- set up clear processes to depersonalize decisions - start with a shared understanding of goals, risks, questions
+- if there are problems, address them immediately rather than letting the simmer
+
+goal should be to build a team where there is a psychological safety net - memebers should be willing to take risks and make mistakes in front of one another.
+
+openly refuse to tolerate bad behavior
+
+project planning:
+- 10 productive engineering weeks per quarter - vacations, meetings, review sessions, production outages, onboarding take the other 3 weeks.
+- budget 20% of time for tech debt
+- as deadlines approach, your job is to say no
+- for initial estimates - take your guess, then double it. For bigger tasks, push for planning time.
+
+### Managing Multiple Teams

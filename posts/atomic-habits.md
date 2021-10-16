@@ -61,3 +61,41 @@ Every action you take is a vote for the type of person you wish to become.
 The most practical way to change who you are is to change what you do.
 
 ### Chapter 3: How to Build Better Habits in 4 Simple Steps
+
+Behaviors followed by satisfying consequences tend to be repeated and those that produce unpleasant consequences are less likely to be repeated.
+
+try->fail->learn->try differently. With practice, the useless movements fade away and the useful actions get reinforced.
+
+Habit formation:
+
+cue: the trigger that initiates behavior. Information that predicts a reward (food, water, sex, money, fame, power, status, power, approval, love, friendship, personal satisfaction).
+
+craving: the motivational force behind every habit. Cravings are linked to a desire to change internal state. Thoughts, feelings, and emotions transform a cue to a craving
+
+response: the actual habit you perform
+
+reward: end goal of every habit. Rewards satisfy us and teach us.
+
+cue notices the reward, cravings want the reward, response is the action to obtain the reward.
+
+problem phase: cue + craving
+solution phase: response + reward
+
+To create a good habit, make the cue obvious, the craving attractive, the response easy, and the reward satisfying
+
+To break a bad habit, make the cue invisible, the craving unattractive, the response difficult, and the reward unsatisfying
+
+### The First Law: Make it Obvious
+### Chapter 4: The Man Who Didn't Look Right
+
+You don't need to be aware of the cue for a habit to begin. You can notice an opportunity and take action without dedicating conscious attention to it. Ex - paramedic who recognized a person was going to have a heart attack just based on appearance.
+
+The more you repeat something, the less likely you become to question what you're doing and why you're doing it. The process of behavior change begins with awareness.
+
+Until you make the unconscious conscious, it will direct your life and you will call it fate.
+
+Use the point-and-call system to reduce mistakes - raises awareness
+
+ask "does this behavior help me become the person I want to be?"
+
+### Chapter 5: The Best Way to Start a New Habit

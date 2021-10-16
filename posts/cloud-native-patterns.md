@@ -69,3 +69,15 @@ Events need message queues (RabbitMQ/Kafka) to store events through network part
 https://github.com/cdavisafc/cloudnative-abundantsunshine
 
 ### Chapter 5: App Redundancy: Scale-Out and Statelessness
+
+Core tenant of cloud-native software is to have redundancy to avoid single points of failure. Apps should always have multiple instances deployed.
+
+Multiple instances should behave like a single logical entity.
+
+Multiple instances allow for flexible horizontal scaling, high availability, reliability, and operational efficiency.
+
+Kubernetes is a platform for running applications that includes capabilities that allow you to deploy, monitor, and scale your apps. Apps must be containerized to run in kubernetes.
+
+Instances must be stateless to allow for redundant deployment.
+
+CAP theorem - only two attributes of consistency, availability, and partition tolerance can be maintained.
