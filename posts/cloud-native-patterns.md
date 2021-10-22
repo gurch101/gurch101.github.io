@@ -81,3 +81,45 @@ Kubernetes is a platform for running applications that includes capabilities tha
 Instances must be stateless to allow for redundant deployment.
 
 CAP theorem - only two attributes of consistency, availability, and partition tolerance can be maintained.
+
+### Chapter 6: Application Configuration: Not just environment variables
+
+Need a way to apply config to dynamic number of instances where infrastructure changes can cause config changes.
+
+Store config in the environment when possible. With spring, you can use the property file for defaults:
+
+```
+ipaddress=${INSTANCE_IP:127.0.0.1}
+```
+
+Configuration data stores persists key/value pairs, maintains version history, and has access control mechanisms. Spring cloud config exposes config from a source code control system over an HTTP API. Sensitive values should be encrypted and stored by a service like Hashicorp Vault.
+
+### Chapter 7: The Application Lifecyle: Accounting for Constant Change
+
+Management functions should be automatable, efficient, and reliable
+
+Platform needs a fail-safe way of detecting when an app failed
+
+App scales depending on load to safe cost - new apps are started/stopped all the time.
+
+Zero downtime deployments:
+- blue/green deployment - stand up second set of instances, then switch traffic from first set to second set. All traffic is on the old or new version exclusively.
+- rolling upgrade - replace a subset of instances with new instances. Different versions of the app will serve traffic at the same time temporarily.
+- parallel deploys - different versions of the app serve traffic for as long as needed. Supports experimentation.
+
+For credential rotation across dependent services, make the provider accept two credentials temporarily (old + new), restart the app, then add the new credential to the client, restart the app, then remove the old credential from the provider.
+
+You should *not* be able to SSH into a production environment because doing so allows a way to make instances non reproducible.
+
+Treat logs as event streams 
+- write directly to stderr/stdout 
+- avoids need for log rotations or locating files in directories
+
+each service needs to broadcast events about its lifecycle - ip/port, etc
+- publish health endpoints, kubernetes will call it continuously to detect crashed apps/app lifecycle. If its down, kubernetes will start a new instance. Can also be event-driven where you publish events.
+
+Serverless takes cloud-native to the extreme
+- each call takes app through entire lifecycle
+- dev needs to focus on making startup and execution as fast as possible
+
+### Chapter 8: Accessing Apps: Services, routing and service discovery

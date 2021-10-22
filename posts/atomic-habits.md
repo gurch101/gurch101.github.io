@@ -99,3 +99,38 @@ Use the point-and-call system to reduce mistakes - raises awareness
 ask "does this behavior help me become the person I want to be?"
 
 ### Chapter 5: The Best Way to Start a New Habit
+
+People who make a specific plan for when and where they will perform a new habit are more likely to follow through.
+
+Use this template: I will [behavior] at [time] in [location]
+
+Diderot Effect: obtaining a new possession creates a spiral of consumption that leads to additional purchases.
+- buy a couch now you question the layout of your entire living room
+- buy a dress and you need to get shoes and earrings to match
+
+habit stacking: identify a current habit you already do and then stack your new behavior on top.
+
+Habit stacking template: After [current habit], I will [new habit]
+
+### Chapter 6: Motivation is Overrated: Environment Often Matters More
+
+behavior is a function of the person in their environment
+
+Your habits change depending on the room you are in and the cues in front of you 
+- re-arranged cafeteria with water available at more stations reduced soda sales
+- when home electrical meters are located in an easy to view location, people use less electricity
+- products sold at the end of aisles and at eye level are sold more frequently
+- people drink more in social situations than they would alone
+
+train yourself to link habits with particular context
+
+only use your room for sleep. If you aren't sleepy, go into a different room.
+
+Go to new places to set new habits
+
+one space, one use
+
+### Chapter 7: The Secret to Self-Control
+
+
+

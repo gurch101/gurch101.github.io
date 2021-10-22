@@ -128,3 +128,44 @@ project planning:
 - for initial estimates - take your guess, then double it. For bigger tasks, push for planning time.
 
 ### Managing Multiple Teams
+
+Directors are responsible for overall department technical competence - guiding and growing that competence in the whole team as necessary via training and hiring. They debug and triage critical problems, should understand the systems they oversee well enough to perform code reviews, and help research problems as needed. They contribute to architecture and design by ensuring the technology aligns with the business. They are responsible for creating and growing the next generation of engineering management. They are responsible for balancing immediate and long term product work with technical debt.
+
+Time management - understand the difference between important and urgent.
+
+Prepare for meetings - make agendas, hold people accountable, make sure the meeting has a clear procedure and expected outcome.
+
+Delegation strategy - if its simple and frequent, delegate (running standups, doing simple code reviews). If its simple and infrequent, do it yourself. If its complex and frequent, delegate. If its complex and infrequent, delegate for training purposes.
+
+Strategies for saying no
+- say "yes and" where you agree but also articulate the sacrifices/downsides of saying yes.
+- say "no" with a set of hard requirements needed to say yes
+- go through a line of questioning so that the person realizes its not a good idea
+- say no quickly rather than dragging something on
+
+advocate and push for technical process improvements to increase engineer productivity
+- code should be checked-in frequently. Encourage this by teaching tdd.
+- work to reduce incidents rather than simply react to them as they come.
+
+When joining a new team, don't focus on whats broken but identify existing strengths and cultivate them.
+
+Strong teams are built on shared purpose and value alignment.
+
+### Managing Managers
+
+open-door policies dont work - you need to find problems proactively
+
+have skip-level meetings 
+- meet with people who report to people who report to you. Hold ~1/quarter. Provide prompts for potential topics.
+- best/worst aspects of project
+- who on your team has been doing really well
+- feedback about your manager
+- changes we could make to the product
+- opportunities we're missing
+- how do you think the org is doing overall?
+- any areas of business strategy you don't understand?
+- what's keeping you from doing your best work right now?
+- how happy are you working here? what could we do to make work more fun?
+- learn which areas you need to support the manager
+
+Universal rule of an employee - manager or first timer - they should make your life easier.
