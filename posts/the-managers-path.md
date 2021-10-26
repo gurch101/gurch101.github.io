@@ -169,3 +169,28 @@ have skip-level meetings
 - learn which areas you need to support the manager
 
 Universal rule of an employee - manager or first timer - they should make your life easier.
+
+New hires act in self-interest until they get to know their colleagues, and then they move to group interest.
+
+make it clear that your goal is to understand what people do so that you're capable of appreciating it better
+
+solving team problems
+- form a hypothesis
+- check the data: tickets, chats, emails, code reviews, calendars
+- observe the team: drop in on meetings
+- ask questions: find out goals - people need to feel an understanding and connection with the purpose of their work
+- check team dynamics: do people like each other? do they collaborate?
+- jump in to help
+- be curious - learn *why*
+
+People ask why things take so long for two reasons 1) they don't like the original estimate or 2) didn't ask for an estimate and now they're upset. You must be aggressive about sharing estimates and updates to estimates, even when people don't ask.
+
+Showing some empathy for the person providing pressure can go a long way to shifting focus from blame to action.
+
+Dealing with roadmap uncertainty
+- be realistic about likelihood of changing plans
+- break down projects into a series of small deliverables so that some results are achieved
+- don't overpromise a future of technical projects
+- dedicate 20% time to dealing with technical debt
+
+### The Big Leagues

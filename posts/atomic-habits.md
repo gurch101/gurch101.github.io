@@ -132,5 +132,77 @@ one space, one use
 
 ### Chapter 7: The Secret to Self-Control
 
+9 out of 10 soldiers that became addicted to heroin in Vietnam war were able to drop the habit immediately when returning home
+- radical changes to environment can be used to break bad habits
+- In Vietnam, heroin was easy to access, soldiers were away from home, stressed
 
+Conversely, 9 out of 10 addicts that come back from rehab, relapse
+- returned to same environment
 
+People with the best self-control are those that have to use it least 
+- spend less time in tempting situations and remove environmental cues
+
+bad habits are autocatalytic - watching tv makes you feel sliuggish so you watch more tv because you don't have energy to do anything else
+
+cue-induced wanting - an external trigger causes a compulsive craving to repeat a bad habit
+
+- if you can't get any work done, leave your phone in another room
+- if you waste too much time watching tv, move the tv to a different room
+- if you play too many video games, unplug the console and put it in the closet after each use
+
+Secret to self-control: make the cues of your good habits obvious and the cues to your bad habits invisible
+
+### The Second Law: Make it Attractive
+### Chapter 8: How to Make a Habit Irresistible
+
+supernormal stimuli - heightened version of reality
+- after spending hundreds of thousands of years hunting and foraging, the brain evolved to place a high value on salt, sugar, and fat because they used to be rare
+- now, junk food is abundant and cheap but our brains continue to crave it like its scarce
+- high contrast foods are appealing - crunchy and creamy over unprocessed foods that taste the same after each bite
+
+the more attractive an opportunity is, the more likely it is to become habit-forming
+
+when you block receptors of dopamine, animals lose all will to live - they won't eat, drink, or have sex. Within a few days, the animals die of thirst. They still *like* those things but they have no desire for them.
+
+habits are a dopamine-driven feedback loop. Its released not only when you experience pleasure, but also when you anticipate it.
+- a child thinking about Christmas can be better than opening the gifts
+- daydreaming about a vacation can be more pleasurable than actually being on vacation
+
+Temptation bundling - linking an action you want to do with an action you need to do
+- After [habit I need], I will [habit I want]
+
+### Chapter 9: The Role of Family and Friends in Shaping Your Habits
+
+Habits that are normal in your culture are among the most attractive behaviors. Behaviors that are attractive, help us fit in.
+- Polgar sisters became chess prodigies because they were raised to prioritize chess above all else
+- We pick up habits from those close to us. A persons chances of becoming obese increased by 57% if they had a friend who became obese. The higher your friends IQ at 11 or 12, the higher your IQ will be at 15.
+- To build better habits, join cultures where your desired behavior is the normal behavior.
+- When we are unsure how to act, we look to the group to guide our behavior. Ex. Checking reviews. Most days, we'd rather be wrong with the crowd than right alone.
+- humans pursue power, prestige, and status - we are drawn to behaviors that earn us respect, approval, admiration, and status. We emulate the behavior of successful people because we desire success ourselves.
+
+### Chapter 10: How to Find and Fix the Causes of Your Bad Habits
+
+Recognize that cravings have underlying motives
+- conserve energy
+- obtain food and water
+- find love and reproduce
+- connect and bond with others
+- win social acceptance and approval
+- reduce uncertainty
+- achieve status and prestige
+
+habit forming products don't create new motivations but latch on underlying motives
+- find love -> Tinder
+- Connect with others -> Facebook
+- Win socal acceptance -> Instagram
+- Reduce uncertainty -> Google search
+- Achieve status -> Play video games
+
+desire is the difference between where you are now and where you want to be in the future.
+
+Reframe habits to highlight their benefits rather than drawbacks. Associate good habits with positive feelings and bad habits with negative feelings.
+
+Create a motivation ritual by doing something you enjoy immediately before a difficult habit.
+
+### The Third Law: Make it Easy
+### Chapter 11: Walk Slowly, but Never Backward
