@@ -194,3 +194,23 @@ Dealing with roadmap uncertainty
 - dedicate 20% time to dealing with technical debt
 
 ### The Big Leagues
+
+The company looks to you for guidance on what to do, how to act, how to think, and what to value.
+
+Four categories:
+- info gathering/sharing: need to synthesize large amounts of info quick, identify critical elements, and share it with appropriate third parties
+- nudging: remind people of their commitments by asking questions instead of giving orders
+- decision making: take conflicting perspectives and incomplete info and set a direction
+- role modeling
+
+The job isn't to be right. It's to help the team make the best possible decisions and help them implement them in a sustainable and efficient way.
+
+VPs balance strategy and management, align dev roadmap with hiring plan.
+
+CTOs are executives first and technologists second - takes strategic thinking and guides technology to solve problems.
+
+Saying something is top priority is one thing, but making the actual tradeoffs on the schedule to get people moving on it is completely different.
+
+Never underestimate the number of times something needs to be said before it sinks in.
+
+Show that you understand your managers priorities and tell them the concrete steps you're taking to meet them.

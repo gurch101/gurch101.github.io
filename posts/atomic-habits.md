@@ -206,3 +206,15 @@ Create a motivation ritual by doing something you enjoy immediately before a dif
 
 ### The Third Law: Make it Easy
 ### Chapter 11: Walk Slowly, but Never Backward
+
+Class divided in two - one to produce most photos, one to produce best photo. Quantity group had higher quality since they practiced more.
+
+We are so focused on figuring out the best approach that we never get around to taking action. The best is the enemy of the good.
+
+People focus on approach rather than action because you delay failure.
+
+If you want to master a habit, the key is to start with repitition, not perfection.
+
+long-term potentiation: strengthing of connections between neurons in the brain based on recent patterns of activity. The more you repeat an activity, the more your brain structure changes to become efficient at that activity.
+
+### Chapter 12: The Law of Least Effort
