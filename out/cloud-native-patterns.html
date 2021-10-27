@@ -50,4 +50,31 @@ you can release less features</li>
 <p>Store config in the environment when possible. With spring, you can use the property file for defaults:</p>
 <div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">ipaddress=${INSTANCE_IP:127.0.0.1}</code></pre></div>
 <p>Configuration data stores persists key/value pairs, maintains version history, and has access control mechanisms. Spring cloud config exposes config from a source code control system over an HTTP API. Sensitive values should be encrypted and stored by a service like Hashicorp Vault.</p>
+<h3>Chapter 7: The Application Lifecyle: Accounting for Constant Change</h3>
+<p>Management functions should be automatable, efficient, and reliable</p>
+<p>Platform needs a fail-safe way of detecting when an app failed</p>
+<p>App scales depending on load to safe cost - new apps are started/stopped all the time.</p>
+<p>Zero downtime deployments:</p>
+<ul>
+<li>blue/green deployment - stand up second set of instances, then switch traffic from first set to second set. All traffic is on the old or new version exclusively.</li>
+<li>rolling upgrade - replace a subset of instances with new instances. Different versions of the app will serve traffic at the same time temporarily.</li>
+<li>parallel deploys - different versions of the app serve traffic for as long as needed. Supports experimentation.</li>
+</ul>
+<p>For credential rotation across dependent services, make the provider accept two credentials temporarily (old + new), restart the app, then add the new credential to the client, restart the app, then remove the old credential from the provider.</p>
+<p>You should <em>not</em> be able to SSH into a production environment because doing so allows a way to make instances non reproducible.</p>
+<p>Treat logs as event streams</p>
+<ul>
+<li>write directly to stderr/stdout</li>
+<li>avoids need for log rotations or locating files in directories</li>
+</ul>
+<p>each service needs to broadcast events about its lifecycle - ip/port, etc</p>
+<ul>
+<li>publish health endpoints, kubernetes will call it continuously to detect crashed apps/app lifecycle. If its down, kubernetes will start a new instance. Can also be event-driven where you publish events.</li>
+</ul>
+<p>Serverless takes cloud-native to the extreme</p>
+<ul>
+<li>each call takes app through entire lifecycle</li>
+<li>dev needs to focus on making startup and execution as fast as possible</li>
+</ul>
+<h3>Chapter 8: Accessing Apps: Services, routing and service discovery</h3>
 </div></div></div></div></body></html>
