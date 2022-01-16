@@ -1,3 +1,11 @@
+---
+title: The Mind-Gut Connection
+date: 2021-01-15
+description: The Mind-Gut Connection Summary
+category: book summary
+type: notes
+---
+
 
 ### Role of gut
 
