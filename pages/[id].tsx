@@ -12,7 +12,7 @@ export default function Post({ post }: any) {
             </Head>            
             <h1 className="mb3">{post.title}</h1>
             <PostMetadata date={post.date} category={post.category} />
-            <div className="mt30" dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
+            <div className="mt25 post" dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
         </div>
     )
 }

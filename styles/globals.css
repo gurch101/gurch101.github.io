@@ -19,8 +19,12 @@ body {
 }
 
 img {
-  width: 100%;
-  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.post {
+  line-height: 1.5;
 }
 
 @media(min-width: 1280px) {
@@ -64,6 +68,6 @@ a:visited {
   margin-bottom: 0.3em;
 }
 
-.mt30 {
-  margin-top: 3em;
+.mt25 {
+  margin-top: 2.5em;
 }

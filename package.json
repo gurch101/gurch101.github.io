@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "export": "next export -o docs && npm run compress",
-    "compress": "imagemin public/images/* --plugin=gifsicle --out-dir=docs/images",
+    "compress": "imagemin public/images/* --plugin=gifsicle --out-dir=docs/images && cp public/images/*.jpg docs/images",
     "start": "next start",
     "lint": "next lint",
     "deploy": "rm -rf node_modules/.cache && next build && npm run export && touch docs/.nojekyll && git add docs/ && git commit -m \"Deploy to gh-pages\" && git push origin main --force"
