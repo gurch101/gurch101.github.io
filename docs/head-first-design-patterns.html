@@ -1,0 +1,17 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Head First Design Patterns | Gurchet&#x27;s Development Blog</title><meta name="description" content="Head First Design Patterns Summary"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/51dd2ece2d2e2902880b.css" as="style"/><link rel="stylesheet" href="/_next/static/css/51dd2ece2d2e2902880b.css" data-n-g=""/><link rel="preload" href="/_next/static/css/da823d5520371b52ce1f.css" as="style"/><link rel="stylesheet" href="/_next/static/css/da823d5520371b52ce1f.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Head First Design Patterns</h1><div class="meta"><span>Sat Oct 09 2021</span><span>book summary</span></div><div class="mt25 post"><h3>Chapter 1: Intro to Design Patterns</h3>
+<p>best way to use design patterns is to load your brain with them then recognize places in your apps where you can apply them.</p>
+<p>Problem with inheritance - changes can unintentionally affect all subclasses</p>
+<p>Problem with interfaces - can lead to code duplication if you have multiple classes that implement the same interface in the same way</p>
+<p>identify aspects of your app that vary and separate them from what stays the same.</p>
+<p>Program to an interface, not an implementation.</p>
+<p>Use delgation - have a base class delegate behavior to other interfaces</p>
+<p>favor composition over inheritance</p>
+<p>strive for loosely coupled designs between objects that interact.</p>
+<p>The strategy pattern: a family of algorithms that are encapsulated and interchangeable. Allows the algorithm vary independently from the client that uses it.</p>
+<p><img src="/images/strategy.png" alt="Strategy Pattern"></p>
+<h3>Chapter 2: The Observer Pattern</h3>
+<p>one to many dependency between objects so that when one object changes state, all of its dependents are notified automatically.</p>
+<p>pub/sub - publisher is the subject, subscribers are the observers</p>
+<p><img src="/images/observer.png" alt="Observer Pattern"></p>
+<p>rather than the subject sending out all datapoints to all observers, update() can take no params and it could be the responsibility of the observer to call get on the subject.</p>
+</div></div></div></div></body></html>
