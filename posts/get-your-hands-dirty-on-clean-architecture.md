@@ -29,3 +29,35 @@ The domain code shouldn't have dependencies; instead, all depdencies point towar
 
 ![Dependency Inversion](/images/di.png)
 ![Hexagonal Architecture](/images/hexarch.png)
+
+### Organizing Code
+
+Traditional package structure is just a nice-looking facade for an unstructured mess of code - classes in one package import classes from other packages that should not be imported.
+```
+app
+    /domain
+    /persistence
+    /web
+```
+
+Organizing by feature - allows enforcing access via package-private visibility for classes. Don't allow broad services (ie use SendMoneyService vs AccountService).
+
+```
+app
+    /feature1
+        /adapter
+            /in
+                /web
+            /out
+                /persistence
+        /domain
+        /application
+            <services go here>
+            /port
+                /in
+                    <use cases go here>
+                /out
+    /feature2
+```
+
+![Package structure](/images/hexarchpackages.png)

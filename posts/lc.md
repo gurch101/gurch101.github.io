@@ -1,13 +1,10 @@
 ---
-title: Leetcode
+title: LeetCode
 date: 2021-10-10
-description: Leetcode Review
+description: LeetCode Review
 category: summary
 type: notes
 ---
-
-
-# LeetCode
 
 ### Two Sum
 
@@ -131,3 +128,23 @@ return newHead;
 ### Set Matrix Zeroes
 
 use first row/col as indicator whether row/col should be made zero. Keep track of whether the first col/row should be made zero. Create helper functions to make row/col by index zero.
+
+### Max SubArray
+
+```js
+var maxSubArray = function(nums) {
+    maxSum = nums[0];
+    curSum = maxSum;
+    i = 1;
+    while(i < nums.length) {
+        curSum = Math.max(nums[i], curSum + nums[i]);
+        maxSum = Math.max(maxSum, curSum);
+        i++;
+    }
+    return maxSum;
+};
+```
+
+### Max Depth of Binary Tree
+
+recursion - max(maxDepth of left, maxDepth of right) + 1

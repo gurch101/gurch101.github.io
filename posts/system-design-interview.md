@@ -173,3 +173,44 @@ Solutions:
 - removed node: go anti-clockwise from removed node until server is found and redistribute to next node
 
 used to deal with celebrity problem by making sure celebrity data is more evenly distributed.
+
+### Chapter 6: Design a Key-Value Store
+
+Understand the problem - read/write/memory usage, size of key-value pair, HA, automatic scaling
+
+Single server - use an in-memory hash table - optimize by compressing data and only storing frequently used data in memory and the rest on disk. Limitations on capacity.
+
+distributed hash table:
+CAP theorem: System can only have two of the following.
+- Consistency: all clients see the same data at the same time no matter which node they connect to
+- Availability: any client which requests data gets a response even if some of the nodes are down
+- Partition Tolerance: System continues to operate despite network partition  (three nodes - data is written to two but not replicated to third, data written to third isn't replicated to other two)
+
+If consistency is chosen over availability, must block all write operations to avoid data inconsistency.
+
+if availability is chosen over consistency, the system keeps accepting reads even though it might return stale data and n1/n2 keep accepting writes. Writes will be replicated to n3 once its back up.
+
+Data is partitioned using consistent hashing using a hash ring. Pros: automatic scaling depending on load, the number of virtual nodes for a server is proportional to the server capacity.
+
+Data is replicated asynchronously over N servers - chose first N servers from key placement.
+
+Quorum consistency:
+- For a write operation to be considered as successful, write operation must be acknowledged by W replicas
+- For a read operation, read operations must wait for responses from R replicas.
+
+Configuration of W, R, N is a tradeoff between latency and consistency. 
+
+If R = 1, W = N, system optimized for fast reads
+If W = 1, R = N, system optimized for fast writes
+Strong consistency is guaranteed if W + R > N (usually N = 3, W = R = 2).
+
+Strong consistency - reads always return most up-to-date val (force replica to not accept new reads/writes until every replica has agreed on current write).
+Weak consistency - reads might not always return up-to-date val.
+Eventual consistency - Given enough time, all updates are propagated and all replicas are consistent.
+
+Inconsistency resolution using versioning
+vector clock - [server, version] pair associated with a data item that can be used to check if one version precedes, succeeds, or is in conflict with others.
+When data item D is written to server Si, vi needs to be incremented in [Si, vi] or [Si, 1] needs to be created
+
+Failure handling
+- need at least two independent sources of info to mark a server as down. All-to-all multicasting makes all servers talk to one another. Gossip protocol - each node mas a list of members and heartbeat counters. Each node sends heartbeats to random nodes. Updated list is sent to a set of random nodes. If heartbeat has not increased for more than predefined periods, the member is considered offline.
