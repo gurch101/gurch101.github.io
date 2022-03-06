@@ -1,5 +1,4 @@
-<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Leetcode | Gurchet&#x27;s Development Blog</title><meta name="description" content="Leetcode Review"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/51dd2ece2d2e2902880b.css" as="style"/><link rel="stylesheet" href="/_next/static/css/51dd2ece2d2e2902880b.css" data-n-g=""/><link rel="preload" href="/_next/static/css/da823d5520371b52ce1f.css" as="style"/><link rel="stylesheet" href="/_next/static/css/da823d5520371b52ce1f.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Leetcode</h1><div class="meta"><span>Sat Oct 09 2021</span><span>summary</span></div><div class="mt25 post"><h1>LeetCode</h1>
-<h3>Two Sum</h3>
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>LeetCode | Gurchet&#x27;s Development Blog</title><meta name="description" content="LeetCode Review"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/51dd2ece2d2e2902880b.css" as="style"/><link rel="stylesheet" href="/_next/static/css/51dd2ece2d2e2902880b.css" data-n-g=""/><link rel="preload" href="/_next/static/css/da823d5520371b52ce1f.css" as="style"/><link rel="stylesheet" href="/_next/static/css/da823d5520371b52ce1f.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">LeetCode</h1><div class="meta"><span>Sat Oct 09 2021</span><span>summary</span></div><div class="mt25 post"><h3>Two Sum</h3>
 <p>Use a map to store the the index of each number, check if remainder exists.</p>
 <h3>Sum Without Arithmetic Operators</h3>
 <p>&#x26; tells you bitwise carry, ^ tells you bitwise sum, set y to carry &#x3C;&#x3C; 1, continue until y = 0</p>
@@ -90,4 +89,19 @@ oldHead <span class="token operator">=</span> curr<span class="token punctuation
 </code></pre></div>
 <h3>Set Matrix Zeroes</h3>
 <p>use first row/col as indicator whether row/col should be made zero. Keep track of whether the first col/row should be made zero. Create helper functions to make row/col by index zero.</p>
+<h3>Max SubArray</h3>
+<div class="remark-highlight"><pre class="language-js"><code class="language-js"><span class="token keyword">var</span> <span class="token function-variable function">maxSubArray</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">nums</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    maxSum <span class="token operator">=</span> nums<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    curSum <span class="token operator">=</span> maxSum<span class="token punctuation">;</span>
+    i <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword control-flow">while</span><span class="token punctuation">(</span>i <span class="token operator">&#x3C;</span> nums<span class="token punctuation">.</span><span class="token property-access">length</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        curSum <span class="token operator">=</span> <span class="token known-class-name class-name">Math</span><span class="token punctuation">.</span><span class="token method function property-access">max</span><span class="token punctuation">(</span>nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> curSum <span class="token operator">+</span> nums<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        maxSum <span class="token operator">=</span> <span class="token known-class-name class-name">Math</span><span class="token punctuation">.</span><span class="token method function property-access">max</span><span class="token punctuation">(</span>maxSum<span class="token punctuation">,</span> curSum<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        i<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword control-flow">return</span> maxSum<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div>
+<h3>Max Depth of Binary Tree</h3>
+<p>recursion - max(maxDepth of left, maxDepth of right) + 1</p>
 </div></div></div></div></body></html>
