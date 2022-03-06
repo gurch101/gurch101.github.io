@@ -1,3 +1,12 @@
+---
+title: Leetcode
+date: 2021-10-10
+description: Leetcode Review
+category: summary
+type: notes
+---
+
+
 # LeetCode
 
 ### Two Sum
