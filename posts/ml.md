@@ -73,6 +73,8 @@ melb_preds = forest_model.predict(val_X)
 print(mean_absolute_error(val_y, melb_preds))
 ```
 
+# Pandas
+
 ### I/O
 
 ```py
@@ -84,7 +86,7 @@ output = pd.DataFrame({'Id': test_data.Id,
 output.to_csv('submission.csv', index=False)
 ```
 
-### Pandas
+### Common Operations 
 
 ```py
 import pandas as pd
@@ -172,6 +174,32 @@ countries_reviewed.sort_values(by='len', ascending=False)
 countries_reviewed.sort_values(by=['country', 'len'])
 
 best_rating_per_price = reviews.groupby('price')['points'].max().sort_index()
+
+# strings are of type object
+reviews['col name'].dtype
+# data frame of column -> type
+reviews.dtypes
+# cast column to another type
+reviews['col name'].astype('float64')
+# get all reviews with null column
+reviews[pd.isnull(reviews['country'])]
+reviews.country.fillna('some val')
+reviews.country.replace('from', 'to')
+
+reviews.rename(columns={'country': 'somethingelse'})
+
+
+# put labels on each axis
+reviews.rename_axis("wines", axis='rows').rename_axis("fields", axis='columns')
+
+# combine rows of df1 and df2 in new df
+pd.concat([df1, df2])
+
+left = canadian_youtube.set_index(['title', 'trending_date'])
+right = british_youtube.set_index(['title', 'trending_date'])
+
+left.join(right, lsuffix='_CAN', rsuffix='_UK')
+powerlifting_combined = powerlifting_meets.set_index("MeetID").join(powerlifting_competitors.set_index("MeetID"))
 ```
 
 
@@ -179,3 +207,5 @@ next:
 https://developers.google.com/machine-learning/crash-course
 
 https://course.fast.ai/
+
+https://courses.dataschool.io/

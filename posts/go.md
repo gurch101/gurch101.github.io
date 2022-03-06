@@ -85,7 +85,7 @@ names are exported if they begin with a capital letter. Otherwise, names are pri
 
 Create a module
 
-```sh
+```bash
 go mod init gurch101.com/modname
 ```
 
@@ -93,7 +93,7 @@ go mod init gurch101.com/modname
 
 Compile and run go program
 
-```sh
+```bash
 go run <prog.go>
 ```
 
