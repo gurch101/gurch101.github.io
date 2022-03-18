@@ -148,3 +148,173 @@ var maxSubArray = function(nums) {
 ### Max Depth of Binary Tree
 
 recursion - max(maxDepth of left, maxDepth of right) + 1
+
+### Coin Change
+
+given a bag of coins and an amount, find the minimum number of coins needed to make amount where dupe coins are allowed.
+
+dp problem where you keep track of min number of coins for each amount 0 to amount
+
+```js
+var coinChange = function(coins, amount) {
+    const dp = [0];
+    for(let i = 1; i < amount +  1; i++) {
+        dp.push(Number.MAX_VALUE);
+    }
+    
+    for(let i = 1; i < amount + 1; i++) {
+        for(let j = 0; j < coins.length; j++) {
+            if(coins[j] <= i) {
+                dp[i] = Math.min(dp[i], dp[i - coins[j]] + 1);
+            }
+        }
+    }
+    if(dp[amount] === Number.MAX_VALUE) return -1;
+    return dp[amount];
+};
+```
+
+### Insert Interval
+
+```java
+class Solution {
+    public int[][] insert(int[][] intervals, int[] newInterval) {
+        ArrayList<int[]> ans=new ArrayList<>();
+        
+        //Add all pairs less than newInterval
+        int i=0;
+        for(i=0;i<intervals.length;i++){
+            if(intervals[i][0]<newInterval[0]){
+                ans.add(intervals[i]);
+            }
+            else{
+                break;
+            }
+        }
+        
+        
+        // I have come here that means i have found the position to add newInterval
+        
+        //CASE 1 --> When newInterval is the first element to get added in ans or it is not merging with any element
+        if(ans.size()==0 || (newInterval[0]>ans.get(ans.size()-1)[1])){
+            ans.add(newInterval);
+        }
+        else{
+            //merging
+            int[] lastinterval=ans.get(ans.size()-1);
+            lastinterval[1]=Math.max(lastinterval[1],newInterval[1]);
+        }
+        
+        // CASE 2--> Now since newIterval has been added but the remaining intervals are left so lets add them up in ans
+        
+        while(i<intervals.length){
+              int[] lastInterval=ans.get(ans.size()-1);
+              if(lastInterval[1]>=intervals[i][0]){
+                  //merging
+               lastInterval[1]=Math.max(lastInterval[1],intervals[i][1]);
+              }
+              else{
+                      ans.add(intervals[i]);
+              }
+            i++;
+        }
+        return ans.toArray(new int[ans.size()][]);
+    }
+}
+```
+### Linked List Cycle
+
+use fast and slow pointer. Proof - if fast is one behind, it will equal slow on next iteration; fast can't be one ahead because they would've been on the same node on the previous iteration.
+
+### Spiral Matrix
+
+maintain count of num visited - loop until all visited (matrix.length * matrix[0].length), maintain flags for direction and min/max indices for range
+
+### Length of longest non-repeating substring
+
+keep track of start and index of most recent occurence of char
+
+```js
+var lengthOfLongestSubstring = function(s) {
+    var start = 0;
+    var cur = 0;
+    var maxLength = 0;
+    var length = 0;
+    var indices = {};
+    while(cur < s.length) {
+        // if we haven't encountered the char, increment length
+        // or if we encountered the char outside the start of the window, increment length
+        if(indices[s[cur]] === undefined || indices[s[cur]] < start) {
+            length++;
+        } else {
+            maxLength = Math.max(maxLength, length);
+            // new start is 1 + last occurence of char
+            start = indices[s[cur]] + 1;
+            // +1 since we have zero based indices
+            length = cur - start + 1;
+        }
+        indices[s[cur]] = cur;
+        cur++;
+    }
+    return Math.max(maxLength, length);
+}
+```
+
+### Missing Number
+
+summation formula OR iterate from 1 - n: total += i - this is still O(n).
+
+### Max Product
+
+iterate in both directions, keep track of max, reset running product whenever zero is encountered
+
+```js
+var maxProduct = function(nums) {
+
+    let max = nums[0];
+    if(nums.length === 1) return max;
+    
+    let product = 1;
+    for(let i = 0; i < nums.length; i++) {
+        product *= nums[i];
+        max = Math.max(max, product);
+        if(nums[i] === 0) product = 1;
+    }
+    
+    product = 1;
+    for(let i = nums.length - 1; i >= 0; i--) {
+        product *= nums[i];
+        max = Math.max(max, product);
+        if(nums[i] === 0) product = 1;
+    }
+    return max;
+};
+```
+
+### Find Minimum in Rotated Sorted Array
+
+use binary search, check if on pivot point, return val, else check if pivot is in the left or the right.
+
+```js
+var findMin = function(nums) {
+    let lo = 0;
+    let hi = nums.length - 1;
+    let mid = Math.floor(nums.length / 2);
+    let minVal = nums[mid];
+    while(lo < hi) {
+        mid = lo + Math.floor((hi - lo) / 2);
+        minVal = Math.min(minVal, nums[mid]);
+        if(mid + 1 < nums.length && nums[mid + 1] <= minVal) {
+            return nums[mid + 1];
+        } else {
+            if(nums[mid] > nums[hi]) {
+                lo = mid;
+            } else {
+                hi = mid;
+            }
+        }
+    }
+    
+    return minVal;
+};
+```

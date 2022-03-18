@@ -51,13 +51,26 @@ app
             /out
                 /persistence
         /domain
+            Account
         /application
-            <services go here>
+            SendMoneyService
+            GetAccountBalanceService
             /port
                 /in
-                    <use cases go here>
+                    SendMoneyUseCase
+                    SendMoneyCommand
+                    GetAccountBalanceQuery
                 /out
+                    LoadAccountPort
     /feature2
 ```
 
 ![Package structure](/images/hexarchpackages.png)
+
+### Implementing a Use Case
+
+- don't put input validation in input adapters since multiple adapters may consume use case. Instead, put validation in the input model. Each use case should have a dedicated input model.
+- business rule validation should go in the domain entities (rich domain model) or in the use case code itself (anemic domain model).
+- use cases should return as little data as possible. Return types should be isolated from other use cases.
+
+![Use Case](/images/usecase.png)
