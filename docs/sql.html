@@ -4,5 +4,49 @@
 <span class="token keyword">select</span> <span class="token operator">*</span> <span class="token keyword">from</span> movies <span class="token keyword">where</span> title <span class="token operator">like</span> <span class="token string">"Toy Story _"</span> <span class="token comment"># any single character</span>
 <span class="token keyword">SELECT</span> <span class="token keyword">DISTINCT</span> director <span class="token keyword">FROM</span> movies <span class="token keyword">ORDER</span> <span class="token keyword">BY</span> director<span class="token punctuation">;</span>
 <span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> movies <span class="token keyword">ORDER</span> <span class="token keyword">BY</span> title <span class="token keyword">LIMIT</span> <span class="token number">5</span> <span class="token keyword">OFFSET</span> <span class="token number">5</span><span class="token punctuation">;</span>
+
+<span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> movies <span class="token keyword">INNER</span> <span class="token keyword">JOIN</span> boxoffice <span class="token keyword">ON</span> movies<span class="token punctuation">.</span>id <span class="token operator">=</span> boxoffice<span class="token punctuation">.</span>movie_id <span class="token keyword">WHERE</span> boxoffice<span class="token punctuation">.</span>international_sales <span class="token operator">></span> boxoffice<span class="token punctuation">.</span>domestic_sales<span class="token punctuation">;</span>
+<span class="token keyword">SELECT</span> <span class="token operator">*</span> <span class="token keyword">FROM</span> movies <span class="token keyword">INNER</span> <span class="token keyword">JOIN</span> boxoffice <span class="token keyword">ON</span> movies<span class="token punctuation">.</span>id <span class="token operator">=</span> boxoffice<span class="token punctuation">.</span>movie_id <span class="token keyword">ORDER</span> <span class="token keyword">BY</span> boxoffice<span class="token punctuation">.</span>rating <span class="token keyword">DESC</span><span class="token punctuation">;</span>
+
+<span class="token comment"># find all buildings that have employees</span>
+<span class="token keyword">SELECT</span> <span class="token keyword">distinct</span><span class="token punctuation">(</span>building_name<span class="token punctuation">)</span> <span class="token keyword">FROM</span> buildings <span class="token keyword">join</span> employees <span class="token keyword">on</span> buildings<span class="token punctuation">.</span>building_name <span class="token operator">=</span> employees<span class="token punctuation">.</span>building<span class="token punctuation">;</span>
+
+<span class="token comment"># list all buildings and distinct employee roles including empty buildings</span>
+<span class="token keyword">SELECT</span> <span class="token keyword">distinct</span> building_name<span class="token punctuation">,</span> role <span class="token keyword">FROM</span> buildings <span class="token keyword">left</span> <span class="token keyword">join</span> employees <span class="token keyword">on</span> buildings<span class="token punctuation">.</span>building_name <span class="token operator">=</span> employees<span class="token punctuation">.</span>building<span class="token punctuation">;</span>
+
+<span class="token comment"># find all employees not assigned a building</span>
+<span class="token keyword">SELECT</span> name<span class="token punctuation">,</span> role <span class="token keyword">FROM</span> employees <span class="token keyword">WHERE</span> building <span class="token operator">IS</span> <span class="token boolean">NULL</span><span class="token punctuation">;</span>
+
+<span class="token comment"># find all buildings that hold no employees</span>
+<span class="token keyword">SELECT</span> building_name <span class="token keyword">FROM</span> buildings <span class="token keyword">left</span> <span class="token keyword">join</span> employees <span class="token keyword">on</span> employees<span class="token punctuation">.</span>building <span class="token operator">=</span> buildings<span class="token punctuation">.</span>building_name <span class="token keyword">where</span> building <span class="token operator">is</span> <span class="token boolean">null</span><span class="token punctuation">;</span>
+
+<span class="token comment"># find the average years employed for each role</span>
+<span class="token keyword">SELECT</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token function">AVG</span><span class="token punctuation">(</span>years_employed<span class="token punctuation">)</span> <span class="token keyword">FROM</span> employees <span class="token keyword">group</span> <span class="token keyword">by</span> role<span class="token punctuation">;</span>
+
+<span class="token comment"># find the number of employees for each role</span>
+<span class="token keyword">SELECT</span> role<span class="token punctuation">,</span> <span class="token function">COUNT</span><span class="token punctuation">(</span><span class="token operator">*</span><span class="token punctuation">)</span> <span class="token keyword">FROM</span> employees <span class="token keyword">group</span> <span class="token keyword">by</span> role<span class="token punctuation">;</span>
+
+<span class="token comment"># find total sales for each director</span>
+<span class="token keyword">SELECT</span> director<span class="token punctuation">,</span> <span class="token function">sum</span><span class="token punctuation">(</span>domestic_sales <span class="token operator">+</span> international_sales<span class="token punctuation">)</span> <span class="token keyword">FROM</span> movies <span class="token keyword">JOIN</span> boxoffice <span class="token keyword">ON</span> boxoffice<span class="token punctuation">.</span>movie_id <span class="token operator">=</span> movies<span class="token punctuation">.</span>id <span class="token keyword">group</span> <span class="token keyword">by</span> Director<span class="token punctuation">;</span>
 </code></pre></div>
+<h3>Join Types</h3>
+<p>Inner join - matches rows from first table with the second table to create a row with combined columns from both tables. Only contains data that exists in both tables. Default join type.</p>
+<p>Left join - include row from first table regardless of whether a matching row is found in second table</p>
+<p>Right join - include row from second table regardless of whether a matching row is found in first table</p>
+<p>full join - include rows from both tables regardless of whether a matching row exists in either.</p>
+<p>sometimes left/right/full join is written as left outer/right outer/full outer but that is equivalent to short form.</p>
+<h3>Aggregates</h3>
+<p>COUNT/MIN/MAX/AVG/SUM</p>
+<p>use GROUP by agg col to apply aggregate function to groups of data by grouping rows that haev the same value as the column specified. Group by is executed after the where clause. can using HAVING to filter grouped rows.</p>
+<h3>Order of Execution</h3>
+<ul>
+<li>FROM/JOIN</li>
+<li>WHERE</li>
+<li>GROUP BY</li>
+<li>HAVING</li>
+<li>SELECT</li>
+<li>DISTINCT</li>
+<li>ORDER BY</li>
+<li>LIMIT/OFFSET</li>
+</ul>
 </div></div></div></div></body></html>

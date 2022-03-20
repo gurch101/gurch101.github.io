@@ -50,4 +50,18 @@
 <li>use cases should return as little data as possible. Return types should be isolated from other use cases.</li>
 </ul>
 <p><img src="/images/usecase.png" alt="Use Case"></p>
+<h3>Implementing a Web Adapter</h3>
+<p>Web adapters take requests from the outside and translates them into calls to our application core. Control flow goes from controllers in the web adapter to the services in the app layer.</p>
+<p><img src="/images/webadapter.png" alt="Web Adapter"></p>
+<p>Responsibilities:</p>
+<ul>
+<li>Map HTTP request to native objects</li>
+<li>Perform auth checks</li>
+<li>Validate input (ensure input model can be translated to use case model)</li>
+<li>Map input to the input model of the use case</li>
+<li>Call use case</li>
+<li>Map output of the use case back to HTTP</li>
+<li>Return HTTP response</li>
+</ul>
+<p>Create a separate controller for each operation, don't reuse input objects (ie create endpoint/update endpoint probably differ by an id attribute only but that is okay). Consider putting each controller and its input objects into a package and making the input objects private to discourage re-use.</p>
 </div></div></div></div></body></html>
