@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>HTTP Header Review | Gurchet&#x27;s Development Blog</title><meta name="description" content="HTTP Header Summary"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/51dd2ece2d2e2902880b.css" as="style"/><link rel="stylesheet" href="/_next/static/css/51dd2ece2d2e2902880b.css" data-n-g=""/><link rel="preload" href="/_next/static/css/da823d5520371b52ce1f.css" as="style"/><link rel="stylesheet" href="/_next/static/css/da823d5520371b52ce1f.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">HTTP Header Review</h1><div class="meta"><span>Sat Oct 09 2021</span><span>summary</span></div><div class="mt25 post"><h3>Content-Security-Policy</h3>
+<p><code>Content-Security-Policy: \&#x3C;policy-directive\>; \&#x3C;policy-directive\></code></p>
+<p>control resources the user agent is allowed to load for a given page by specifying server origins and script endpoints. Helps guard against cross-site scripting attacks.</p>
+<p>Can control image/script/style/font sources, iframes. Can also upgrade-insecure-requests to instruct the user agent to use https for all http urls.</p>
+<p>connect-src: what ajax/websockets can do
+font-src: @font-face
+default-src/script-src/style-src/img-src/media-src/frame-src
+form-action (form actions) /child-src (iframe)</p>
+<p>frame-ancestors 'none' is roughly equivalent to X-Frame-Options: DENY</p>
+<p>navigate-to to control where a website can go via links or window.location</p>
+<p>Use Content-Security-Policy-Report-Only: report-to /some-endpoint so that policy failures are logged</p>
+<p>Possible values:</p>
+<ul>
+<li>none: prevent loading resource from any source</li>
+<li>self: allow from same scheme + host + port</li>
+<li>data: allow loading via data urls</li>
+<li>&#x3C;domain.com>: allow loading from given domain</li>
+<li>*.domain.com: allow loading from any subdomain</li>
+<li>https: allow loading from https only</li>
+<li>unsafe-inline: allow running inline source</li>
+</ul>
+<p>example:</p>
+<p>default-src 'self' = allow everything but only from same origin</p>
+<div class="remark-highlight"><pre class="language-http"><code class="language-http"><span class="token header-name keyword">Content-Security-Policy:</span> default-src 'self' cdn.example.com; connect-src 'self'
+</code></pre></div>
+<h3>Strict-Transport-Security: max-age=31536000; includeSubDomains</h3>
+<p>Ensure site is only accessed through https. http is auto upgraded.</p>
+</div></div></div></div></body></html>
