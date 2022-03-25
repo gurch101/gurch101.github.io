@@ -318,3 +318,167 @@ var findMin = function(nums) {
     return minVal;
 };
 ```
+
+### Search in Rotated Sorted Array
+
+```js
+ */
+var isRotationOnLeft = function(nums, lo, mid, hi) {
+    return nums[mid] < nums[lo];
+}
+var isRotationOnRight = function(nums, lo, mid, hi) {
+    return nums[mid] > nums[hi];
+}
+
+var search = function(nums, target) {
+    let lo = 0;
+    let hi = nums.length - 1;
+    let mid = Math.floor((hi - lo) / 2)
+    if(nums.length === 1) return nums[0] === target? 0 : -1;
+    while(lo <= hi) {
+        mid = lo + Math.floor((hi - lo) / 2);
+        if(nums[mid] === target) return mid;
+        if(isRotationOnLeft(nums, lo, mid, hi)) {
+            if(target <= nums[hi] && target > nums[mid]) {
+                lo = mid + 1;
+            } else {
+                hi = mid - 1;
+            }
+        } else if(isRotationOnRight(nums, lo, mid, hi)) {
+            if(target >= nums[lo] && target < nums[mid]) {
+                hi = mid - 1;
+            } else {
+                lo = mid + 1;
+            }
+        } else if(target > nums[mid]) {
+            lo = mid + 1;
+        } else {
+            hi = mid - 1;
+        }
+    }
+    return -1;
+};
+```
+
+### 3Sum
+
+traps: javascript sort casts each element to string before sorting!
+
+```js
+var threeSum = function(nums) {
+    var sums = {};
+    var triplets = [];
+    var uniques = {};
+    nums.sort((a, b) => a - b);
+    for(let i = 0; i < nums.length; i++) {
+        const firstNum = nums[i];
+        let start = i + 1;
+        let end = nums.length - 1;
+        while(start < end && start < nums.length) {
+            const sum = firstNum + nums[start] + nums[end];
+            if(sum === 0) {
+                if(uniques[firstNum + " " + nums[start] + " " + nums[end]] === undefined) {
+                    triplets.push([firstNum, nums[start], nums[end]]);
+                    uniques[firstNum + " " + nums[start] + " " + nums[end]] = true;
+                }
+                start++;
+                end--;
+            } else if(sum < 0) {
+                start++;
+            } else {
+                end--;
+            }
+        }
+    }
+    return triplets;
+};
+```
+
+### Container with most water
+
+two pointers in an array
+
+```js
+var maxArea = function(height) {
+    let curMax = 0;
+    let lo = 0;
+    let hi = height.length - 1;
+    while(lo < hi) {
+        const curHeight = Math.min(height[lo], height[hi]);
+        const curLength = hi - lo;
+        curMax = Math.max(curMax, curHeight * curLength);
+        // keep the tallest side fixed
+        // if we kept the shortest side fixed, we would have a shorter height and shorter width which is guaranteed less that curMax
+        if(height[lo] > height[hi]) {
+            hi--;
+        } else {
+            lo++;
+        }
+    }
+    
+    return curMax;
+};
+```
+
+### Reverse Bits
+
+num >>> 0 gets twos complement of a negative number
+
+```js
+var reverseBits = function(n) {
+    let rev = 0;
+    let bit = 0;
+    while(bit < 32) {
+        if(n & (1 << bit)) {
+            rev |= (1 << (31 - bit));
+        }
+        bit++;
+    }
+    return rev >>> 0;
+};
+```
+
+### Course Schedule
+
+```js
+var canFinish = function(numCourses, prerequisites) {
+    let g = {};
+    let inboundCts = {};
+    let toVisit = [];
+    // build graph
+    for(let i = 0; i < prerequisites.length; i++) {
+        const [to, from] = prerequisites[i];
+        g[from] = g[from] || [];
+        g[from].push(to);
+        g[to] = g[to] || [];
+        inboundCts[to] = inboundCts[to] || 0;
+        inboundCts[to]++;
+    }
+    // initial nodes to visit are those with no pre-reqs
+    const nodes = Object.keys(g);
+    for(let i = 0; i < nodes.length; i++) {
+        if(inboundCts[nodes[i]] === undefined) {
+            toVisit.push(nodes[i]);
+        }
+    }
+    let numVisited = 0;
+    while(toVisit.length > 0) {
+        const n = toVisit.pop();
+        numVisited++;
+        for(let i = 0; i < g[n].length; i++) {
+            const neighbor = g[n][i];
+            inboundCts[neighbor]--;
+            if(inboundCts[neighbor] === 0) {
+                toVisit.push(neighbor);
+            }
+        }
+    }
+    // count those without any pre-reqs as visited
+    for(let i = 0; i < numCourses; i++) {
+        if(g[i] === undefined) {
+            numVisited++;
+        }
+    }
+    return numVisited === numCourses;
+};
+```
