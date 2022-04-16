@@ -6,6 +6,10 @@ category: typescript
 type: post 
 ---
 
+<div style="font-size: 1.25rem; font-weight: 300; border: 1px solid rgba(0, 0, 0, 0.2); border-radius: 3px; padding: 5px">
+tl;dr? Try out the tester here: <a href="/apps/wt/index.html">Wordle Tester</a>
+</div>
+
 I used to play a game called Mastermind when I was in elementary school. The rules are simple:
 
 1. One player is the code breaker, the other is the code maker
@@ -28,3 +32,5 @@ When Mastermind was released, computer scientists, mathematicians, and hobbyists
 **IFrames have a `sandbox` attribute that lets you control what it can do**. It turns out you can restrict what iframes can do on your site using the `sandbox` attribute. If you using `sandbox=""`, the iframed content is effectively treated as a static site - no javascript, no form submissions, no popups, and no browser-level site redirections are allowed. I used `allow-scripts` to embed the users solver code and `allow-same-origin` so that I can execute it from the host site.
 
 **Vanilla Javascript is great**. While my site isn't entirely vanilla (I use ES modules and typescript), I chose not to use any view library and instead coded directly against the DOM to keep in the spirit of the original game. With template literals, the jquery-like `querySelector`, and the ability to run tests using jsdom, I rarely felt like I was missing out on features provided by react and its ilk. The entire site being 111kb uncompressed is a nice bonus (103kb is the word list, the actual code for the site is just 8kb).
+
+**I'm still horrible at CSS**. The memes are true - after a decade as a dev, I still google how to center things. Thank goodness for Bootstrap/tailwind.
