@@ -1,0 +1,121 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>React | Gurchet&#x27;s Development Blog</title><meta name="description" content="React Summary"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">React</h1><div class="meta"><span>Sat Oct 02 2021</span><span>summary</span></div><div class="mt25 post"><ul>
+<li>favor functional components since they have no lifecycle methods, constructors, or boilerplate.</li>
+<li>always name components/functions since it helps when reading the error stack</li>
+<li>rather than hardcoding markup, use const config objects and loops</li>
+<li>use <code>ErrorBoundary</code> to avoid cascading failures</li>
+<li>the more props a component takes, the more reasons to re-render</li>
+<li>if a component has multiple pieces of state, use <code>useReducer</code> instead of multiple <code>useState</code> calls</li>
+</ul>
+<div class="remark-highlight"><pre class="language-js"><code class="language-js"><span class="token keyword">const</span> <span class="token constant">TYPES</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token constant">SMALL</span><span class="token operator">:</span> <span class="token string">'small'</span><span class="token punctuation">,</span>
+  <span class="token constant">MEDIUM</span><span class="token operator">:</span> <span class="token string">'medium'</span><span class="token punctuation">,</span>
+  <span class="token constant">LARGE</span><span class="token operator">:</span> <span class="token string">'large'</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">const</span> initialState <span class="token operator">=</span> <span class="token punctuation">{</span>
+  isOpen<span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+  type<span class="token operator">:</span> <span class="token constant">TYPES</span><span class="token punctuation">.</span><span class="token constant">LARGE</span><span class="token punctuation">,</span>
+  phone<span class="token operator">:</span> <span class="token string">''</span><span class="token punctuation">,</span>
+  email<span class="token operator">:</span> <span class="token string">''</span><span class="token punctuation">,</span>
+  error<span class="token operator">:</span> <span class="token keyword null nil">null</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">const</span> <span class="token function-variable function">reducer</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token parameter">state<span class="token punctuation">,</span> action</span><span class="token punctuation">)</span> <span class="token arrow operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword control-flow">switch</span> <span class="token punctuation">(</span>action<span class="token punctuation">.</span><span class="token property-access">type</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token spread operator">...</span>
+    <span class="token keyword module">default</span><span class="token operator">:</span>
+      <span class="token keyword control-flow">return</span> state
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function"><span class="token maybe-class-name">Component</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>state<span class="token punctuation">,</span> dispatch<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useReducer</span><span class="token punctuation">(</span>reducer<span class="token punctuation">,</span> initialState<span class="token punctuation">)</span>
+
+  <span class="token keyword control-flow">return</span> <span class="token punctuation">(</span>
+    <span class="token spread operator">...</span>
+  <span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+</code></pre></div>
+<ul>
+<li>group components by route/module rather than container/component. State should live close to the component using it. Container/component model encourages few components to hold most state. Put UI components in a common module.</li>
+<li>use absolute paths instead of relative paths to enable easy project structure changes.</li>
+<li>watch the bundle size. Don't ship a single JS bundle. Split by route.</li>
+</ul>
+<h3>SWR</h3>
+<p>Data is bound to the components that need the data, components are independent of one another. Only 1 request is sent to the API - SWR caches by key, request is deduped, cached, and shared automatically.</p>
+<div class="remark-highlight"><pre class="language-js"><code class="language-js"><span class="token keyword">const</span> <span class="token function-variable function">fetcher</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token parameter"><span class="token spread operator">...</span>args</span><span class="token punctuation">)</span> <span class="token arrow operator">=></span> <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token spread operator">...</span>args<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token method function property-access">then</span><span class="token punctuation">(</span><span class="token parameter">res</span> <span class="token arrow operator">=></span> res<span class="token punctuation">.</span><span class="token method function property-access">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token keyword">function</span> <span class="token function">useUser</span> <span class="token punctuation">(</span><span class="token parameter">id</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token punctuation">{</span> data<span class="token punctuation">,</span> error <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">useSWR</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">/api/user/</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>id<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> fetcher<span class="token punctuation">)</span>
+
+  <span class="token keyword control-flow">return</span> <span class="token punctuation">{</span>
+    user<span class="token operator">:</span> data<span class="token punctuation">,</span>
+    isLoading<span class="token operator">:</span> <span class="token operator">!</span>error <span class="token operator">&#x26;&#x26;</span> <span class="token operator">!</span>data<span class="token punctuation">,</span>
+    isError<span class="token operator">:</span> error
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// page component</span>
+
+<span class="token keyword">function</span> <span class="token function"><span class="token maybe-class-name">Page</span></span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword control-flow">return</span> <span class="token operator">&#x3C;</span>div<span class="token operator">></span>
+    <span class="token operator">&#x3C;</span><span class="token maybe-class-name">Navbar</span> <span class="token operator">/</span><span class="token operator">></span>
+    <span class="token operator">&#x3C;</span><span class="token maybe-class-name">Content</span> <span class="token operator">/</span><span class="token operator">></span>
+  <span class="token operator">&#x3C;</span><span class="token operator">/</span>div<span class="token operator">></span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// child components</span>
+
+<span class="token keyword">function</span> <span class="token function"><span class="token maybe-class-name">Navbar</span></span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword control-flow">return</span> <span class="token operator">&#x3C;</span>div<span class="token operator">></span>
+    <span class="token spread operator">...</span>
+    <span class="token operator">&#x3C;</span><span class="token maybe-class-name">Avatar</span> <span class="token operator">/</span><span class="token operator">></span>
+  <span class="token operator">&#x3C;</span><span class="token operator">/</span>div<span class="token operator">></span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function"><span class="token maybe-class-name">Content</span></span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token punctuation">{</span> user<span class="token punctuation">,</span> isLoading <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">useUser</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token keyword control-flow">if</span> <span class="token punctuation">(</span>isLoading<span class="token punctuation">)</span> <span class="token keyword control-flow">return</span> <span class="token operator">&#x3C;</span><span class="token maybe-class-name">Spinner</span> <span class="token operator">/</span><span class="token operator">></span>
+  <span class="token keyword control-flow">return</span> <span class="token operator">&#x3C;</span>h1<span class="token operator">></span><span class="token maybe-class-name">Welcome</span> back<span class="token punctuation">,</span> <span class="token punctuation">{</span>user<span class="token punctuation">.</span><span class="token property-access">name</span><span class="token punctuation">}</span><span class="token operator">&#x3C;</span><span class="token operator">/</span>h1<span class="token operator">></span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">function</span> <span class="token function"><span class="token maybe-class-name">Avatar</span></span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token punctuation">{</span> user<span class="token punctuation">,</span> isLoading <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">useUser</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token keyword control-flow">if</span> <span class="token punctuation">(</span>isLoading<span class="token punctuation">)</span> <span class="token keyword control-flow">return</span> <span class="token operator">&#x3C;</span><span class="token maybe-class-name">Spinner</span> <span class="token operator">/</span><span class="token operator">></span>
+  <span class="token keyword control-flow">return</span> <span class="token operator">&#x3C;</span>img src<span class="token operator">=</span><span class="token punctuation">{</span>user<span class="token punctuation">.</span><span class="token property-access">avatar</span><span class="token punctuation">}</span> alt<span class="token operator">=</span><span class="token punctuation">{</span>user<span class="token punctuation">.</span><span class="token property-access">name</span><span class="token punctuation">}</span> <span class="token operator">/</span><span class="token operator">></span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">/*</span>
+<span class="token comment">if fetcher needs multiple args,</span>
+<span class="token comment">useSWR(['/api/user', token], fetchWithToken)</span>
+<span class="token comment">const { data: orders } = useSWR({ url: '/api/orders', args: user }, fetcher)</span>
+<span class="token comment">*/</span>
+
+<span class="token keyword module">import</span> <span class="token imports">useSWR</span> <span class="token keyword module">from</span> <span class="token string">'swr'</span>
+
+<span class="token keyword">function</span> <span class="token function"><span class="token maybe-class-name">Profile</span></span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token punctuation">{</span> data<span class="token punctuation">,</span> mutate <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">useSWR</span><span class="token punctuation">(</span><span class="token string">'/api/user'</span><span class="token punctuation">,</span> fetcher<span class="token punctuation">)</span>
+
+  <span class="token keyword control-flow">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&#x3C;</span>div<span class="token operator">></span>
+      <span class="token operator">&#x3C;</span>h1<span class="token operator">></span><span class="token maybe-class-name">My</span> name is <span class="token punctuation">{</span>data<span class="token punctuation">.</span><span class="token property-access">name</span><span class="token punctuation">}</span><span class="token punctuation">.</span><span class="token operator">&#x3C;</span><span class="token operator">/</span>h1<span class="token operator">></span>
+      <span class="token operator">&#x3C;</span>button onClick<span class="token operator">=</span><span class="token punctuation">{</span><span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=></span> <span class="token punctuation">{</span>
+        <span class="token keyword">const</span> newName <span class="token operator">=</span> data<span class="token punctuation">.</span><span class="token property-access">name</span><span class="token punctuation">.</span><span class="token method function property-access">toUpperCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token comment">// send a request to the API to update the data</span>
+        <span class="token keyword control-flow">await</span> <span class="token function">requestUpdateUsername</span><span class="token punctuation">(</span>newName<span class="token punctuation">)</span>
+        <span class="token comment">// update the local data immediately and revalidate (refetch)</span>
+        <span class="token comment">// NOTE: key is not required when using useSWR's mutate as it's pre-bound</span>
+        <span class="token function">mutate</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token spread operator">...</span>data<span class="token punctuation">,</span> name<span class="token operator">:</span> newName <span class="token punctuation">}</span><span class="token punctuation">)</span>
+      <span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token operator">></span><span class="token maybe-class-name">Uppercase</span> my name<span class="token operator">!</span><span class="token operator">&#x3C;</span><span class="token operator">/</span>button<span class="token operator">></span>
+    <span class="token operator">&#x3C;</span><span class="token operator">/</span>div<span class="token operator">></span>
+  <span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre></div>
+<h3>Prefetching Data</h3>
+<p>Prefetch when the HTML loads.</p>
+<div class="remark-highlight"><pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>head</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>link</span> <span class="token attr-name">rel</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>preload<span class="token punctuation">"</span></span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/api/data<span class="token punctuation">"</span></span> <span class="token attr-name">as</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>fetch<span class="token punctuation">"</span></span> <span class="token attr-name">crossorigin</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>anonymous<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>head</span><span class="token punctuation">></span></span>
+</code></pre></div>
+</div></div></div></div></body></html>
