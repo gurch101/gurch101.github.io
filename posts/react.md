@@ -6,6 +6,12 @@ category: summary
 type: notes
 ---
 
+### Components
+
+A component that accepts props and returns a description of its UI
+
+### Tips
+
 - favor functional components since they have no lifecycle methods, constructors, or boilerplate.
 - always name components/functions since it helps when reading the error stack
 - rather than hardcoding markup, use const config objects and loops
@@ -43,8 +49,8 @@ function Component() {
     ...
   )
 }
-
 ```
+
 - group components by route/module rather than container/component. State should live close to the component using it. Container/component model encourages few components to hold most state. Put UI components in a common module.
 - use absolute paths instead of relative paths to enable easy project structure changes.
 - watch the bundle size. Don't ship a single JS bundle. Split by route.
@@ -132,3 +138,190 @@ Prefetch when the HTML loads.
 <link rel="preload" href="/api/data" as="fetch" crossorigin="anonymous">
 </head>
 ```
+
+### React Router
+
+```js
+<Router>
+  <Link to="/foo"></Link>
+  <Routes>
+    <Route path="/foo" element={<FooPage />}>
+  </Routes>
+</Router>
+```
+
+
+### useState
+
+When state changes, react needs to run the component functions that use that state. This differs from the class-based setState - in classes, setState accepts an object with just the properties you want to update and then merges them with the rest. The useState hook replaces the previous state value with the new value passed to the function.
+
+
+```js
+const [state, setState] = useState(initialVal);
+
+
+setState(someVal);
+
+setState(latestState => ({
+  ...latestState,
+  someVal
+}))
+```
+
+If its expensive to set `initialVal`, pass a function to `useState`
+
+```js
+const [state, setState] = useState(() => someExpensiveFunc());
+```
+
+If you need to compute next state val from current state val, pass a function to `setState`.  We need to do this because React batches updates together to ignore redundant updates.
+
+```js
+setState(state => (state + 1));
+```
+
+### useReducer
+
+When multiple state values change together, use a reducer (ie ajax - loading/error/data). A reducer function accepts a state value and an action value and returns the new state value.
+
+
+```js
+function reducer(state, action) {
+  switch(action.type) {
+    case "SET_GROUP":
+      return {
+        ...state,
+        group: action.payload,
+        bookableIndex: 0
+      }
+    case "SET_BOOKABLE":
+      return {
+        ...state,
+        bookable: action.payload
+      }
+    case "NEXT_BOOKABLE":
+      const count = state.bookables.filter(b => b.group === state.group).length;
+      return {
+        ...state,
+        bookableIndex: (state.bookableIndex + 1) % count
+      }
+    default:
+      return state;
+  }
+}
+
+
+const initialState = {
+  group: "Rooms",
+  bookableIndex: 0,
+  hasDetails: true,
+  bookables
+};
+
+// alt: const { {group, bookableIndex, bookables, hasDetails }, dispatch } = useReducer(reducer, initialState);
+const [state, dispatch] = useReducer(reducer, initialState);
+const {group, bookableIndex, bookables, hasDetails} = state;
+
+function changeGroup(e) {
+  dispatch({
+    type: "SET_GROUP",
+    payload: e.target.value
+  })
+}
+
+// if initialState needs expensive computation, getInitialState is passed someVal and should return initialState
+const [state, dispatch] = useReducer(reducer, someVal, getInitialState)
+```
+
+#### useEffect
+
+When your component has a side effect, use the `useEffect` hook. Called after rendering. Common side effects:
+- interacting with dom directly
+- working with timers
+- using local storage
+- ajax
+
+
+```js
+// run on every render
+useEffect(() => {
+
+})
+
+// run on component mount only
+useEffect(() => {
+  function handleResize() {
+    setSize({
+      width: window.innerWidth,
+      height: window.innerHeight
+    });
+  }
+
+  window.addEventListener('resize', handleResize);
+
+  // called on unmount or if the effect runs again
+  return () => window.removeEventListener('resize', handleResize);
+}, []);
+
+useEffect(() => {
+  fetch("/api/users")
+    .then(resp => resp.json())
+    .then(data => setUsers(data));
+}, []);
+
+// since react expects a cleanup function as a return value, use async internally
+useEffect(() => {
+  async function getUsers() {
+    const resp = await fetch("/api/users");
+    const data = await resp.json();
+    setUsers(data);
+  }
+
+  getUsers();
+}, [])
+
+// run when dependencies change
+useEffect(() => {
+
+}, [dep1, dep2]);
+```
+
+### useLayoutEffect
+
+Runs synchronously after React updates the DOM but before the browser repaints. Can be used to avoid flashes of changing state. Use in place of `useEffect` if you see FOUC.
+
+### useRef
+
+if you need to update state without causing a re-render, `useRef`. Useful to store timer id's, DOM element references.
+
+```js
+// ref.current will equal initialVal
+const ref = useRef(initialVal);
+
+const incRef = () => ref.current++;
+
+
+const timerRef = useRef(null);
+
+useEffect(() => {
+  timerRef.current = setInterval(() => {
+    dispatch({ type: 'NEXT_BOOKABLE' });
+  }, 3000);
+
+  return () => clearInterval(timerRef.current);
+}, []);
+
+
+const nextButtonRef = useRef();
+
+function doStuff() {
+  nextButtonRef.current.focus();
+}
+
+return (
+  <button ref={nextButtonRef}>NEXT</button>
+)
+```
+
+### useCallback
+
