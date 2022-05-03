@@ -280,7 +280,7 @@ useEffect(() => {
   getUsers();
 }, [])
 
-// run when dependencies change
+// run when dependencies change - deps can be props, state
 useEffect(() => {
 
 }, [dep1, dep2]);
@@ -323,5 +323,16 @@ return (
 )
 ```
 
+### State Management
+
+When different components use the same data to build their UI, the most explicit way to share that data is to pass it as props from parent to child. It is common to lift state up to a common ancestor to make it more widely available.
+
 ### useCallback
 
+avoid redefining callbacks with the `useCallback` hook. Functions from useState/useReducer are guaranteed to have stable identity. By default, our own functions will be re-defined on every call to the component.
+
+```js
+const stableFunction = useCallback(functionToCache, [depList]);
+```
+
+### useMemo
