@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>React | Gurchet&#x27;s Development Blog</title><meta name="description" content="React Summary"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">React</h1><div class="meta"><span>Sat Oct 02 2021</span><span>summary</span></div><div class="mt25 post"><h3>Components</h3>
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>React | Gurchet&#x27;s Development Blog</title><meta name="description" content="React Summary"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/51dd2ece2d2e2902880b.css" as="style"/><link rel="stylesheet" href="/_next/static/css/51dd2ece2d2e2902880b.css" data-n-g=""/><link rel="preload" href="/_next/static/css/da823d5520371b52ce1f.css" as="style"/><link rel="stylesheet" href="/_next/static/css/da823d5520371b52ce1f.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">React</h1><div class="meta"><span>Sat Oct 02 2021</span><span>summary</span></div><div class="mt25 post"><h3>Components</h3>
 <p>A component that accepts props and returns a description of its UI</p>
 <h3>Tips</h3>
 <ul>
@@ -239,7 +239,7 @@
   <span class="token function">getUsers</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
 
-<span class="token comment">// run when dependencies change</span>
+<span class="token comment">// run when dependencies change - deps can be props, state</span>
 <span class="token function">useEffect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=></span> <span class="token punctuation">{</span>
 
 <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">[</span>dep1<span class="token punctuation">,</span> dep2<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -275,5 +275,11 @@
   <span class="token operator">&#x3C;</span>button ref<span class="token operator">=</span><span class="token punctuation">{</span>nextButtonRef<span class="token punctuation">}</span><span class="token operator">></span><span class="token constant">NEXT</span><span class="token operator">&#x3C;</span><span class="token operator">/</span>button<span class="token operator">></span>
 <span class="token punctuation">)</span>
 </code></pre></div>
+<h3>State Management</h3>
+<p>When different components use the same data to build their UI, the most explicit way to share that data is to pass it as props from parent to child. It is common to lift state up to a common ancestor to make it more widely available.</p>
 <h3>useCallback</h3>
+<p>avoid redefining callbacks with the <code>useCallback</code> hook. Functions from useState/useReducer are guaranteed to have stable identity. By default, our own functions will be re-defined on every call to the component.</p>
+<div class="remark-highlight"><pre class="language-js"><code class="language-js"><span class="token keyword">const</span> stableFunction <span class="token operator">=</span> <span class="token function">useCallback</span><span class="token punctuation">(</span>functionToCache<span class="token punctuation">,</span> <span class="token punctuation">[</span>depList<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div>
+<h3>useMemo</h3>
 </div></div></div></div></body></html>
