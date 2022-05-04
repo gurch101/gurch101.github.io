@@ -150,6 +150,9 @@ Prefetch when the HTML loads.
 </Router>
 ```
 
+### Hooks
+
+hooks let you use state, access context, and hook into lifecycle events
 
 ### useState
 
@@ -402,6 +405,147 @@ Best practice - use separate context providers for different pieces of info to a
 Use separate contexts for a state value and its updater. When you provide `{user, setUser}`, all consumers re-render every time since its a fresh object every time. In the above case, its fine since setUser never changes but if you had a Logout button that only needed `setUser` it would make sense to split.
 
 ### Custom Hooks
+
+Lets you re-use functionality in multiple components
+
+```js
+function useDocumentTitle(title) {
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
+}
+
+// in component
+
+useDocumentTitle('foobar');
+```
+
+Hooks can call other hooks.
+
+```js
+const getRandomIndex = length => Math.floor(Math.random() & length);
+
+function useRandomTitle(titles = ["Hello"]) {
+  const [index, setIndex] = useState(() => getRandomIndex(titles.length));
+
+  useDocumentTitle(title);
+
+  return () => setIndex(getRandomIndex(titles.length));
+}
+
+// in component
+
+const nextTitle = useRandomTitle(titles);
+
+return (
+  <button onClick={nextTitle}></button>
+)
+```
+
+
+```js
+function getSize() {
+  return {
+    width: window.innerWidth,
+    height: window.innerHeight
+  };
+}
+
+function useWindowSize() {
+  const [size, setSize] = useState(getSize());
+  
+  useEffect(() => {
+    function updateSize() {
+      setSize(getSize());
+    }
+
+    window.addEventListener('resize', updateSize);
+
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+}
+
+
+const { width, height } = useWindowSize();
+```
+
+
+```js
+function useLocalStorage(key, val) {
+  const [value, setValue] = useState(val);
+
+  useEffect(() => {
+    const storedValue = window.localStorage.getItem(key);
+
+    if(storedValue) {
+      window.localStorage.setItem(key, value);
+    }
+  }, [key]);
+
+  useEffect(() => {
+    window.localStorage.setItem(key, value);
+  }, [key, val]);
+
+  return [value, setValue];
+}
+```
+
+Avoid context consumers from caring about where data comes from
+
+```js
+function useUser() {
+  const user = useContext(UserContext);
+
+  return user;
+}
+
+```
+
+
+data fetching hook
+
+```js
+function useFetch(url) {
+  const [data, setData] = useState();
+  const [error, setError] = useState();
+  const [status, setStatus] = useState();
+
+  useEffect(() => {
+    let doUpdate = true;
+
+    setStatus("loading");
+    setData(undefined);
+    setError(null);
+
+    getData(url)
+      .then(data => {
+        if(doUpdate) {
+          setData(data);
+          setStatus("success");
+        }
+      })
+      .catch(error => {
+        if(doUpdate) {
+          setError(error);
+          setStatus("error");
+        }
+      }
+
+
+      return () => doUpdate = false;
+  }, [url]);
+
+  return {data: bookables = [], error, status};
+}
+
+const {data, status, error} = useFetch(url);
+```
+
+Rules
+- names must start with `use`
+- hooks can only be called at the top level - not inside conditions, loops, or nested functions (put the logic *inside* the hook)
+- hooks can only be called from React functions (components or other hooks)
+
 
 ### Third-Party Hooks
 
