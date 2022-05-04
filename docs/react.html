@@ -228,6 +228,11 @@
     <span class="token punctuation">.</span><span class="token method function property-access">then</span><span class="token punctuation">(</span><span class="token parameter">data</span> <span class="token arrow operator">=></span> <span class="token function">setUsers</span><span class="token punctuation">(</span>data<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
+<span class="token function">useEffect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">let</span> doUpdate <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+  <span class="token function">fetch</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token method function property-access">then</span><span class="token punctuation">(</span><span class="token parameter">resp</span> <span class="token arrow operator">=></span> <span class="token keyword control-flow">if</span><span class="token punctuation">(</span>doUpdate<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+  <span class="token keyword control-flow">return</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=></span> doUpdate <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
 <span class="token comment">// since react expects a cleanup function as a return value, use async internally</span>
 <span class="token function">useEffect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=></span> <span class="token punctuation">{</span>
   <span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token function">getUsers</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
@@ -282,4 +287,64 @@
 <div class="remark-highlight"><pre class="language-js"><code class="language-js"><span class="token keyword">const</span> stableFunction <span class="token operator">=</span> <span class="token function">useCallback</span><span class="token punctuation">(</span>functionToCache<span class="token punctuation">,</span> <span class="token punctuation">[</span>depList<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 </code></pre></div>
 <h3>useMemo</h3>
+<p>avoid redoing unnecessary work if the inputs to a function are unchanged.</p>
+<div class="remark-highlight"><pre class="language-js"><code class="language-js"><span class="token keyword">const</span> <span class="token punctuation">[</span>sourceText<span class="token punctuation">,</span> setSourceText<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token string">"ball"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// passing an empty list will mean the function only runs once</span>
+<span class="token keyword">const</span> anagrams <span class="token operator">=</span> <span class="token function">useMemo</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=></span> <span class="token function">getAnagrams</span><span class="token punctuation">(</span>sourceText<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">[</span>sourceText<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> distict <span class="token operator">=</span> <span class="token function">useMemo</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=></span> <span class="token function">getDistinct</span><span class="token punctuation">(</span>anagrams<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">[</span>anagrams<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div>
+<h3>useContext</h3>
+<p>share state like themes, localization, or user details across many components using <code>useContext</code>. Should be used for rarely changing values used by many components.</p>
+<div class="remark-highlight"><pre class="language-js"><code class="language-js"><span class="token keyword">const</span> <span class="token punctuation">{</span> createContext <span class="token punctuation">}</span> <span class="token keyword module">from</span> <span class="token string">"react"</span><span class="token punctuation">;</span>
+
+<span class="token comment">// can take defaultContext as a param - default will be returned even if there is no provider</span>
+<span class="token keyword">const</span> <span class="token maybe-class-name">UserContext</span> <span class="token operator">=</span> <span class="token function">createContext</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword module">export</span> <span class="token keyword module">default</span> <span class="token maybe-class-name">UserContext</span><span class="token punctuation">;</span>
+
+<span class="token comment">// in the provider component (ie app.js/router.js)</span>
+
+<span class="token keyword">const</span> <span class="token punctuation">[</span>user<span class="token punctuation">,</span> setUser<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token operator">&#x3C;</span><span class="token maybe-class-name">UserContext</span><span class="token punctuation">.</span><span class="token property-access"><span class="token maybe-class-name">Provider</span></span> value<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">{</span>user<span class="token punctuation">,</span> setUser<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token operator">></span>
+<span class="token comment">// user can now be made available to all components in the tree - any time the user changes, the entire tree is re-rendered</span>
+<span class="token operator">&#x3C;</span><span class="token operator">/</span><span class="token maybe-class-name">UserContext</span><span class="token punctuation">.</span><span class="token property-access"><span class="token maybe-class-name">Provider</span></span><span class="token operator">></span>
+
+
+<span class="token comment">// in the consuming component</span>
+<span class="token keyword">const</span> <span class="token punctuation">{</span>user<span class="token operator">:</span> loggedInUser<span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">userContext</span><span class="token punctuation">(</span><span class="token maybe-class-name">UserContext</span><span class="token punctuation">)</span>
+</code></pre></div>
+<p>To avoid full re-renders, do this:</p>
+<div class="remark-highlight"><pre class="language-js"><code class="language-js"><span class="token keyword module">export</span> <span class="token keyword">function</span> <span class="token function"><span class="token maybe-class-name">UserProvider</span></span><span class="token punctuation">(</span><span class="token parameter"><span class="token punctuation">{</span>children<span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>user<span class="token punctuation">,</span> setUser<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token keyword null nil">null</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword control-flow">return</span> <span class="token punctuation">(</span>
+    <span class="token operator">&#x3C;</span><span class="token maybe-class-name">UserContext</span><span class="token punctuation">.</span><span class="token property-access"><span class="token maybe-class-name">Provider</span></span> value<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">{</span>user<span class="token punctuation">,</span> setUser<span class="token punctuation">}</span><span class="token punctuation">}</span><span class="token operator">></span>
+      <span class="token punctuation">{</span>children<span class="token punctuation">}</span> <span class="token comment">// react wraps children in &#x3C;Wrapper>&#x3C;/Wrapper> - this component doesn't change when setUser is called thus avoiding a re-render</span>
+    <span class="token operator">&#x3C;</span><span class="token operator">/</span><span class="token maybe-class-name">UserContext</span><span class="token punctuation">.</span><span class="token property-access"><span class="token maybe-class-name">Provider</span></span><span class="token operator">></span>
+  <span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// in the provider component</span>
+<span class="token operator">&#x3C;</span><span class="token maybe-class-name">UserProvider</span><span class="token operator">></span>
+  <span class="token comment">// components</span>
+<span class="token operator">&#x3C;</span><span class="token operator">/</span><span class="token maybe-class-name">UserProvider</span><span class="token operator">></span>
+</code></pre></div>
+<p>Above works because UserProvider accesses children as a prop and updating the state within the component doesn't change props. Since the identity doesn't change, react doesn't re-render children except for context consumers.</p>
+<p>Best practice - use separate context providers for different pieces of info to avoid unnecessary re-renders. Put the providers as close as possible to the components using them. If there are many providers, consider creating an <code>&#x3C;AppProvider></code> that wraps them all.</p>
+<p>Use separate contexts for a state value and its updater. When you provide <code>{user, setUser}</code>, all consumers re-render every time since its a fresh object every time. In the above case, its fine since setUser never changes but if you had a Logout button that only needed <code>setUser</code> it would make sense to split.</p>
+<h3>Custom Hooks</h3>
+<h3>Third-Party Hooks</h3>
+<h3>Code Splitting with Suspense</h3>
+<h3>Data Fetching with Suspense</h3>
+<h3>useTransition, useDeferredValue, SuspenseList</h3>
+<p>TODO:</p>
+<ul>
+<li>notes on react-testing-library</li>
+<li>testing components</li>
+<li>testing custom hooks</li>
+<li>testing components using context</li>
+<li>read Next.js docs</li>
+<li>https://react2025.com/</li>
+<li>https://masteringnextjs.com/</li>
+</ul>
 </div></div></div></div></body></html>
