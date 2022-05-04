@@ -269,6 +269,11 @@ useEffect(() => {
     .then(data => setUsers(data));
 }, []);
 
+useEffect(() => {
+  let doUpdate = true;
+  fetch("").then(resp => if(doUpdate) {})
+  return () => doUpdate = false;
+}, [])
 // since react expects a cleanup function as a return value, use async internally
 useEffect(() => {
   async function getUsers() {
@@ -336,3 +341,82 @@ const stableFunction = useCallback(functionToCache, [depList]);
 ```
 
 ### useMemo
+
+avoid redoing unnecessary work if the inputs to a function are unchanged.
+
+```js
+const [sourceText, setSourceText] = useState("ball");
+// passing an empty list will mean the function only runs once
+const anagrams = useMemo(() => getAnagrams(sourceText), [sourceText]);
+const distict = useMemo(() => getDistinct(anagrams), [anagrams]);
+```
+
+### useContext
+
+share state like themes, localization, or user details across many components using `useContext`. Should be used for rarely changing values used by many components.
+
+```js
+
+const { createContext } from "react";
+
+// can take defaultContext as a param - default will be returned even if there is no provider
+const UserContext = createContext();
+
+export default UserContext;
+
+// in the provider component (ie app.js/router.js)
+
+const [user, setUser] = useState();
+
+<UserContext.Provider value={{user, setUser}}>
+// user can now be made available to all components in the tree - any time the user changes, the entire tree is re-rendered
+</UserContext.Provider>
+
+
+// in the consuming component
+const {user: loggedInUser} = userContext(UserContext)
+```
+
+To avoid full re-renders, do this:
+
+```js
+export function UserProvider({children}) {
+  const [user, setUser] = useState(null);
+  return (
+    <UserContext.Provider value={{user, setUser}}>
+      {children} // react wraps children in <Wrapper></Wrapper> - this component doesn't change when setUser is called thus avoiding a re-render
+    </UserContext.Provider>
+  )
+}
+
+// in the provider component
+<UserProvider>
+  // components
+</UserProvider>
+```
+
+Above works because UserProvider accesses children as a prop and updating the state within the component doesn't change props. Since the identity doesn't change, react doesn't re-render children except for context consumers.
+
+Best practice - use separate context providers for different pieces of info to avoid unnecessary re-renders. Put the providers as close as possible to the components using them. If there are many providers, consider creating an `<AppProvider>` that wraps them all.
+
+Use separate contexts for a state value and its updater. When you provide `{user, setUser}`, all consumers re-render every time since its a fresh object every time. In the above case, its fine since setUser never changes but if you had a Logout button that only needed `setUser` it would make sense to split.
+
+### Custom Hooks
+
+### Third-Party Hooks
+
+### Code Splitting with Suspense
+
+### Data Fetching with Suspense
+
+### useTransition, useDeferredValue, SuspenseList
+
+
+TODO:
+- notes on react-testing-library
+- testing components
+- testing custom hooks
+- testing components using context
+- read Next.js docs
+- https://react2025.com/
+- https://masteringnextjs.com/
