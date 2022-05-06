@@ -129,6 +129,23 @@ function Profile () {
 }
 ```
 
+### React Query
+
+```js
+const queryClient = new QueryClient();
+
+<QueryClientProvider client={queryClient}>
+  <App/>
+</QueryClientProvider>
+
+// if initialData is not undefined, don't call server and just use initialData instead
+const { data, status, error, isLoading } = useQuery([keys], () => fetch(url), { initialData: queryClient.getQueryData([keys])});
+const queryClient = useQueryClient();
+const data = queryClient.getQueryData([keys]);
+
+const {mutate: createBookable, status, error} = useMutation(item => createItem("http://foo.com/bookables", item), { onSuccess: bookable => queryClient.setQueryData("bookables", old => [...(old || []), bookable] )})
+```
+
 ### Prefetching Data
 
 Prefetch when the HTML loads.
@@ -143,11 +160,55 @@ Prefetch when the HTML loads.
 
 ```js
 <Router>
-  <Link to="/foo"></Link>
+  <Link to="/foo" replace={true} className="btn"><span>New</span></Link>
   <Routes>
-    <Route path="/foo" element={<FooPage />}>
+    <Route path="/foo1" element={<FooPage />}>
+    <Route path="/foo2">
+      <FooPage />
+    </Route>
+    <Route path="/bar/*" element={<BarPage />}>
   </Routes>
 </Router>
+
+// BarPage.js
+
+<Routes>
+  <Route path="/:id">
+    <BarDetail />
+  </Route>
+  <Route path="/:id/edit">
+    <BarEditDetail />
+  </Route>
+</Routes>
+
+
+// BarDetail.js
+const = {id} = useParams();
+const {searchParams, setSearchParams} = useSearchParams();
+const navigate = useNavigate();
+searchParams.get("date");
+
+// replace true prevents browsers back button from cycling through query params
+setSearchParams({id, date}, {replace: true});
+function onButtonClick() {
+  navigate(`/bar/${id}/edit`);
+}
+
+// RequireAuth component
+function RequireAuth({ children }: { children: JSX.Element }) {
+  let auth = useAuth();
+  let location = useLocation();
+
+  if (!auth.user) {
+    // Redirect them to the /login page, but save the current location they were
+    // trying to go to when they were redirected. This allows us to send them
+    // along to that page after they login, which is a nicer user experience
+    // than dropping them off on the home page.
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+}
 ```
 
 ### Hooks
@@ -547,11 +608,109 @@ Rules
 - hooks can only be called from React functions (components or other hooks)
 
 
-### Third-Party Hooks
+### Concurrent Mode
+
+lets react work on multiple versions of your UI simultaneously - pausing, restarting, and discarding rendering tasks to make apps seem as responsive as possible.
 
 ### Code Splitting with Suspense
 
+For big components that don't take part in initial user interactions, should do the following:
+- load component code only when we try to render the component
+- show a placeholder while the component loads
+- continue rendering the rest of the app
+- replace the placeholder with the component after it's loaded
+
+Default dynamic imports:
+
+```js
+function onClick() {
+  import("./myBigModule")
+    .then(({ default: showMessage, sayHi }) => {
+      // default exported function
+      showMessage("foo", "Bar");
+      // named exports
+      sayHi("hello world");
+    })
+}
+```
+
+React dynamic import
+
+```js
+function CalendarWrapper() {
+  const [isOn, setIsOn] = useState(false);
+  return isOn ? <LazyCalendar> : <button onClick={() => setIsOn(true)}>Show Calendar</button>
+}
+
+// lazy is passed a function that returns a promise that resolves to a default component export. The promise is thrown and caught by the Suspense
+const LazyCalendar = lazy(() => import("./Calendar.js"));
+
+// suspense components handle pending promises that are thrown
+<Suspense fallback={<div>Loading...</div>}>
+  <CalendarWrapper/>
+</Suspense>
+```
+
+Code splitting on routes. Routes that arent lazy are just rendered.
+
+```js
+const BookablesPage = lazy(() => import("./BookablesPage"));
+
+return (
+  <Suspense fallback={<div>Loading</div>}>
+    <Routes>
+      <Route path="/foo" element={<div>Foo</div>} />
+      <Route path="/bookables/*" element={<BookablesPage/>} />
+    </Routes>
+  </Suspense>
+)
+```
+
+Error boundary components can be used to catch thrown errors
+
+```js
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return {hasError: true}
+  }
+
+  componentDidCatch(error, errorInfo) {
+    logErrorToMyService(error, errorInfo);
+  }
+
+  render() {
+    const { children, fallback = <h1>Something Went Wrong</h1> } = this.props;
+    return this.state.hasError ? fallback : children;
+  }
+}
+```
+
+Suspense and error boundary let you decouple loading/error UI from the actual component.
+
 ### Data Fetching with Suspense
+
+```js
+const { data: bookables = [] } = useQuery("bookables", () => getData("/bookables"), { suspense: true });
+
+function Img({src, alt, ...props}) {
+  const { data: imgObject } = useQuery(src, () => new Promise(resolve => (
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.src = src;
+  ), { suspense: true}));
+
+  return <img src={imgObject.src} alt={alt} {...props}/>;
+}
+
+<Suspense fallback={<img src={fallbackSrc} alt="fallback" />}>
+  <Img src={src} alt={alt} />
+</Suspense>
+```
 
 ### useTransition, useDeferredValue, SuspenseList
 
