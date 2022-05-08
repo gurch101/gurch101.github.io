@@ -91,3 +91,102 @@ Responsibilities:
 - Return HTTP response
 
 Create a separate controller for each operation, don't reuse input objects (ie create endpoint/update endpoint probably differ by an id attribute only but that is okay). Consider putting each controller and its input objects into a package and making the input objects private to discourage re-use.
+
+### Implementing a Persistence Layer
+
+Services call port interfaces to access persistence functionality. These interfaces are implemented by persistence adapters that are responsible for talking to the actual database. This layer of indirection lets you evolve domain code without thinking about persistence problems
+
+![Persistence Adapter](/images/persistence.png)
+
+Responsibilites:
+- take input
+- map input into database format (in java, domain objects to JPA entities)
+- send input to the database
+- map database output into application format
+- return output
+
+The repository should only expose methods that are needed by the service. Interface segregation principle: broad interfaces should be split into specific ones so that clients only know about methods they need. Bob Martin: "Depending on something that carries baggage you don't need can cause you troubles you didn't expect". You can have one persistence adapter that implements all persistence ports for each entity.
+
+![Persistence Context](/images/persistence-context.png)
+
+Transactions should be managed by the service since the persistence layer doesn't know which operations are part of the same use case.
+
+### Testing Architecture Elements
+
+Testing pyramid tells us that system/integration tests shouldn't focus on coverage because it will lead to too much time spent building tests.
+
+Domain entities should be tested with unit tests.
+
+Use cases should also be unit tests with mocked dependencies
+
+Web adapters should be be tested with `@WebMvcTest(controllers = ControllerUnderTest.class)` using `MockMvc`
+
+Persistence adapters should be tested with `@DataJpaTest` and explicitly `@Import({Adapter.class, Mapper.class})`.
+
+System tests should be done with `@SpringBootTest` with a `TestRestTemplate`. Only cover the most important/common parts.
+
+Test coverage alone is meaningless - test success should be measured in how comfortable the team feels shipping the software. The more often you ship, the more you trust your tests. For each production bug, ask "why didnt our tests catch this bug?", document the answer, and then add a test that covers it.
+
+### Mapping between Boundaries
+
+there are tradeoffs in using the same model in two layers of the app vs implementing a mapper.
+
+No Mapping Strategy:
+
+![No Mapping](/images/nomapping.png)
+
+Pros: no mapping needed. Good for simple CRUD use cases.
+
+Cons: Single entity will have annotations to deal with JSON serialization/request validation/database mapping. Meanwhile, the actual service layers cares about none of these things. Violates single responsibility principle.
+
+Two-Way Mapping Strategy:
+
+![Two-Way Mapping](/images/twowaymapping.png)
+
+Outer layers map into the inner domain model and back. The inner layers concentrate on domain logic and aren't responsible for mapping.
+
+Pros: Single responsibility principle is maintained since each layer has its own model which may have a structure that is completely different from the domain model.
+
+Cons: Lots of boilerplate. Debugging mapping code can be a pain especially if its hidden behind a framework of generics/reflection. Since the domain object communicates across boundaries, it is vulnerable to change required by the outer layers.
+
+Full Mapping Strategy:
+
+![Full Mapping](/images/fullmapping.png)
+
+Web layer maps to command object of app layer. Each use case has its own command.
+
+Pros: there is no guessing involved as to which fields should be filled and which fields should be left empty. The application layer maps the command object to the domain model.
+
+Cons: Even more mapping code since you are mapping into many different command objects (one per use case).
+
+
+One-Way Mapping Strategy:
+
+![One-Way Mapping](/images/onewaymapping.png)
+
+Models in all layers implement the same interface that encapsulates the state by providing getters on the relevant attributes.
+
+Domain model itself can implement rich behavior which is accessible only within the service layer.
+
+Domain object can be passed to the outer layers without mapping since the domain object implements the same state interface.
+
+Layers can then decide if they work with the interface or if they need to map it to their own model. They cannot modify the state of the domain object since the modifying behavior is not exposed by the state interface. Mapping is unnecessary at the web layer if we're dealing with a "read" operation.
+
+Pros: clear mapping responsibility - if a layer receives an object from another layer, we map it to something that layer can work with. Thus each layer only maps one way. Best if the models across the layers are similar.
+
+Cons: doesn't work if models across layers are not similar.
+
+
+Which to use:
+
+If working on a modifying use case, use full mapping between web and application layers. This gives clear per-use-case validation rules and we don't need to deal with fields we don't need in a certain use case. Use no mapping between the application and persistence layer in order to be able to quickly evolve the code without mapping overhead. Move to two-way mapping once persistence issues creep into application layer.
+
+If working on a query, start with the no mapping strategy between all layers. Move to two-way mapping once we need to deal with web/persistence issues in the app layer.
+
+### Assembling the Application
+
+We want to keep the code dependencies pointed in the right direction - all dependencies should point inwards towards the domain code so that the domain code doesn't need to change when something in the outer layers changes. Nice side effect of this is testability - all use cases only know about interfaces which are injected.
+
+Should be the responsibility of configuration components to construct concrete implementations at runtime.
+
+With Spring, use `@Component` and `@RequiredArgsConstructor` with private final dependencies on interfaces. Alternative that doesn't involve classpath scanning, use `@Configuration` classes where `@Bean` is exposed - this has the benefit of keeping spring specific annotations outside of application code. Use `@EnableJpaRepositories` to instantiate spring data repository interfaces. Keep "feature" annotations on specific config classes rather than the main application to keep test start up fast.
