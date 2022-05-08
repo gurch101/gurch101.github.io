@@ -48,14 +48,15 @@ app
         /adapter
             /in
                 /web
+                    /AccountsController (package private)
             /out
                 /persistence
-        /domain
+                    / AcoountPersistenceAdapter (package private - implements UpdateAccountStatePort)
+        /domain - domain is public
             Account
         /application
-            SendMoneyService
-            GetAccountBalanceService
-            /port
+            SendMoneyService (package private - implements SendMoneyUseCase)
+            /port - all ports are public
                 /in
                     SendMoneyUseCase
                     SendMoneyCommand
@@ -190,3 +191,39 @@ We want to keep the code dependencies pointed in the right direction - all depen
 Should be the responsibility of configuration components to construct concrete implementations at runtime.
 
 With Spring, use `@Component` and `@RequiredArgsConstructor` with private final dependencies on interfaces. Alternative that doesn't involve classpath scanning, use `@Configuration` classes where `@Bean` is exposed - this has the benefit of keeping spring specific annotations outside of application code. Use `@EnableJpaRepositories` to instantiate spring data repository interfaces. Keep "feature" annotations on specific config classes rather than the main application to keep test start up fast.
+
+### Enforcing Architecture Boundaries
+
+There is a boundary between each layer and its next inward/outward neighbor - dependencies that cross a layer boundary must always point inwards. Java visiblity modifiers don't scale to big packages since sub-packages are treeated as different packages so package-private doesn't always work.
+
+Use ArchUnit to do post-compile checks at build time.
+
+
+```java
+@Test
+void domainLayerDoesNotDependOnAppLayer() {
+    noClasses()
+        .that()
+        .resideIn("buckpal.domain")
+        .should()
+        .dependOnClassesThat()
+        .resideInPackage("buckpal.application")
+        .check(new ClassFileImporter().importPackages("buckpal.."));
+}
+```
+
+Build separate artifacts.
+
+![Multi-module project](/images/multimodule.png)
+
+### Taking Shortcuts Consciously
+
+Broken window theory - as soon as something looks rundown or damaged, people feel that it's ok to make it more rundown or damaged.
+
+Maintain [architecture decision records](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions) to consciously document added shortcuts.
+
+Common shortcuts:
+- sharing input/output models between use cases when the use cases are functionally bound and we actually want both use cases to be affected if we change a certain detail. As soon as they evolve separately from one other, separate the models even if it means to duplicate classes.
+- using the domain entity  as the input/output model for a use case.
+- skipping incoming ports to remove a layer of abstraction. Adapters are forced to know more about the internals of the application.
+- skipping the serivce and communicating directly with the persistence layer
