@@ -1,0 +1,95 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Software Architecture &amp; Technology of Large-Scale Systems | Gurchet&#x27;s Development Blog</title><meta name="description" content="Udemy course notes"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Software Architecture &amp; Technology of Large-Scale Systems</h1><div class="meta"><span>Sat May 28 2022</span><span>summary</span></div><div class="mt25 post"><p>Traditional three-tier architecture - frontend/web tier, application server/business logic, database server</p>
+<h3>Performance</h3>
+<p>A measure of how fast or responsive a system is under a given workload and given hardware.</p>
+<p>Every performance problem is the result of some queue building up somewhere. This queue builds up due to inefficient/slow processing, serial resource access (only one thing can access resource at a time ie low concurrency), or limited resource capacity.</p>
+<p>Efficiency</p>
+<ul>
+<li>resource utilization (IO/CPU)</li>
+<li>logic (algorithms, db queries)</li>
+<li>storage (db schema/indices, data structures)</li>
+<li>caching</li>
+</ul>
+<p>Concurrency</p>
+<ul>
+<li>hardware</li>
+<li>software</li>
+</ul>
+<p>Capacity</p>
+<ul>
+<li>CPU</li>
+<li>RAM</li>
+<li>Disk</li>
+<li>Network</li>
+</ul>
+<h5>Performance Objectives</h5>
+<p>Minimize request-response latency</p>
+<ul>
+<li>affects single user experience</li>
+<li>wait/idle time + processing time</li>
+</ul>
+<p>Maximize throughput</p>
+<ul>
+<li>rate of request processing</li>
+<li>affects number of users that a system can support</li>
+<li>decreasing latency and increasing capacity can increase throughput</li>
+</ul>
+<p>To visualize performance, plot request time (X) vs number of requests (Y). If there is a positive skew, the tail latency indicates requests are being queued.</p>
+<h3>Network transfer latency</h3>
+<ul>
+<li>network hops between potentially distant/unreliable servers</li>
+<li>TCP overhead - connection creation request/acknowledgement (SYN/ACK) is a round trip</li>
+<li>SSL overhead - TCP overhead + SSL hello/key exchange (2 more round trips)</li>
+</ul>
+<p>Approaches to minimize network latencies</p>
+<ul>
+<li>between client + web server (persistent connections - HTTP 1.1, static data caching)</li>
+<li>data format (gRPC/thrift for intranet/microservice communication)</li>
+<li>data compression</li>
+<li>SSL session caching</li>
+<li>session/data caching</li>
+<li>connection pooling</li>
+</ul>
+<h3>Memory access latency</h3>
+<ul>
+<li>GC execution</li>
+<li>Memory swaps when app memory exceeds physical memory</li>
+<li>finite buffer memory for db</li>
+</ul>
+<p>Approaches to minimize memory latencies</p>
+<ul>
+<li>avoid memory bloat</li>
+<li>use smallest heap as possible to minimize GC runtime</li>
+<li>multiple smaller processes are better than one large process</li>
+<li>use a purpose built GC algorithm (real-time GC for server, blocking but more efficient GC for batch processing)</li>
+<li>maximize buffer memory, normalize data, consider computation over storage (if value can be computed, compute it rather than store it)</li>
+</ul>
+<h3>Disk access latency</h3>
+<ul>
+<li>logging</li>
+<li>database</li>
+<li>web content (static files)</li>
+</ul>
+<p>Approaches to minimize disk latency</p>
+<ul>
+<li>web content caching (static files)</li>
+<li>async/batch logging (disadvantage - data loss)</li>
+<li>batch I/O</li>
+<li>query optimization</li>
+<li>db cache</li>
+<li>db indexes</li>
+<li>schema denormalization</li>
+<li>faster disk, using RAID to allow parallel reads</li>
+</ul>
+<h3>CPU latency</h3>
+<ul>
+<li>inefficient algorithms</li>
+<li>context switching - process state is saved/restored to/from memory/cpu when multiple processes are running on a computer. Also caused by I/O</li>
+</ul>
+<p>Approaches to minimize CPU latency</p>
+<ul>
+<li>async/batch I/O</li>
+<li>use a single threaded model (nginx, node.js - one thread handles request/response, other threads do I/O)</li>
+<li>thread pool should be sized appropriately to number of cores</li>
+<li>run processes in their own virtual env to ensure each process has dedicated CPU</li>
+</ul>
+</div></div></div></div></body></html>

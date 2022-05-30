@@ -1,0 +1,29 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Java Summary | Gurchet&#x27;s Development Blog</title><meta name="description" content="Java Summary"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Java Summary</h1><div class="meta"><span>Fri Sep 17 2021</span><span>summary</span></div><div class="mt25 post"><h3>Primitive Types</h3>
+<p>integer types:
+byte - -2^7 to 2^7 - 1
+short - -2^15 to 2^15 - 1
+int - -2^31 to 2^31 - 1 (Integer.MIN_VALUE, Integer.MAX_VALUE)
+long - 2^63 to 2^63 - 1 (should be suffixed with L)</p>
+<p>floating point types:
+float (32 bit)
+double (64 bit)</p>
+<p>doubles and ints are the default type for numeric literals.</p>
+<p>Can get min/max values by calling <code>&#x3C;DataType>.MIN_VALUE/MAX_VALUE</code></p>
+<p>char - single character in quotes - 16 bits - can store unicode (65k characters) - <code>'\u&#x3C;charCode>'</code>
+boolean</p>
+<h3>Modules</h3>
+<p>Introduced in Java 9.</p>
+<p>A module is a container of packages.</p>
+<p>Has a name, inputs (module dependencies), and outputs (package exports)</p>
+<p>Every module has a module descriptor file at the module root folder and is named <code>module-info.java</code></p>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">[open] module &#x26;lt;my.module.name&#x26;gt; {
+  requires // other modules this module depends on
+  exports // packages exported by the current module
+  provides // service implementations that the current modules provide
+  uses // the services the current module consumes
+}</code></pre></div>
+<p>A normal module grants access at compile and run time to types in only those packages which are explicitly exported.</p>
+<p>An open module grants access at compile time to types in only those packages which are explicitly exported but grants access at run time to types in all its packages.</p>
+<p>Automatic modules are not explicitly declared in module descriptor files. It is automatically created when a JAR file is placed into the module path. By default, it <code>requires</code> all platform modules, all our own modules, and all other automatic modules and exports all packages by default.</p>
+<p>Libraries that use reflection like Hibernate or Spring will only work with open modules.</p>
+</div></div></div></div></body></html>

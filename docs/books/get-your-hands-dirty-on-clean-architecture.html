@@ -1,0 +1,147 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Get your Hands Dirty On Clean Architecture | Gurchet&#x27;s Development Blog</title><meta name="description" content="Get Your Hands Dirty on Clean Architecture Summary"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Get your Hands Dirty On Clean Architecture</h1><div class="meta"><span>Sat Oct 09 2021</span><span>book summary</span></div><div class="mt25 post"><h3>What's Wrong with Layers</h3>
+<p>Traditional app - controllers, domain/service, persistence</p>
+<p>Problems:</p>
+<ul>
+<li>It promotes database-driven design. We should be trying to model behaviour, not state. Also leads to tight coupling between the repository/entities and the service.</li>
+<li>It's prone to shortcuts. In a typical layered architecture, you can only access things in the same layer or lower. If you need to access something in a higher layer, we move the thing to the lower layer. IE utils/helpers in repo layer.</li>
+<li>It grows hard to test. In simple cases, devs make the controller talk to repo directly - makes test setup difficult. More dependencies = harder test setup. A complex test setup is the first step towards no tests at all because we don't have time for them.</li>
+<li>It hides the use cases. Layered architectures don't impose rules on the "width" of domain services making things hard to find/maintain.</li>
+<li>It makes parallel work difficult.</li>
+</ul>
+<h3>Inverting Dependencies</h3>
+<p>Single Responsibility Principle - a component should only have one reason to change.</p>
+<p>You shouldn't need to change a component if its dependencies change.</p>
+<p>Dependency inversion principle - invert the direction of any dependency in our code base.</p>
+<p>The domain code shouldn't have dependencies; instead, all depdencies point towards the domain code.</p>
+<p><img src="/images/di.png" alt="Dependency Inversion">
+<img src="/images/hexarch.png" alt="Hexagonal Architecture"></p>
+<h3>Organizing Code</h3>
+<p>Traditional package structure is just a nice-looking facade for an unstructured mess of code - classes in one package import classes from other packages that should not be imported.</p>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">app
+    /domain
+    /persistence
+    /web</code></pre></div>
+<p>Organizing by feature - allows enforcing access via package-private visibility for classes. Don't allow broad services (ie use SendMoneyService vs AccountService).</p>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">app
+    /feature1
+        /adapter
+            /in
+                /web
+                    /AccountsController (package private)
+            /out
+                /persistence
+                    / AcoountPersistenceAdapter (package private - implements UpdateAccountStatePort)
+        /domain - domain is public
+            Account
+        /application
+            SendMoneyService (package private - implements SendMoneyUseCase)
+            /port - all ports are public
+                /in
+                    SendMoneyUseCase
+                    SendMoneyCommand
+                    GetAccountBalanceQuery
+                /out
+                    LoadAccountPort
+    /feature2</code></pre></div>
+<p><img src="/images/hexarchpackages.png" alt="Package structure"></p>
+<h3>Implementing a Use Case</h3>
+<ul>
+<li>don't put input validation in input adapters since multiple adapters may consume use case. Instead, put validation in the input model. Each use case should have a dedicated input model.</li>
+<li>business rule validation should go in the domain entities (rich domain model) or in the use case code itself (anemic domain model).</li>
+<li>use cases should return as little data as possible. Return types should be isolated from other use cases.</li>
+</ul>
+<p><img src="/images/usecase.png" alt="Use Case"></p>
+<h3>Implementing a Web Adapter</h3>
+<p>Web adapters take requests from the outside and translates them into calls to our application core. Control flow goes from controllers in the web adapter to the services in the app layer.</p>
+<p><img src="/images/webadapter.png" alt="Web Adapter"></p>
+<p>Responsibilities:</p>
+<ul>
+<li>Map HTTP request to native objects</li>
+<li>Perform auth checks</li>
+<li>Validate input (ensure input model can be translated to use case model)</li>
+<li>Map input to the input model of the use case</li>
+<li>Call use case</li>
+<li>Map output of the use case back to HTTP</li>
+<li>Return HTTP response</li>
+</ul>
+<p>Create a separate controller for each operation, don't reuse input objects (ie create endpoint/update endpoint probably differ by an id attribute only but that is okay). Consider putting each controller and its input objects into a package and making the input objects private to discourage re-use.</p>
+<h3>Implementing a Persistence Layer</h3>
+<p>Services call port interfaces to access persistence functionality. These interfaces are implemented by persistence adapters that are responsible for talking to the actual database. This layer of indirection lets you evolve domain code without thinking about persistence problems</p>
+<p><img src="/images/persistence.png" alt="Persistence Adapter"></p>
+<p>Responsibilites:</p>
+<ul>
+<li>take input</li>
+<li>map input into database format (in java, domain objects to JPA entities)</li>
+<li>send input to the database</li>
+<li>map database output into application format</li>
+<li>return output</li>
+</ul>
+<p>The repository should only expose methods that are needed by the service. Interface segregation principle: broad interfaces should be split into specific ones so that clients only know about methods they need. Bob Martin: "Depending on something that carries baggage you don't need can cause you troubles you didn't expect". You can have one persistence adapter that implements all persistence ports for each entity.</p>
+<p><img src="/images/persistence-context.png" alt="Persistence Context"></p>
+<p>Transactions should be managed by the service since the persistence layer doesn't know which operations are part of the same use case.</p>
+<h3>Testing Architecture Elements</h3>
+<p>Testing pyramid tells us that system/integration tests shouldn't focus on coverage because it will lead to too much time spent building tests.</p>
+<p>Domain entities should be tested with unit tests.</p>
+<p>Use cases should also be unit tests with mocked dependencies</p>
+<p>Web adapters should be be tested with <code>@WebMvcTest(controllers = ControllerUnderTest.class)</code> using <code>MockMvc</code></p>
+<p>Persistence adapters should be tested with <code>@DataJpaTest</code> and explicitly <code>@Import({Adapter.class, Mapper.class})</code>.</p>
+<p>System tests should be done with <code>@SpringBootTest</code> with a <code>TestRestTemplate</code>. Only cover the most important/common parts.</p>
+<p>Test coverage alone is meaningless - test success should be measured in how comfortable the team feels shipping the software. The more often you ship, the more you trust your tests. For each production bug, ask "why didnt our tests catch this bug?", document the answer, and then add a test that covers it.</p>
+<h3>Mapping between Boundaries</h3>
+<p>there are tradeoffs in using the same model in two layers of the app vs implementing a mapper.</p>
+<p>No Mapping Strategy:</p>
+<p><img src="/images/nomapping.png" alt="No Mapping"></p>
+<p>Pros: no mapping needed. Good for simple CRUD use cases.</p>
+<p>Cons: Single entity will have annotations to deal with JSON serialization/request validation/database mapping. Meanwhile, the actual service layers cares about none of these things. Violates single responsibility principle.</p>
+<p>Two-Way Mapping Strategy:</p>
+<p><img src="/images/twowaymapping.png" alt="Two-Way Mapping"></p>
+<p>Outer layers map into the inner domain model and back. The inner layers concentrate on domain logic and aren't responsible for mapping.</p>
+<p>Pros: Single responsibility principle is maintained since each layer has its own model which may have a structure that is completely different from the domain model.</p>
+<p>Cons: Lots of boilerplate. Debugging mapping code can be a pain especially if its hidden behind a framework of generics/reflection. Since the domain object communicates across boundaries, it is vulnerable to change required by the outer layers.</p>
+<p>Full Mapping Strategy:</p>
+<p><img src="/images/fullmapping.png" alt="Full Mapping"></p>
+<p>Web layer maps to command object of app layer. Each use case has its own command.</p>
+<p>Pros: there is no guessing involved as to which fields should be filled and which fields should be left empty. The application layer maps the command object to the domain model.</p>
+<p>Cons: Even more mapping code since you are mapping into many different command objects (one per use case).</p>
+<p>One-Way Mapping Strategy:</p>
+<p><img src="/images/onewaymapping.png" alt="One-Way Mapping"></p>
+<p>Models in all layers implement the same interface that encapsulates the state by providing getters on the relevant attributes.</p>
+<p>Domain model itself can implement rich behavior which is accessible only within the service layer.</p>
+<p>Domain object can be passed to the outer layers without mapping since the domain object implements the same state interface.</p>
+<p>Layers can then decide if they work with the interface or if they need to map it to their own model. They cannot modify the state of the domain object since the modifying behavior is not exposed by the state interface. Mapping is unnecessary at the web layer if we're dealing with a "read" operation.</p>
+<p>Pros: clear mapping responsibility - if a layer receives an object from another layer, we map it to something that layer can work with. Thus each layer only maps one way. Best if the models across the layers are similar.</p>
+<p>Cons: doesn't work if models across layers are not similar.</p>
+<p>Which to use:</p>
+<p>If working on a modifying use case, use full mapping between web and application layers. This gives clear per-use-case validation rules and we don't need to deal with fields we don't need in a certain use case. Use no mapping between the application and persistence layer in order to be able to quickly evolve the code without mapping overhead. Move to two-way mapping once persistence issues creep into application layer.</p>
+<p>If working on a query, start with the no mapping strategy between all layers. Move to two-way mapping once we need to deal with web/persistence issues in the app layer.</p>
+<h3>Assembling the Application</h3>
+<p>We want to keep the code dependencies pointed in the right direction - all dependencies should point inwards towards the domain code so that the domain code doesn't need to change when something in the outer layers changes. Nice side effect of this is testability - all use cases only know about interfaces which are injected.</p>
+<p>Should be the responsibility of configuration components to construct concrete implementations at runtime.</p>
+<p>With Spring, use <code>@Component</code> and <code>@RequiredArgsConstructor</code> with private final dependencies on interfaces. Alternative that doesn't involve classpath scanning, use <code>@Configuration</code> classes where <code>@Bean</code> is exposed - this has the benefit of keeping spring specific annotations outside of application code. Use <code>@EnableJpaRepositories</code> to instantiate spring data repository interfaces. Keep "feature" annotations on specific config classes rather than the main application to keep test start up fast.</p>
+<h3>Enforcing Architecture Boundaries</h3>
+<p>There is a boundary between each layer and its next inward/outward neighbor - dependencies that cross a layer boundary must always point inwards. Java visiblity modifiers don't scale to big packages since sub-packages are treeated as different packages so package-private doesn't always work.</p>
+<p>Use ArchUnit to do post-compile checks at build time.</p>
+<div class="remark-highlight"><pre class="language-java"><code class="language-java"><span class="token annotation punctuation">@Test</span>
+<span class="token keyword">void</span> <span class="token function">domainLayerDoesNotDependOnAppLayer</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">noClasses</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">that</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">resideIn</span><span class="token punctuation">(</span><span class="token string">"buckpal.domain"</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">should</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">dependOnClassesThat</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">resideInPackage</span><span class="token punctuation">(</span><span class="token string">"buckpal.application"</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">check</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">ClassFileImporter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">importPackages</span><span class="token punctuation">(</span><span class="token string">"buckpal.."</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre></div>
+<p>Build separate artifacts.</p>
+<p><img src="/images/multimodule.png" alt="Multi-module project"></p>
+<h3>Taking Shortcuts Consciously</h3>
+<p>Broken window theory - as soon as something looks rundown or damaged, people feel that it's ok to make it more rundown or damaged.</p>
+<p>Maintain <a href="https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions">architecture decision records</a> to consciously document added shortcuts.</p>
+<p>Common shortcuts:</p>
+<ul>
+<li>sharing input/output models between use cases when the use cases are functionally bound and we actually want both use cases to be affected if we change a certain detail. As soon as they evolve separately from one other, separate the models even if it means to duplicate classes.</li>
+<li>using the domain entity as the input/output model for a use case.</li>
+<li>skipping incoming ports to remove a layer of abstraction. Adapters are forced to know more about the internals of the application.</li>
+<li>skipping the serivce and communicating directly with the persistence layer</li>
+</ul>
+</div></div></div></div></body></html>

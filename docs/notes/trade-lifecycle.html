@@ -1,0 +1,52 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Trade Lifecycle | Gurchet&#x27;s Development Blog</title><meta name="description" content="Udemy course notes"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Trade Lifecycle</h1><div class="meta"><span>Fri May 20 2022</span><span>summary</span></div><div class="mt25 post"><p>Series of steps through which any trade passes. Objective is to have the trade settle by the due date.</p>
+<p>Front office:</p>
+<ul>
+<li>trade execution (buy/sell from counterparty)</li>
+<li>trade capture (trade skeleton should be captured)</li>
+</ul>
+<p>Both front and back office need reference data</p>
+<ul>
+<li>security info</li>
+<li>counterparty info</li>
+</ul>
+<p>Operations:</p>
+<ul>
+<li>
+<p>trade capture</p>
+</li>
+<li>
+<p>trade enrichment</p>
+</li>
+<li>
+<p>trade confirmation (ensure details captured by party/counterparty are agreed upon)</p>
+</li>
+<li>
+<p>settlement instructions (command issued to depository/custodian that will actually authorize the trade settlement)</p>
+</li>
+<li>
+<p>pre-settlement statuses (depository makes sure settlement instructions match)</p>
+</li>
+<li>
+<p>failed settlement (5-10% of trades fail due to non matching instructions)</p>
+</li>
+<li>
+<p>settlement</p>
+</li>
+<li>
+<p>reflecting settlment</p>
+</li>
+<li>
+<p>reconciliation (update local book of record to match depository)</p>
+</li>
+</ul>
+<h3>What is a trade?</h3>
+<p>Legal agreement to buy or sell goods. One party pays cash in exchange for goods, other party receives cash in exchange for goods.</p>
+<p>Parties can be investor &#x26; broker, broker &#x26; exchange, broker &#x26; trader, trader &#x26; trader</p>
+<h3>Trade Execution</h3>
+<p>Historically, between traders on a trading floor where market makers advertise their prices on "pitches"</p>
+<p>Currently, automatic execution via electronic exchanges (order-driven markets) or bid/offer prices are quoted to attract investors (quote-driven markets).</p>
+<p>trader uses current trading position + average price of current trading position to determine whether to buy/sell at profit/loss.</p>
+<p>Investment manager makes an investment decision and communicates an "order" to executing broker. Broker records detail of the order - client account, buy/sell, quantity, security, desired price.</p>
+<p>When the broker receives the order, it acts as agent (broker attempts to find a third party willing to trade on terms of order - investment bank makes commission <em>only</em>) or principal (trader trades off investment bank trading book). The broker becomes the counterparty to the trade (broker is investors counterparty and investor is broker's counterparty).</p>
+<p>If the trade is made by a fund (ie mutual fund provider), the block level trade needs to be allocated to its underlying funds (splits).</p>
+</div></div></div></div></body></html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Prisma | Gurchet&#x27;s Development Blog</title><meta name="description" content="Prisma Summary"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Prisma</h1><div class="meta"><span>Sat Oct 02 2021</span><span>summary</span></div><div class="mt25 post"><h1>Prisma</h1>
+<p>Prisma is an type-safe ORM that can query a database in node.js apps with either REST or GraphQL APIs.</p>
+<p><code>npx prisma init</code> to create <code>.env</code> which stores db connection info and <code>prisma/schema.prisma</code> which has the schema</p>
+<p>add models into <code>schema.prisma</code></p>
+<div class="remark-highlight"><pre class="language-sh"><code class="language-sh">model User {
+  id    Int     @default(autoincrement()) @id
+  email String  @unique
+  name  String?
+  posts Post[]
+}
+
+model Post {
+  id        Int      @default(autoincrement()) @id
+  title     String
+  content   String?
+  published Boolean? @default(false)
+  author    User?    @relation(fields: [authorId], references: [id])
+  authorId  Int?
+}</code></pre></div>
+<p>apply migrations by running <code>npx prisma migrate dev --name &#x3C;migrationName></code>.</p>
+<p>run <code>npx prisma generate</code> to generate the client code off the models. Re-run every time you update the model.</p>
+</div></div></div></div></body></html>
