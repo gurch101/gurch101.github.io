@@ -1,20 +1,22 @@
 ---
 title: Subdomains in Flask
-description: Using subdomains to identify tenants in a multitenant Flask application 
+description: Using subdomains to identify tenants in a multitenant Flask application
 date: 2015-12-06
 category: python flask postgresql
-type: post
+type: blog
 ---
 
 In my last post, I wrote about [using postgresql schemas to support multiple tenants from a single database](/flask-postgres-multitenancy). To identify a tenant, we relied on a tenant identifier to be present in the user record itself. This week, we'll use subdomains to identify the tenant.
 
 ### Making Flask Play Nice with Subdomains
+
 At a bare minimum, there are only two things that need to be done in order to make Flask work with subdomains:
 
-1. set the `SERVER_NAME` config value to `<hostname>:<port>`. By default, session cookies will be valid on all subdomains of `SERVER_NAME` 
-2. set the `subdomain` parameter on any url rules or blueprints. The parameter can be either static (`subdomain='foo'`) or dynamic (`subdomain='<tenant>'`). 
+1. set the `SERVER_NAME` config value to `<hostname>:<port>`. By default, session cookies will be valid on all subdomains of `SERVER_NAME`
+2. set the `subdomain` parameter on any url rules or blueprints. The parameter can be either static (`subdomain='foo'`) or dynamic (`subdomain='<tenant>'`).
 
 ### Dealing with Static Resources
+
 If you're using Flask to serve static resources rather than a web server, you'll need to manually register the static folder url rule so that you can configure it to support subdomains. Here's how you do that:
 
 ```python
@@ -23,7 +25,7 @@ app.static_folder='static'
 app.add_url_rule('/static/<path:filename>',
                  endpoint='static',
                  subdomain='<tenant>',
-                 view_func=app.send_static_file)                 
+                 view_func=app.send_static_file)
 
 # optional. If not set, the above view_func will be passed <tenant> as a parameter.
 @app.url_value_preprocessor
@@ -36,8 +38,9 @@ def before_route(endpoint, values):
 With the above, static resources will be accessible from one central location, regardless of subdomain.
 
 ### Testing in a Development Environment
+
 Flask doesn't support subdomains on `localhost` or on host names without a tld identifier. For the example app below, I added the following entry to `/etc/hosts`:
-    
+
 ```bash
 127.0.0.1 local.com
 127.0.0.1 company1.local.com
@@ -45,6 +48,7 @@ Flask doesn't support subdomains on `localhost` or on host names without a tld i
 ```
 
 ### An Example App
+
 ```python
 from functools import wraps
 from urlparse import urlparse
@@ -162,6 +166,7 @@ if __name__ == '__main__':
 ```
 
 #### Schema and Test Data
+
 ```sql
 CREATE SCHEMA "company1";
 CREATE SCHEMA "company2";
@@ -181,12 +186,12 @@ CREATE TABLE company2.app_user (
 CREATE TABLE company1.company_data (
     id SERIAL PRIMARY KEY,
     description TEXT NOT NULL
-); 
+);
 
 CREATE TABLE company2.company_data (
     id SERIAL PRIMARY KEY,
     description TEXT NOT NULL
-); 
+);
 
 INSERT INTO company1.app_user(username, password) VALUES ('user_1', '$pbkdf2-sha256$29000$5ry31vofg7CWkhJCSClFKA$i01NZ9cAJCAYlXQCY2AXmcmJfe8eD5vZMDOy0h8tH2U');
 
@@ -197,11 +202,15 @@ INSERT INTO company2.company_data(description) VALUES ('company 2 data');
 ```
 
 ### Verifying Behaviour with curl
+
 Logging in:
+
 ```bash
 curl -c - --data "uname=user_1&passwd=foo" http://company1.local.com:5000/login > cookie.txt
 ```
+
 getting data:
+
 ```bash
 curl -b cookie.txt http://company1.local.com:5000/data
 {
@@ -213,4 +222,3 @@ curl -b cookie.txt http://company1.local.com:5000/data
   ]
 }
 ```
-

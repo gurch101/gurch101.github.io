@@ -3,7 +3,7 @@ title: System Design Interview
 date: 2021-10-10
 description: System Design Interview Summary
 category: book summary
-type: notes
+type: books
 ---
 
 ### Chapter 1: Scaling from 1 to a million users
@@ -11,23 +11,22 @@ type: notes
 - start with a single server to host static assets, app server, database server
 - vertically scale until you can't
 - split db and app server so they can be scaled independently
-    - nosql = low latency, unstructured, massive amounts of data
-- horizontally scale - use a load balancer 
-    - improved availability
-    - stateful architecture requires sticky sessions
-    - stateless - more scalable -> store user state in redis/nosql db/relational db
+  - nosql = low latency, unstructured, massive amounts of data
+- horizontally scale - use a load balancer
+  - improved availability
+  - stateful architecture requires sticky sessions
+  - stateless - more scalable -> store user state in redis/nosql db/relational db
 - failover/redundancy - db replication with one master db for writes and many read nodes
 - add a cache for data that is read frequently but updated infrequently
-    - considerations: expiration, what to cache, consistency, eviction (what to do when full - LRU)
+  - considerations: expiration, what to cache, consistency, eviction (what to do when full - LRU)
 - use a CDN
-    - considerations: cost (only cache frequently used content), expiry, failover, invalidation
+  - considerations: cost (only cache frequently used content), expiry, failover, invalidation
 - use multiple data centers and a geoDNS - routes to server closest to user
-    - considerations: automated deployments, monitoring, replication, immutable infrastructure
+  - considerations: automated deployments, monitoring, replication, immutable infrastructure
 - use message queues for long running tasks
 - sharding the db to scale horizontally
-    - considerations: resharding data when shards need to be split further, celebrity problem (certain users are more popular/active than others), leads to denormalization to prevent joins
+  - considerations: resharding data when shards need to be split further, celebrity problem (certain users are more popular/active than others), leads to denormalization to prevent joins
 - split tiers into separate services
-
 
 ### Chapter 2: Back-Of-The-Envelope Estimation
 
@@ -57,9 +56,9 @@ Assumptions:
 • Data is stored for 5 years.
 Estimations:
 Query per second (QPS) estimate:
-• Daily active users (DAU) = 300 million * 50% = 150 million
-• Tweets QPS = 150 million * 2 tweets / 24 hour / 3600 seconds = ~3500
-• Peek QPS = 2 * QPS = ~7000
+• Daily active users (DAU) = 300 million _ 50% = 150 million
+• Tweets QPS = 150 million _ 2 tweets / 24 hour / 3600 seconds = ~3500
+• Peek QPS = 2 _ QPS = ~7000
 We will only estimate media storage here.
 • Average tweet size:
 • tweet_id 64 bytes
@@ -67,15 +66,14 @@ We will only estimate media storage here.
 140 bytes
 • media
 1 MB
-• Media storage: 150 million * 2 * 10% * 1 MB = 30 TB per day
-• 5-year media storage: 30 TB * 365 * 5 = ~55 PB
+• Media storage: 150 million _ 2 _ 10% _ 1 MB = 30 TB per day
+• 5-year media storage: 30 TB _ 365 _ 5 = ~55 PB
 
 ### Chapter 3: A Framework For System Design Interviews
 
 - deliberately ambiguous
 - purpose is to demonstrate design skill, defend design choices, and respond to feedback
 - interviewer is looking for ability to collaborate, resolve ambiguity, work under pressure
-
 
 step 1: understand the problem and establish design scope
 
@@ -86,7 +84,6 @@ how many users does the product have?
 how fast does the company anticipate the scale up?
 what is the tech stack?
 what existing services can you leverage to simplify the design
-
 
 step 2: propose high-level design
 
@@ -118,30 +115,33 @@ throttle mechanism - IP, user id, other properties? system wide?
 scale? distributed?
 different limiters for different endpoints?
 
-
 Step 2: Propose high-level design
 
 Start with client/server, then add separate services.
 
 Algorithms:
+
 - Token bucket algorithm: put tokens into a bucket periodically up to some capacity. Remove a token for each request.
-    - pros: easy to implement, memory efficient, allows bursty traffic. Cons: difficult to tune bucket size/refill rate
+
+  - pros: easy to implement, memory efficient, allows bursty traffic. Cons: difficult to tune bucket size/refill rate
 
 - Leaking bucket algorithm: put requests on a queue - if queue is full, drop request, else process request at a fixed rate
-    - pros: memory efficient, good for cases where a stable outflow rate is needed
-    - cons: not good for bursty traffic
+
+  - pros: memory efficient, good for cases where a stable outflow rate is needed
+  - cons: not good for bursty traffic
 
 - Fixed window counter algorithm: divide time into fix-sized time windows and assign a counter to each window. Increment counter by one for each request. Once the counter reaches a threshold, drop requests until new window starts.
 
 - Sliding window algorithm: remove all timestamps older than start of current time window, add timestamp for new request, if the log size is the same or lower than allowed count, accept request.
-    - pros: very accurate, cons: consumes memory because timestamps are kept
+  - pros: very accurate, cons: consumes memory because timestamps are kept
 - redis has INCR/EXPIRE to increment and timeout a counter.
 
 Step 3: Design Deep-Dive
 
 maintain rules in configuration files, return HTTP 429 if rate is exceeded. Return headers to clients to provide number of remaining requests within windows. Possibly queue excess requests for later processing on message queue.
 
-Possible problems 
+Possible problems
+
 - race conditions when reading/updating counters - use locks
 - synchronization issues in distributed environments where multiple caches are involved. Use sticky sessions or centralized data stores.
 - performance - make service geographically distrubted and route to nearest server. Synchronize with eventual consistency.
@@ -155,8 +155,10 @@ Step 4: Wrap up
 
 ### Chapter 5: Design Consistent Hashing
 
-If you have n cache servers, a common way to balance the load is to use the following hash method: 
-``` serverIndex = hash(key) % N, where N is the size of the server pool
+If you have n cache servers, a common way to balance the load is to use the following hash method:
+
+```serverIndex = hash(key) % N, where N is the size of the server pool
+
 ```
 
 Problem - if number of servers change, we get different server indices
@@ -167,7 +169,8 @@ map servers and keys on to a ring using a uniformly distributed hash function. T
 
 problems: partition sizes can be different when servers are added/removed. Key distribution can be non-uniform.
 
-Solutions: 
+Solutions:
+
 - represent each server with multiple virtual nodes so that each server is responsible for multiple partitions. More virtual nodes = more balanced distribution but this requires more storage to store data about each virtual node.
 - new node: redistribute data by going anti-clockwise from new node until a server is found.
 - removed node: go anti-clockwise from removed node until server is found and redistribute to next node
@@ -182,9 +185,10 @@ Single server - use an in-memory hash table - optimize by compressing data and o
 
 distributed hash table:
 CAP theorem: System can only have two of the following.
+
 - Consistency: all clients see the same data at the same time no matter which node they connect to
 - Availability: any client which requests data gets a response even if some of the nodes are down
-- Partition Tolerance: System continues to operate despite network partition  (three nodes - data is written to two but not replicated to third, data written to third isn't replicated to other two)
+- Partition Tolerance: System continues to operate despite network partition (three nodes - data is written to two but not replicated to third, data written to third isn't replicated to other two)
 
 If consistency is chosen over availability, must block all write operations to avoid data inconsistency.
 
@@ -195,10 +199,11 @@ Data is partitioned using consistent hashing using a hash ring. Pros: automatic 
 Data is replicated asynchronously over N servers - chose first N servers from key placement.
 
 Quorum consistency:
+
 - For a write operation to be considered as successful, write operation must be acknowledged by W replicas
 - For a read operation, read operations must wait for responses from R replicas.
 
-Configuration of W, R, N is a tradeoff between latency and consistency. 
+Configuration of W, R, N is a tradeoff between latency and consistency.
 
 If R = 1, W = N, system optimized for fast reads
 If W = 1, R = N, system optimized for fast writes
@@ -213,4 +218,5 @@ vector clock - [server, version] pair associated with a data item that can be us
 When data item D is written to server Si, vi needs to be incremented in [Si, vi] or [Si, 1] needs to be created
 
 Failure handling
+
 - need at least two independent sources of info to mark a server as down. All-to-all multicasting makes all servers talk to one another. Gossip protocol - each node mas a list of members and heartbeat counters. Each node sends heartbeats to random nodes. Updated list is sent to a set of random nodes. If heartbeat has not increased for more than predefined periods, the member is considered offline.

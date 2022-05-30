@@ -10,5 +10,5 @@ type: notes
 
 - one-dimensional layout system
 - default direction is row
-- justify-content is parallel to direction, align-items is perpendicular
+- justify-content is parallel to direction, align-items is perpendicular (AiPE)
 - grows to fit content

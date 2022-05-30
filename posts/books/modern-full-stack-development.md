@@ -3,14 +3,13 @@ title: Modern Full Stack Development
 date: 2021-10-10
 description: Modern Full Stack Development Summary
 category: book summary
-type: notes
+type: books
 ---
 
 # Node
 
 - single-threaded, event-driven, with background workers. Node spawns a thread for I/O, event queue on main thread handles responses.
 - Uses V8 JS engine
-
 
 ### NPM
 
@@ -44,10 +43,10 @@ major.minor.patch
 - major: backwards-incompatible changes
 - minor: backwards-compatible + bug fixes
 - patch: bug fixes
- 
+
 - for "~" (ie ~1.0.1), npm will grab latest patch
 - for "^" (ie ^1.0.1), npm will grab latest minor
-- for "*", npm will grab latest version
+- for "\*", npm will grab latest version
 
 ### Axios Tips
 
@@ -55,9 +54,9 @@ request is sent in application/json. If you need form-urlencoded, do this in a b
 
 ```js
 const params = new URLSearchParams();
-params.append('param1', 'value1');
-params.append('param2', 'value2');
-axios.post('/foo', params);
+params.append("param1", "value1");
+params.append("param2", "value2");
+axios.post("/foo", params);
 ```
 
 Cancel tokens:
@@ -66,35 +65,42 @@ Cancel tokens:
 const CancelToken = axios.CancelToken;
 const source = CancelToken.source();
 
-axios.get('/user/12345', {
-  cancelToken: source.token
-}).catch(function (thrown) {
-  if (axios.isCancel(thrown)) {
-    console.log('Request canceled', thrown.message);
-  } else {
-    // handle error
-  }
-});
+axios
+  .get("/user/12345", {
+    cancelToken: source.token,
+  })
+  .catch(function (thrown) {
+    if (axios.isCancel(thrown)) {
+      console.log("Request canceled", thrown.message);
+    } else {
+      // handle error
+    }
+  });
 
-axios.post('/user/12345', {
-  name: 'new name'
-}, {
-  cancelToken: source.token
-})
+axios.post(
+  "/user/12345",
+  {
+    name: "new name",
+  },
+  {
+    cancelToken: source.token,
+  }
+);
 
 // cancel the request (the message parameter is optional)
-source.cancel('Operation canceled by the user.');
+source.cancel("Operation canceled by the user.");
 ```
 
 Client with shared props
+
 ```js
 // Set config defaults when creating the instance
 const instance = axios.create({
-  baseURL: 'https://api.example.com'
+  baseURL: "https://api.example.com",
 });
 
 // Alter defaults after instance has been created
-instance.defaults.headers.common['Authorization'] = AUTH_TOKEN;
+instance.defaults.headers.common["Authorization"] = AUTH_TOKEN;
 ```
 
 Questions:

@@ -3,9 +3,8 @@ title: The Mind-Gut Connection
 date: 2021-01-15
 description: The Mind-Gut Connection Summary
 category: book summary
-type: notes
+type: books
 ---
-
 
 ### Role of gut
 
@@ -26,6 +25,7 @@ gut has more than 100 trillion microbes, 1000 species, and 7 million genes (360 
 gut microbiome linked to autism, behavioral abnormalities, neurodegenerative diseases like Parkinsons and Alzheimers, depression
 
 emotions alter gastrointestinal contractions:
+
 - fear decreases stomach contractions but increases intestinal contractions
 - anger increases stomach contractions and intestinal contractions
 - sadness decreases stomach and intestinal contractions
@@ -53,13 +53,12 @@ more than 90% of the sensory information collected by your gut never reaches con
 90% = gut to brain, 10% = brain to gut
 
 gut nervous system:
+
 - strength and direction of gut peristalsis to speed or slow transit of ingested food
 - produce the right amount of acid and bile
 - gathers info pertaining to the presense and amount of food in the stomach, the size/consistency of the food you swallow, the chemical composition of an ingested meal, presense and activity of gut microbiota
 
-gut contains phytochemical receptors that are activated by certain specific chemicals in plants
-    - when sweet receptors sense glucose or artificial sweeteners, they stimulate the absorption of glucose into the blood stream and the release of insulin from the pancreas, and other hormones to create a sense of satiety
-    - bitter receptors stimulate gut to release ghrelin which stimulates appetite
+gut contains phytochemical receptors that are activated by certain specific chemicals in plants - when sweet receptors sense glucose or artificial sweeteners, they stimulate the absorption of glucose into the blood stream and the release of insulin from the pancreas, and other hormones to create a sense of satiety - bitter receptors stimulate gut to release ghrelin which stimulates appetite
 
 vagus nerve transmits majority of signals to and from brain
 
@@ -71,7 +70,7 @@ thin layer of mucus separates microbes from bacteria. Lipopolysaccharides from g
 
 Immune cells release cytokines that can reach the brain and reduce energy level, increase fatigue and pain sensitivity, and make you depressed.
 
-Pathogens stimulate water secretion, reverse peristalsis to empty the stomach, accelerate transit through small/large intestine. 
+Pathogens stimulate water secretion, reverse peristalsis to empty the stomach, accelerate transit through small/large intestine.
 
 ### Endocrine System Role
 
@@ -97,19 +96,15 @@ Stress, inflammation, high-fat foods, and certain food additives can make the gu
 
 ingestion of pribiotic enriched yogurt for four weeks reduce brain response to negative emotional stimuli
 
-historically excess acid production and peptic ulcer cures involved cutting the vagus nerve, this led to many other symptoms
-    - nausea, cramps, vomiting, belly pain, diarrhea
+historically excess acid production and peptic ulcer cures involved cutting the vagus nerve, this led to many other symptoms - nausea, cramps, vomiting, belly pain, diarrhea
 
-Gut microbes play an important role in brain-gut interactions. Ancient microbes can produce some of the same hormones and gut peptides that mammals produce. 
+Gut microbes play an important role in brain-gut interactions. Ancient microbes can produce some of the same hormones and gut peptides that mammals produce.
 
 Disruption in gut-brain communication impacts gut disorders but also nondigestive disorders like anxiety, depression, and autism.
 
 ### Disorders
 
-dysbiosis - mix of gut microbes falls out of its healthy stable state causing several gut disorders
-    - antibiotics can cause colitis or gut inflammation since it diminishes the diversity and abundance of normal gut microbiota which allows invasion of C. difficile
-    - colon inflammation can be rapidly cured by reestablishing gut microbiome through fecal transplant
-
+dysbiosis - mix of gut microbes falls out of its healthy stable state causing several gut disorders - antibiotics can cause colitis or gut inflammation since it diminishes the diversity and abundance of normal gut microbiota which allows invasion of C. difficile - colon inflammation can be rapidly cured by reestablishing gut microbiome through fecal transplant
 
 ### Thoughts & Questions
 

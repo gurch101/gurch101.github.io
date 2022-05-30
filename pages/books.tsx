@@ -5,16 +5,16 @@ import { getSortedPostsData } from "../lib/posts";
 const Notes: NextPage = ({ posts }: any) => {
   return (
     <PostPage
-      title="Gurchet's Development Notes"
-      description="Software development notes"
-      header="Gurchet Rai - Notes"
+      title="Gurchet's Book Summaries"
+      description="Book summaries"
+      header="Gurchet Rai - Book Summaries"
       posts={posts}
     />
   );
 };
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPostsData("notes");
+  const allPostsData = getSortedPostsData("books");
   return {
     props: {
       posts: allPostsData,

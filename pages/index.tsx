@@ -1,33 +1,29 @@
-import { NextPage } from 'next';
-import Head from 'next/head';
-import { getSortedPostsData } from '../lib/posts';
-import PostList from '../components/PostList';
+import { NextPage } from "next";
+import PostPage from "../components/PostPage";
+import { getSortedPostsData } from "../lib/posts";
 
 const Home: NextPage = ({ posts }: any) => {
   return (
-    <>  
-      <Head>
-        <title>{`Gurchet's Development Blog`}</title>
-        <meta name="description" content="Software development blog" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <h1>Gurchet Rai</h1>
-      <PostList posts={posts} /> 
-    </>
-  )
-}
+    <PostPage
+      title="Gurchet's Development Blog"
+      description="Software development blog"
+      header="Gurchet Rai"
+      posts={posts}
+    />
+  );
+};
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPostsData('post');
+  const allPostsData = getSortedPostsData("blog");
   return {
     props: {
-      posts: allPostsData
-    }
-  }
+      posts: allPostsData,
+    },
+  };
 }
 
 export const config = {
-  unstable_runtimeJS: false
-}
+  unstable_runtimeJS: false,
+};
 
-export default Home
+export default Home;

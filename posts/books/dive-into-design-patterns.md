@@ -3,25 +3,24 @@ title: Dive into Design Pattern
 date: 2021-10-10
 description: Dive into Design Pattern Summary
 category: book summary
-type: notes
+type: books
 ---
 
 # Dive Into Design Patterns
 
 ### Chapter 1 - Intro to OOP
 
-wrapping data and behavior related to that data into objects that are constructed from blueprints called classes
-    - class has methods
-    - fields on class are called members of the class
-    - members = state, methods = behavior
+wrapping data and behavior related to that data into objects that are constructed from blueprints called classes - class has methods - fields on class are called members of the class - members = state, methods = behavior
 
 4 Pillars
+
 - Abstraction: objects only model attributes and behaviors of real objects in a specific context. IE Airplane would be represented differently in a flight simulator vs a flight booking application
 - Encapsulation: each object has an interface that is open to interaction with other objects. IE a car engine can have a start method but all the details are hidden. Object hides parts of its state and behaviors from other objects.
 - Inheritance: ability to build new classes on top of existing ones.
 - Polymorphism: ability of a program to detect the real class of an object and call its implementation even when its type is unknown in the current context.
 
 Object relationships
+
 - Association: one object uses or interacts with another. Solid line with arrow in UML.
 - Dependency: object accepts another object as a method parameter, instantiates, or uses another object. Dotted line with arrow in UML. If changes in to a class definition results in modifications in another class, you have a dependency.
 - Composition: One object is composed of one or more instances of another. Filled in diamond arrow in UML. Container controls lifecycle of dependents. (University is composed of departments)
@@ -32,6 +31,7 @@ Object relationships
 pattern = typical solution to commonly occuring problems in software design that descirbe how a couple classes relate and interact with each other.
 
 ### Chapter 3 - Software Design Principles
+
 #### Features of Good Design
 
 Code reuse: reuse code rather than develop something over and over again to reduce development cost. To do so requires effort to ensure loose coupling (coding against interfaces, no hardcoded operations) at the expense of making the software more complicated.
@@ -41,16 +41,17 @@ Framework: don't call us, we'll call you (JUnit manages test lifecycle, Spring m
 Extensibility: only constant thing is change - things change because: we understand the problem better once we start to solve it, the goal posts move after the clients see what your app can do. It's important to provide for possible future changes when designing an application's architecture.
 
 Design Pattern Principles:
+
 - Encapsulate what varies: identify aspects of your app that vary and separate them from what stays the same. Main goal is to minimize the effect caused by changes.
-    - on a method level, move frequently changing stuff into a separate method (ie computing taxes for an order total)
-    - on a class level, move frequently changing stuff into a separate class and delgate work to that class
+  - on a method level, move frequently changing stuff into a separate method (ie computing taxes for an order total)
+  - on a class level, move frequently changing stuff into a separate class and delgate work to that class
 - Program to an interface, not an implementation:
-    - allows for extensibility in the future
+  - allows for extensibility in the future
 - Favor composition over inheritance
-    - subclasses can't reduce the interface of the superclass
-    - overridden methods must be compatible with the base one
-    - breaks encapsulation of the superclass
-    - tight coupling between superclass and base classes
+  - subclasses can't reduce the interface of the superclass
+  - overridden methods must be compatible with the base one
+  - breaks encapsulation of the superclass
+  - tight coupling between superclass and base classes
 
 ![Inheritance](/images/inheritance.png)
 ![Composition](/images/composition.png)

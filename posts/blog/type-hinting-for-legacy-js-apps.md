@@ -3,13 +3,12 @@ title: Type Hinting For Legacy Javascript Applications
 date: 2020-02-06
 description: Getting the benefits of typescript without adding a compilation step to your toolchain
 category: javascript
-type: post
+type: blog
 ---
 
-If you're in the (un)fortunate position of maintaining a legacy javascript application, you may find yourself longing for the benefits of a modern javascript toolchain. 
+If you're in the (un)fortunate position of maintaining a legacy javascript application, you may find yourself longing for the benefits of a modern javascript toolchain.
 
 In this post, we'll look at how we can get some of the benefits of typescript without adding a compilation step to your development workflow.
-
 
 ### Add type definitions to your dev dependencies
 
@@ -21,8 +20,6 @@ Before - no autocomplete is available for jquery:
 After - we get intellisense just by installing the type definitions for our dependencies:
 ![VS code with type definitions](/images/packagejsonafter.gif)
 
-
-
 ### Add a jsconfig.json file
 
 Adding a jsconfig.json file gives you some basic type checking which should prevent trivial bugs which would otherwise fly under the radar.
@@ -32,7 +29,6 @@ Before - no method overload checking or variable type re-assignment checking:
 
 After - we see errors when trying to call methods that don't exist or if we're calling functions with the incorrect number of arguments. Variable type re-assignment also triggers an error:
 ![VS code without jsconfig.json](/images/jsconfigafter.gif)
-
 
 ### Add jsdoc for improved typing
 

@@ -15,6 +15,4 @@ type: notes
 - https://github.com/donnemartin/system-design-primer
 - https://h5bp.org/Front-end-Developer-Interview-Questions
 - OSWAP top 10
-- Get Your Hands Dirty On Clean Architecture
 - https://www.techinterviewhandbook.org/
-

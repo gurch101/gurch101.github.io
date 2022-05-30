@@ -3,7 +3,7 @@ title: Cloud Native Patterns
 date: 2021-10-03
 description: Cloud Native Patterns Summary
 category: book summary
-type: notes
+type: books
 ---
 
 Cloud = where it runs; Cloud-native = how it runs
@@ -23,10 +23,10 @@ goal should be easy and frequent releases into production
 continuous delivery = the newest possible version of the software is deployable at any time (trunk is always deployable)
 
 - advantages: can deploy at any time (first mover advantage), allows you to gather feedback early. If you miss dates,
-                you can release less features
+  you can release less features
 
 traditional delivery = SDLC is front-loaded with development, followed by extensive testing and packaging
-    
+
 - disadvantages: if you miss dates, testing is compressed (at the expense of quality) or you push dates
 
 Before: tested extensively before going to production and were left scrambling on go-live.
@@ -39,13 +39,14 @@ AWS uses commodity hardware to offer services at a lower price but with a higher
 
 Google app engine doesnt provide raw access to resources.
 
-For cloud-native apps, operators are interested in the application and *not* the hosts the app is running on/directories involved
+For cloud-native apps, operators are interested in the application and _not_ the hosts the app is running on/directories involved
 
 The popularity of containers was driven by the need to support cloud-native applications. Multiple containers run on a single host sharing the host's operating system.
 
 The platform creates app instances, monitors application health, distributes app instances across the infrastructure, assigns IP addresses to the containers, dynamically routes to app instances, and injects configuration
 
 challenges of highly distributed architectures:
+
 - coordinating configuration changes
 - tracing/monitoring execution flows
 - retry logic - circuit breakers prevent inadvertent internal DDoS
@@ -103,22 +104,26 @@ Platform needs a fail-safe way of detecting when an app failed
 App scales depending on load to safe cost - new apps are started/stopped all the time.
 
 Zero downtime deployments:
+
 - blue/green deployment - stand up second set of instances, then switch traffic from first set to second set. All traffic is on the old or new version exclusively.
 - rolling upgrade - replace a subset of instances with new instances. Different versions of the app will serve traffic at the same time temporarily.
 - parallel deploys - different versions of the app serve traffic for as long as needed. Supports experimentation.
 
 For credential rotation across dependent services, make the provider accept two credentials temporarily (old + new), restart the app, then add the new credential to the client, restart the app, then remove the old credential from the provider.
 
-You should *not* be able to SSH into a production environment because doing so allows a way to make instances non reproducible.
+You should _not_ be able to SSH into a production environment because doing so allows a way to make instances non reproducible.
 
-Treat logs as event streams 
-- write directly to stderr/stdout 
+Treat logs as event streams
+
+- write directly to stderr/stdout
 - avoids need for log rotations or locating files in directories
 
 each service needs to broadcast events about its lifecycle - ip/port, etc
+
 - publish health endpoints, kubernetes will call it continuously to detect crashed apps/app lifecycle. If its down, kubernetes will start a new instance. Can also be event-driven where you publish events.
 
 Serverless takes cloud-native to the extreme
+
 - each call takes app through entire lifecycle
 - dev needs to focus on making startup and execution as fast as possible
 

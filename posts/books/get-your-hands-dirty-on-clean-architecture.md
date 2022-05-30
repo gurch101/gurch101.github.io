@@ -3,7 +3,7 @@ title: Get your Hands Dirty On Clean Architecture
 date: 2021-10-10
 description: Get Your Hands Dirty on Clean Architecture Summary
 category: book summary
-type: notes
+type: books
 ---
 
 ### What's Wrong with Layers
@@ -11,6 +11,7 @@ type: notes
 Traditional app - controllers, domain/service, persistence
 
 Problems:
+
 - It promotes database-driven design. We should be trying to model behaviour, not state. Also leads to tight coupling between the repository/entities and the service.
 - It's prone to shortcuts. In a typical layered architecture, you can only access things in the same layer or lower. If you need to access something in a higher layer, we move the thing to the lower layer. IE utils/helpers in repo layer.
 - It grows hard to test. In simple cases, devs make the controller talk to repo directly - makes test setup difficult. More dependencies = harder test setup. A complex test setup is the first step towards no tests at all because we don't have time for them.
@@ -33,6 +34,7 @@ The domain code shouldn't have dependencies; instead, all depdencies point towar
 ### Organizing Code
 
 Traditional package structure is just a nice-looking facade for an unstructured mess of code - classes in one package import classes from other packages that should not be imported.
+
 ```
 app
     /domain
@@ -83,6 +85,7 @@ Web adapters take requests from the outside and translates them into calls to ou
 ![Web Adapter](/images/webadapter.png)
 
 Responsibilities:
+
 - Map HTTP request to native objects
 - Perform auth checks
 - Validate input (ensure input model can be translated to use case model)
@@ -100,6 +103,7 @@ Services call port interfaces to access persistence functionality. These interfa
 ![Persistence Adapter](/images/persistence.png)
 
 Responsibilites:
+
 - take input
 - map input into database format (in java, domain objects to JPA entities)
 - send input to the database
@@ -160,7 +164,6 @@ Pros: there is no guessing involved as to which fields should be filled and whic
 
 Cons: Even more mapping code since you are mapping into many different command objects (one per use case).
 
-
 One-Way Mapping Strategy:
 
 ![One-Way Mapping](/images/onewaymapping.png)
@@ -176,7 +179,6 @@ Layers can then decide if they work with the interface or if they need to map it
 Pros: clear mapping responsibility - if a layer receives an object from another layer, we map it to something that layer can work with. Thus each layer only maps one way. Best if the models across the layers are similar.
 
 Cons: doesn't work if models across layers are not similar.
-
 
 Which to use:
 
@@ -197,7 +199,6 @@ With Spring, use `@Component` and `@RequiredArgsConstructor` with private final 
 There is a boundary between each layer and its next inward/outward neighbor - dependencies that cross a layer boundary must always point inwards. Java visiblity modifiers don't scale to big packages since sub-packages are treeated as different packages so package-private doesn't always work.
 
 Use ArchUnit to do post-compile checks at build time.
-
 
 ```java
 @Test
@@ -223,7 +224,8 @@ Broken window theory - as soon as something looks rundown or damaged, people fee
 Maintain [architecture decision records](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions) to consciously document added shortcuts.
 
 Common shortcuts:
+
 - sharing input/output models between use cases when the use cases are functionally bound and we actually want both use cases to be affected if we change a certain detail. As soon as they evolve separately from one other, separate the models even if it means to duplicate classes.
-- using the domain entity  as the input/output model for a use case.
+- using the domain entity as the input/output model for a use case.
 - skipping incoming ports to remove a layer of abstraction. Adapters are forced to know more about the internals of the application.
 - skipping the serivce and communicating directly with the persistence layer

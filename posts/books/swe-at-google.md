@@ -1,3 +1,11 @@
+---
+title: Software Engineering at Google
+date: 2022-05-20
+description: Software Engineering at Google Summary
+category: book summary
+type: books
+---
+
 ### Chapter 1: What is Software Engineering?
 
 software engineering is just programming with a team over time.
@@ -55,6 +63,7 @@ If you are not failing occasionally, you are not being innovative enough or taki
 Build a blameless post-mortem culture: summarize the event and its timeline from discovery to resolution, identify cause, assess damage, come up with action items for resolution, and come up with action items to prevent the event from happening again.
 
 A good developer:
+
 - thrives in ambiguity: can make progress towards a problem, even when the environment is constantly shifting
 - values feedback: has humility to receive a give feedbkac gracefully
 - puts the user first
@@ -65,14 +74,13 @@ A good developer:
 Organizations needs a culture of learning
 
 challenges/obstacles
+
 - lack of psychological safety
 - knowledge islands that elad to info fragmentation and duplication
 - single point of failure/bus factor
 - all-or-nothing expertise
 - parroting - mimicry without understanding
 - haunted graveyards - areas in code that people are afraid to change
-
-
 
 You can have all the uninterrupted time in the world, but if you're using it to work on the wrong thing, you're wasting your time.
 
@@ -82,9 +90,10 @@ Documentation doesn't replace human expertise - humans can assess which info is 
 
 A big part of learning is being able to try things and feeling safe to fail.
 
-Inheriting a legacy code base - Chesterson's fence - removing something (a fence) just because you don't see the use of it, isn't a good idea. You should only remove it if you know *why* you don't see the use of it.
+Inheriting a legacy code base - Chesterson's fence - removing something (a fence) just because you don't see the use of it, isn't a good idea. You should only remove it if you know _why_ you don't see the use of it.
 
 Strategies:
+
 - wikis
 - group chats
 - mailing lists
@@ -99,3 +108,49 @@ The first time you learn somethinhg is the best time to see ways that the existi
 Bad behavior of a few individuals can make an entire team unwelcoming. Novices end up taking their questions elsewhere and new experts stop trying. In the worst cases, the group reduces to its most toxic members. Knowledge sharing should be done with kindness and respect.
 
 A leader should improve the quality of the people around them, improve the teams psychological safety, create a culture of teamwork and collaboration.
+
+### Chapter 4: Engineering for Equity
+
+Unconscious bias leads to systems that fails its users. Engineering teams need to be representative of their existing and future users.
+
+Build for inclusive design from the start. Design for the user that is least like you.
+
+Build for everyone and _with_ everyone.
+
+### Chapter 5: How to Lead a Team
+
+Engineering manager - responsible for performance, productivity, and happiness of every person on their team while ensuring the needs of the business are met. Focuses on the social health of the team.
+
+Tech lead - responsible for tech decisions and choices, architecture, priorities, velocity, and general project management. Focuses on the technical health of the team.
+
+Best leads serve their team with humility, respect, and trust.
+
+As an IC, you typically end your day with something you can point to as an accomplishment (code, documentation). As a manager, it is much more difficult to quantify work done.
+
+Above all, resist the urge to manage. Instead, serve your team by creating an atmosphere of humility, trust, and respect. Remove bureaucratic obstacles, help the team reach consensus. Advise only when necessary.
+
+If a manager makes it obvious that they trust their employees, the employee feels positive pressure to live up to that trust. Traditional managers worry about how to get things done, whereas great managers worry about what things get done and trust their team to figure out how to do it.
+
+If your employees are so uninterested in thier job that they actually need traditional-manager babysitting to be convinced to work, that is your real problem.
+
+If you try to achieve an impossible goal, there is a good chance you'll fail, but if you fail trying to achieve the impossible, you'll most likely accomplish far more than you have accomplished had you merely attempted something you knew you could complete.
+
+Hire people that are smarter than you and who can replace you. They'll be able to direct themselves. Will give you time for other opportunities.
+
+Sometimes you get to be the tooth fairy, sometimes you have to be the dentist. You need to deal with people who aren't meeting expectations by coaching them, providing direction and encouragement. "Hope is not a strategy". High performers waste time pulling the low performer along which causes team morale to go down. This requires temporary micromanagement where you set small, incremental, achieveable goals.
+
+Never compromise the hiring bar - don't just hire the best from a pool of unqualified applicants.
+
+Trust your team. Respect their abilities and prior accomplishments, even if they are new to your team.
+
+Mediate your reactions and maintain your calm.
+
+When someone is asking you questions, they typically don't want you to solve the problem but rather help them solve it - the best way to do that is to ask questions which helps them refine and explore the problem.
+
+Balance the trade-offs of a mentee's time learning versus your own time contributing to the product. Help the mentee arrive at the solution but don't solve it for them.
+
+Set clear goals so the team knows what to prioritize and how to make appropriate tradeoffs.
+
+Make a list of all the thankless tasks that need to be done and distribute them equally amongst the team.
+
+Ask reports what _they_ need.

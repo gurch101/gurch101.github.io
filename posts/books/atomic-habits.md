@@ -3,7 +3,7 @@ title: Atomic Habits
 date: 2021-10-10
 description: Atomic Habits Summary
 category: book summary
-type: notes
+type: books
 ---
 
 ### The Fundamentals: Why Tiny Changes Make a Big Difference
@@ -28,7 +28,8 @@ The hallmark of any compounding process - the most powerful outcomes are delayed
 
 A stonecutter hammers away at his rock, perhaps 100 times without as much as a crack showing in it. Yet at the 101 blow, it will split in two, and I know it was not that last blow that did it - but all that had gone before.
 
-If you want better results, forget about goals and focus on your system instead. Goals set the direction but the system is what makes progress. 
+If you want better results, forget about goals and focus on your system instead. Goals set the direction but the system is what makes progress.
+
 - Winners and losers have the same goals but the difference in the system is what leads to winners.
 - Achieving a goal only changes your life for the moment
 - goals restrict your happiness - either you achieve your goal and are are successful or you fail and are a disappointment. Fall in love with the process.
@@ -42,7 +43,7 @@ Your commitment to the process will determine your progress.
 
 outcomes = what you get
 
-processes  = what you do
+processes = what you do
 
 identity = what you believe
 
@@ -86,6 +87,7 @@ To create a good habit, make the cue obvious, the craving attractive, the respon
 To break a bad habit, make the cue invisible, the craving unattractive, the response difficult, and the reward unsatisfying
 
 ### The First Law: Make it Obvious
+
 ### Chapter 4: The Man Who Didn't Look Right
 
 You don't need to be aware of the cue for a habit to begin. You can notice an opportunity and take action without dedicating conscious attention to it. Ex - paramedic who recognized a person was going to have a heart attack just based on appearance.
@@ -105,6 +107,7 @@ People who make a specific plan for when and where they will perform a new habit
 Use this template: I will [behavior] at [time] in [location]
 
 Diderot Effect: obtaining a new possession creates a spiral of consumption that leads to additional purchases.
+
 - buy a couch now you question the layout of your entire living room
 - buy a dress and you need to get shoes and earrings to match
 
@@ -116,7 +119,8 @@ Habit stacking template: After [current habit], I will [new habit]
 
 behavior is a function of the person in their environment
 
-Your habits change depending on the room you are in and the cues in front of you 
+Your habits change depending on the room you are in and the cues in front of you
+
 - re-arranged cafeteria with water available at more stations reduced soda sales
 - when home electrical meters are located in an easy to view location, people use less electricity
 - products sold at the end of aisles and at eye level are sold more frequently
@@ -133,13 +137,16 @@ one space, one use
 ### Chapter 7: The Secret to Self-Control
 
 9 out of 10 soldiers that became addicted to heroin in Vietnam war were able to drop the habit immediately when returning home
+
 - radical changes to environment can be used to break bad habits
 - In Vietnam, heroin was easy to access, soldiers were away from home, stressed
 
 Conversely, 9 out of 10 addicts that come back from rehab, relapse
+
 - returned to same environment
 
-People with the best self-control are those that have to use it least 
+People with the best self-control are those that have to use it least
+
 - spend less time in tempting situations and remove environmental cues
 
 bad habits are autocatalytic - watching tv makes you feel sliuggish so you watch more tv because you don't have energy to do anything else
@@ -153,27 +160,32 @@ cue-induced wanting - an external trigger causes a compulsive craving to repeat 
 Secret to self-control: make the cues of your good habits obvious and the cues to your bad habits invisible
 
 ### The Second Law: Make it Attractive
+
 ### Chapter 8: How to Make a Habit Irresistible
 
 supernormal stimuli - heightened version of reality
+
 - after spending hundreds of thousands of years hunting and foraging, the brain evolved to place a high value on salt, sugar, and fat because they used to be rare
 - now, junk food is abundant and cheap but our brains continue to crave it like its scarce
 - high contrast foods are appealing - crunchy and creamy over unprocessed foods that taste the same after each bite
 
 the more attractive an opportunity is, the more likely it is to become habit-forming
 
-when you block receptors of dopamine, animals lose all will to live - they won't eat, drink, or have sex. Within a few days, the animals die of thirst. They still *like* those things but they have no desire for them.
+when you block receptors of dopamine, animals lose all will to live - they won't eat, drink, or have sex. Within a few days, the animals die of thirst. They still _like_ those things but they have no desire for them.
 
 habits are a dopamine-driven feedback loop. Its released not only when you experience pleasure, but also when you anticipate it.
+
 - a child thinking about Christmas can be better than opening the gifts
 - daydreaming about a vacation can be more pleasurable than actually being on vacation
 
 Temptation bundling - linking an action you want to do with an action you need to do
+
 - After [habit I need], I will [habit I want]
 
 ### Chapter 9: The Role of Family and Friends in Shaping Your Habits
 
 Habits that are normal in your culture are among the most attractive behaviors. Behaviors that are attractive, help us fit in.
+
 - Polgar sisters became chess prodigies because they were raised to prioritize chess above all else
 - We pick up habits from those close to us. A persons chances of becoming obese increased by 57% if they had a friend who became obese. The higher your friends IQ at 11 or 12, the higher your IQ will be at 15.
 - To build better habits, join cultures where your desired behavior is the normal behavior.
@@ -183,6 +195,7 @@ Habits that are normal in your culture are among the most attractive behaviors. 
 ### Chapter 10: How to Find and Fix the Causes of Your Bad Habits
 
 Recognize that cravings have underlying motives
+
 - conserve energy
 - obtain food and water
 - find love and reproduce
@@ -192,6 +205,7 @@ Recognize that cravings have underlying motives
 - achieve status and prestige
 
 habit forming products don't create new motivations but latch on underlying motives
+
 - find love -> Tinder
 - Connect with others -> Facebook
 - Win socal acceptance -> Instagram
@@ -205,6 +219,7 @@ Reframe habits to highlight their benefits rather than drawbacks. Associate good
 Create a motivation ritual by doing something you enjoy immediately before a difficult habit.
 
 ### The Third Law: Make it Easy
+
 ### Chapter 11: Walk Slowly, but Never Backward
 
 Class divided in two - one to produce most photos, one to produce best photo. Quantity group had higher quality since they practiced more.

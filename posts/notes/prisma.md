@@ -1,3 +1,11 @@
+---
+title: Prisma
+date: 2021-10-03
+description: Prisma Summary
+category: summary
+type: notes
+---
+
 # Prisma
 
 Prisma is an type-safe ORM that can query a database in node.js apps with either REST or GraphQL APIs.

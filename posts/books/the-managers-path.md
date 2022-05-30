@@ -3,7 +3,7 @@ title: The Manager's Path
 date: 2021-10-10
 description: The Manager's Path Summary
 category: book summary
-type: notes
+type: books
 ---
 
 ### Management 101
@@ -18,7 +18,7 @@ As you become more senior, your manager expects you to bring solutions, not prob
 
 ### Mentoring
 
-good mentor - discuss projects, whiteboard, pair program. Assists when you're stuck. 
+good mentor - discuss projects, whiteboard, pair program. Assists when you're stuck.
 
 Listen: understand the mentee is probably nervous and trying their best to please you. They may not ask questions when they don't understand things. Get those questions out of him - the odds of you spending all your time answering questions are slim compared to the odds that your intern will go off in the absolute wrong direction because they didnt ask enough questions.
 
@@ -36,8 +36,9 @@ Scales themselves by delegating work effectively without micromanaging. Use thei
 
 Influencing without authority.
 
-Roles a tech lead plays: 
-- system architect/business analyst: identify critical systems that need to change and the features that need to be built in order to deliver upcoming projects. 
+Roles a tech lead plays:
+
+- system architect/business analyst: identify critical systems that need to change and the features that need to be built in order to deliver upcoming projects.
 - project planner: break down work into rough deliverables so that the team can work in parallel
 - software dev/team leader: write code, communicate challenges, and delegate
 
@@ -49,11 +50,12 @@ The plan itself is less important than spending time on the act of planning.
 
 Explain things to upper management in a nonthreatening and non condescending way.
 
-Your manager isn't great at handing you plum assignments that showcase your talents to the whole organization; she expects *you* to tell *her* where these opportunities live.
+Your manager isn't great at handing you plum assignments that showcase your talents to the whole organization; she expects _you_ to tell _her_ where these opportunities live.
 
 Be careful of relying on process to solve problems that are a result of communication or leadership gaps on the team.
 
 Good tech lead:
+
 - understands the architecture, data flow, how it reflects the products it supports
 - is a team player. Don't do all the interesting work yourself. Look at the tricky/boring/annoying areas and unstick them.
 - leads technical decisions. Always solicit opinions of the team.
@@ -74,6 +76,7 @@ get feedback
 have regular 1-1s
 
 1-1 types:
+
 - todo list meeting: both parties come with objectives to cover in order of importance. Updates are given, decisions are made, planning happens
 - the catch-up: listen to anything the report wants to discuss. Don't allow the discussion to turn into therapy
 - the feedback meeting: review progress on goals, discuss performance issues
@@ -101,6 +104,7 @@ Need to hold people accountable for their decisions, make sure that decisions pa
 Its important for technical managers to still be in the code - should be able to identify and prioritize technical debt, guide what is/isn't possible, identify the shortest path to implement new features.
 
 Common problems in dysfunctional teams:
+
 - not shipping: find and remove bottlenecks in the tools and processes.
 - people drama: let go or transfer toxic employees.
 - overwork: slow down product roadmap, deal with tech debt, cut features
@@ -113,6 +117,7 @@ create a data-driven culture by gathering stats on team productivity, quality (t
 hold retrospectives
 
 how to manage conflict:
+
 - don't rely exclusively on concensus or voting
 - set up clear processes to depersonalize decisions - start with a shared understanding of goals, risks, questions
 - if there are problems, address them immediately rather than letting the simmer
@@ -122,6 +127,7 @@ goal should be to build a team where there is a psychological safety net - memeb
 openly refuse to tolerate bad behavior
 
 project planning:
+
 - 10 productive engineering weeks per quarter - vacations, meetings, review sessions, production outages, onboarding take the other 3 weeks.
 - budget 20% of time for tech debt
 - as deadlines approach, your job is to say no
@@ -138,12 +144,14 @@ Prepare for meetings - make agendas, hold people accountable, make sure the meet
 Delegation strategy - if its simple and frequent, delegate (running standups, doing simple code reviews). If its simple and infrequent, do it yourself. If its complex and frequent, delegate. If its complex and infrequent, delegate for training purposes.
 
 Strategies for saying no
+
 - say "yes and" where you agree but also articulate the sacrifices/downsides of saying yes.
 - say "no" with a set of hard requirements needed to say yes
 - go through a line of questioning so that the person realizes its not a good idea
 - say no quickly rather than dragging something on
 
 advocate and push for technical process improvements to increase engineer productivity
+
 - code should be checked-in frequently. Encourage this by teaching tdd.
 - work to reduce incidents rather than simply react to them as they come.
 
@@ -155,7 +163,8 @@ Strong teams are built on shared purpose and value alignment.
 
 open-door policies dont work - you need to find problems proactively
 
-have skip-level meetings 
+have skip-level meetings
+
 - meet with people who report to people who report to you. Hold ~1/quarter. Provide prompts for potential topics.
 - best/worst aspects of project
 - who on your team has been doing really well
@@ -175,19 +184,21 @@ New hires act in self-interest until they get to know their colleagues, and then
 make it clear that your goal is to understand what people do so that you're capable of appreciating it better
 
 solving team problems
+
 - form a hypothesis
 - check the data: tickets, chats, emails, code reviews, calendars
 - observe the team: drop in on meetings
 - ask questions: find out goals - people need to feel an understanding and connection with the purpose of their work
 - check team dynamics: do people like each other? do they collaborate?
 - jump in to help
-- be curious - learn *why*
+- be curious - learn _why_
 
 People ask why things take so long for two reasons 1) they don't like the original estimate or 2) didn't ask for an estimate and now they're upset. You must be aggressive about sharing estimates and updates to estimates, even when people don't ask.
 
 Showing some empathy for the person providing pressure can go a long way to shifting focus from blame to action.
 
 Dealing with roadmap uncertainty
+
 - be realistic about likelihood of changing plans
 - break down projects into a series of small deliverables so that some results are achieved
 - don't overpromise a future of technical projects
@@ -198,6 +209,7 @@ Dealing with roadmap uncertainty
 The company looks to you for guidance on what to do, how to act, how to think, and what to value.
 
 Four categories:
+
 - info gathering/sharing: need to synthesize large amounts of info quick, identify critical elements, and share it with appropriate third parties
 - nudging: remind people of their commitments by asking questions instead of giving orders
 - decision making: take conflicting perspectives and incomplete info and set a direction

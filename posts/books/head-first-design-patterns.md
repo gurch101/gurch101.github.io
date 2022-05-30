@@ -3,7 +3,7 @@ title: Head First Design Patterns
 date: 2021-10-10
 description: Head First Design Patterns Summary
 category: book summary
-type: notes
+type: books
 ---
 
 ### Chapter 1: Intro to Design Patterns
