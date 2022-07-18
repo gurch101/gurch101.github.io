@@ -60,7 +60,9 @@ Create a provider by calling `nest g service cats`
 
 ```js
 // application-scoped by default - instantiated and resolved at bootup and destroyed at shut down
-@Injectible()
+import { Injectable } from '@nest/common';
+
+@Injectable()
 export class CatsService {
   private readonly cats: Cat[] = [];
 

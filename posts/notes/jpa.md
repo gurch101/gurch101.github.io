@@ -36,7 +36,7 @@ public class PersonDao {
   }
 
   public int update(Person person) {
-    return jdbcTemplate.update("update  person set name=?, location=?, birth_date=? where id = ?", new Object[] { person.getName(), person.getLocation(), new Timestamp(person.getBirthDate().getTime()), person.getId()})
+    return jdbcTemplate.update("update person set name=?, location=?, birth_date=? where id = ?", new Object[] { person.getName(), person.getLocation(), new Timestamp(person.getBirthDate().getTime()), person.getId()})
   }
 }
 ```
@@ -109,30 +109,6 @@ public class PersonJpaRepository {
 }
 ```
 
-application.properties:
-
-```
-# load data.sql AFTER jpa creates all tables
-spring.jpa.defer-datasource-initialization=true
-```
-
-### Entity Manager
-
-```java
-em.flush() // synchronize all changes with db - requires a transaction; a flush can still be rolled back on failure
-em.clear() // make all managed entities unmanaged - any changes made to entity object are not synchronized after clear is called
-em.detach(entity) // detach specific entity
-em.refresh(entity) // repace entity contents with values in db
-```
-
-### JPQL
-
-Query using entities instead of db tables.
-
-```java
-List<Course> courses = em.createQuery("SELECT c from Course c where name like '%foo'", Course.class).getResultList()
-```
-
 ### Relationships
 
 ```java
@@ -157,6 +133,13 @@ public class Review {
 
   @ManyToOne // adds course_id field to Review table; eager fetched by default
   private Course course;
+
+  @Enumerated(EnumType.STRING) // by default, the ordinal (number) is stored which is bad if you ever need to add an enum entry between others
+  private ReviewRating rating;
+}
+
+public enum ReviewRating {
+  ONE, TWO, THREE, FOUR, FIVE
 }
 
 @Entity
@@ -171,6 +154,16 @@ public class Student {
   @ManyToMany
   @JoinTable(name = "student_course", joinColumns = @JoinColumn(name="student_id"), inverseJoinColumns = @JoinColumn(name="course_id"))
   private List<Course> courses = new ArrayList<>();
+
+  // since its embedded, the address fields are stored directly in student
+  @Embedded
+  private Address address;
+}
+
+@Embeddable
+public class Address {
+  private String line1;
+  private String line;
 }
 
 @Entity
@@ -199,6 +192,83 @@ To enroll a student in a course
 Course c = em.getReference(Course.class, <primaryKey>);
 student.addCourse(c);
 em.persist(student); // this triggers select * on all courses, delete on each course, the insert of each course
+```
+
+application.properties:
+
+```
+# load data.sql AFTER jpa creates all tables
+spring.jpa.defer-datasource-initialization=true
+```
+
+### Entity Manager
+
+```java
+em.flush() // synchronize all changes with db - requires a transaction; a flush can still be rolled back on failure
+em.clear() // make all managed entities unmanaged - any changes made to entity object are not synchronized after clear is called
+em.detach(entity) // detach specific entity
+em.refresh(entity) // repace entity contents with values in db
+```
+
+### Criteria Queries
+
+```java
+CriteriaBuilder cb = em.getCriteriaBuilder();
+CriteriaQuery<Course> cq = cb.createQuery(Course.class);
+Root<Course> courseRoot = cq.from(Course.class);
+// select * from course;
+TypedQuery<Course> query = em.createQuery(cq.select(courseRoot));
+List<Course> resultList = query.getResultList();
+
+
+// select * from course where name like "%100 Steps"
+Predicate like100Steps = cb.like(courseRoot.get("name"), "%100 Steps");
+cq.where(like100Steps);
+TypedQuery<Course> query = em.createQuery(cq.select(courseRoot));
+List<Course> resultList = query.getResultList();
+
+
+// select * from course where c.students is empty (select * from course left outer join students on course.id = student.course_id where student.id is null)
+Predicate noStudents = cb.isEmpty(courseRoot.get("students"));
+cq.where(noStudents);
+TypedQuery<Course> query = em.createQuery(cq.select(courseRoot));
+List<Course> resultList = query.getResultList();
+
+// select * from course inner join student_course on course.id = student_course.course_id inner join student on student.id = student_course.student_id;
+Join<Object, Object> join = courseRoot.join("students"); // add JoinType.LEFT as second param to make left join
+TypedQuery<Course> query = em.createQuery(cq.select(courseRoot));
+List<Course> resultList = query.getResultList();
+```
+
+### Collections
+
+`@ElementCollection` Declares an element collection mapping. Data for collection is in separate table. Used to set up relationship to primitive type or `@Embeddable`. Target object is not an entity. Limitations: can't query/persist/merge independently of parent object, target objects are always persisted/merged/removed with their parent object.
+
+`@CollectionTable` Specifies the name of table that will hold the collection and provides the join column
+
+```java
+@Entity
+@Table(name = "student")
+public class Student {
+  @Id
+  private int id;
+
+  @ElementCollection
+  @CollectionTable(
+    name = "image"
+    joinColumns = @JoinColumn(name = "student_id")
+  )
+  @Column(name = "file_name") // creates image(student_id, file_name) table
+  private Set<String> images = new HashSet<String>();
+}
+```
+
+### JPQL
+
+Query using entities instead of db tables.
+
+```java
+List<Course> courses = em.createQuery("SELECT c from Course c where name like '%foo'", Course.class).getResultList()
 ```
 
 ### Lazy Loading
@@ -273,6 +343,78 @@ List<Course> someCustomName(String namedParam1, String namedParam2);
 
 Add `@RepositoryRestResource(path="courses")` to the repository. Add `@JsonIgnore` to entity fields you don't want to expose/return.
 
+### Soft Deletes in Hibernate
+
+add `@SqlDelete(sql="update course set is_deleted = false where id = ?)` to the `@Entity` class. This query will run whenever an entity manager remove is run. This will not updated the cached entity - use `@PreRemove` for that.
+
+To filter out soft-deleted records from queries, add `@Where(clause = "is_deleted = false")`. This clause doesn't apply to native queries.
+
+Whenever an entity is deleted, `@PreRemove` is fired.
+
+### JPA Entity Lifecycle Methods
+
+`@PostLoad` called after an entity is retrieved.
+
+`@PostPersist` called after an entity is persisted.
+
+`@PostRemove` called after an entity is removed.
+
+`@PostUpdate`
+
+`@PrePersist`
+
+`@PreRemove`
+
+`@PreUpdate`
+
+### Tips
+
+Ensure `toString()`, `hashCode()`, `equals()` only includes values directly on the entity and not relationships
+
+### When to use JPA
+
+Use for simple, non-batch queries
+
+### Performance Tuning
+
+Measure and monitor performance _before_ optimizing performance.
+
+application.properties:
+
+```
+spring.jpa.properties.hibernate.generate_statistics=true
+logging.level.org.hibernate.stat=debug
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+```
+
+Add good indexes to ensure queries are efficient. Review the execution plan.
+
+Use a cache for reference data (dropdowns, static info)
+
+Make minimal use of eager fetching
+
+Avoid n + 1 problems - don't call `get<Relationship>` for lazy fetch relationships within a for loop
+
+- use entitygraph to fetch relationships for specific queries rather than using eager fetch
+- use a jpql query with a JOIN FETCH (`SELECT c FROM Course c JOIN FETCH c.students s`)
+
+### Caching
+
+Two-levels of caching. Each transaction has its own cache associated with the persistence context (first-level cache - built into hibernate). The second-level cache spans requests/transactions/persistence contexts and requires additional configuration.
+
+1. in application.properties - turn on ehcache where you have to explicitly enable caching on entities
+
+```
+spring.jpa.properties.hibernate.cache.use_second_level_cache=true
+spring.jpa.properties.hibernate.cache.region.factory_class=org.hibernate.cache.ehcache.EhCacheRegionFactory
+spring.jpa.properties.javax.persistence.sharedCache.mode=ENABLE_SELECTIVE
+
+logging.level.net.sf.ehcache=debug
+```
+
+2. Add `@Cacheable` on the entities to cache
+
 ### H2 Setup
 
 in application.properties:
@@ -284,6 +426,21 @@ spring.datasource.url=jdbc:h2:mem:testdb
 When running, goto `/h2-console` to connect to an admin panel
 
 Spring boot will automatically run `src/main/resources/schema.sql` to create the schema for JPA-managed entites and `src/main/resources/data.sql` to populate it. If using a migration tool, do not use these files.
+
+### Other Database
+
+Add database connector to your gradle/maven file
+
+in application.properties:
+
+```
+spring.jpa.hibernate.ddl-auto=none
+spring.datasource.url=<conn-string>
+spring.datasource.username=
+spring.datasource.password=
+```
+
+One strategy for setting up the schema is to use h2 in development to get all the CREATE TABLE queries from the logs
 
 ### Questions
 

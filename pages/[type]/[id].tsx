@@ -22,7 +22,6 @@ export default function Post({ post }: any) {
 
 export function getStaticPaths() {
   const paths = getAllPosts();
-  console.log(paths);
   return {
     paths,
     fallback: false,

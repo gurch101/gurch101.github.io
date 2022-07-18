@@ -50,3 +50,11 @@ Investment manager makes an investment decision and communicates an "order" to e
 When the broker receives the order, it acts as agent (broker attempts to find a third party willing to trade on terms of order - investment bank makes commission _only_) or principal (trader trades off investment bank trading book). The broker becomes the counterparty to the trade (broker is investors counterparty and investor is broker's counterparty).
 
 If the trade is made by a fund (ie mutual fund provider), the block level trade needs to be allocated to its underlying funds (splits).
+
+### Trade Capture
+
+Formally recording details of an individual trade immediately after execution. Trade date/time (dividend entitlements is based on trade date), contractual settlement date (the day securities/cash are exchanged), buy/sell, quantity, security, market, price, internal "owner" (the trader/advisor), counterparty (entity name + location)
+
+If counterparty or security reference data is missing, STP between fo system and ops system can't occur and an exception is raised
+
+A trade is "open" until settlement date. Exposure with counterparty exists until settlement date.

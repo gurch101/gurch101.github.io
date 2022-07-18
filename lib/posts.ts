@@ -53,7 +53,9 @@ export function getSortedPostsData(postType: PostType) {
   const fileNames = fs.readdirSync(postsDirectory(postType));
   const allPostsData = fileNames
     .map((fileName) => getParsedPostData(postType, fileName))
-    .filter((post) => post.type === postType);
+    .filter(
+      (post) => post.type === postType && post.category.indexOf("draft") < 0
+    );
   return allPostsData
     .sort(({ date: a }, { date: b }) => {
       if (a < b) {
