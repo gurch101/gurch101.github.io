@@ -1,7 +1,22 @@
 <!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Prisma | Gurchet&#x27;s Development Blog</title><meta name="description" content="Prisma Summary"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Prisma</h1><div class="meta"><span>Sat Oct 02 2021</span><span>summary</span></div><div class="mt25 post"><h1>Prisma</h1>
 <p>Prisma is an type-safe ORM that can query a database in node.js apps with either REST or GraphQL APIs.</p>
-<p><code>npx prisma init</code> to create <code>.env</code> which stores db connection info and <code>prisma/schema.prisma</code> which has the schema</p>
+<ol>
+<li>
+<p><code>npm install --save-dev prisma</code> and <code>npm install @prisma/client</code></p>
+</li>
+<li>
+<p><code>npx prisma init</code> to create <code>.env</code> which stores db connection info and <code>prisma/schema.prisma</code> which has the schema.</p>
+</li>
+<li>
+<p>Set the provider in <code>schema.prisma</code> to sqlite/postgresql, etc.</p>
+</li>
+<li>
+<p>Set the <code>DATABASE_URL</code> in <code>.env</code>. (for sqlite, `file:./dev.db)</p>
+</li>
+<li>
 <p>add models into <code>schema.prisma</code></p>
+</li>
+</ol>
 <div class="remark-highlight"><pre class="language-sh"><code class="language-sh">model User {
   id    Int     @default(autoincrement()) @id
   email String  @unique
@@ -16,7 +31,81 @@ model Post {
   published Boolean? @default(false)
   author    User?    @relation(fields: [authorId], references: [id])
   authorId  Int?
+  createDate DateTime @default(now())
 }</code></pre></div>
+<ol start="6">
+<li>
 <p>apply migrations by running <code>npx prisma migrate dev --name &#x3C;migrationName></code>.</p>
-<p>run <code>npx prisma generate</code> to generate the client code off the models. Re-run every time you update the model.</p>
+</li>
+<li>
+<p>run <code>npx prisma generate</code> to generate the client code off the models in the schema. Re-run every time you update the model.</p>
+</li>
+</ol>
+<h3>Client</h3>
+<div class="remark-highlight"><pre class="language-ts"><code class="language-ts"><span class="token keyword">import</span> <span class="token punctuation">{</span> PrismaClient <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@prisma/client"</span><span class="token punctuation">;</span>
+
+<span class="token comment">// only create one instance in your application. Each client manages a connection pool of size (cpus * 2) + 1.</span>
+<span class="token comment">// automatically connects lazily on first request</span>
+<span class="token keyword">const</span> prisma <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">PrismaClient</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div>
+<p>https://www.prisma.io/docs/concepts/components/prisma-client/working-with-prismaclient/connection-pool</p>
+<h3>Migrations</h3>
+<p>Update schema then run <code>npx prisma migrate dev</code> to create (if needed) and apply migrations. Use this command in development environments.</p>
+<p>To apply migrations in staging or production, run <code>npx prisma migrate deploy</code>.</p>
+<p>To make sure the database is in sync with the prisma schema (for a pre-existing db, for ex), run <code>prisma db pull</code></p>
+<p>To create a migration (based on schema or empty file) without applying it, run <code>npx prisma migrate dev --create-only</code>. This is useful if you need to modify the migration file (to handle use cases not handled by prisma schema files - adding extensions, stored procedures, triggers, views, partial indexes) before applying it. This is also useful if you need to rename fields since a rename is a CREATE + DROP - you should manually modify the migration to <code>ALTER TABLE RENAME</code>.</p>
+<p>To baseline a migration (mark it as applied) for pre-existing databases, run <code>prisma migrate resolve --applied &#x3C;migration name></code>.</p>
+<p>Migrations are applied in the order they are created.</p>
+<p><code>prisma migrate diff</code> can diff two schema sources (file/db) and outputs the difference to a sql script.</p>
+<h3>Seed Database</h3>
+<ol>
+<li>Create <code>prisma/seed.ts</code> file</li>
+</ol>
+<div class="remark-highlight"><pre class="language-ts"><code class="language-ts"><span class="token keyword">import</span> <span class="token punctuation">{</span> PrismaClient <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@prisma/client"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> prisma <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">PrismaClient</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">async</span> <span class="token keyword">function</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">await</span> prisma<span class="token punctuation">.</span>user<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    data<span class="token operator">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token function">catch</span><span class="token punctuation">(</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token function">finally</span><span class="token punctuation">(</span><span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token keyword">await</span> prisma<span class="token punctuation">.</span><span class="token function">$disconnect</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div>
+<ol start="2">
+<li>Update <code>package.json</code></li>
+</ol>
+<div class="remark-highlight"><pre class="language-json"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"prisma"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"seed"</span><span class="token operator">:</span> <span class="token string">"ts-node prisma/seed.ts"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div>
+<ol start="3">
+<li>Apply with <code>npx prisma db seed</code>, <code>npx prisma migrate dev</code>, or <code>npx prisma migrate reset</code></li>
+</ol>
+<h3>Limitations</h3>
+<ul>
+<li>cascades aren't supported by prisma schema, need to manually maintain in migration files.</li>
+</ul>
+<h3>Nestjs integration</h3>
+<div class="remark-highlight"><pre class="language-ts"><code class="language-ts"><span class="token keyword">import</span> <span class="token punctuation">{</span> INestApplication<span class="token punctuation">,</span> Injectable<span class="token punctuation">,</span> OnModuleInit <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@nestjs/common"</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> PrismaClient <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"@prisma/client"</span><span class="token punctuation">;</span>
+
+<span class="token decorator"><span class="token at operator">@</span><span class="token function">Injectable</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name">PrismaService</span> <span class="token keyword">extends</span> <span class="token class-name">PrismaClient</span> <span class="token keyword">implements</span> <span class="token class-name">OnModuleInit</span> <span class="token punctuation">{</span>
+  <span class="token keyword">async</span> <span class="token function">onModuleInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">await</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">$connect</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">async</span> <span class="token function">enableShutdownHooks</span><span class="token punctuation">(</span>app<span class="token operator">:</span> INestApplication<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">$on</span><span class="token punctuation">(</span><span class="token string">"beforeExit"</span><span class="token punctuation">,</span> <span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+      <span class="token keyword">await</span> app<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div>
 </div></div></div></div></body></html>

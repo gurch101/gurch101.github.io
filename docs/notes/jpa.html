@@ -23,7 +23,7 @@
   <span class="token punctuation">}</span>
 
   <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">update</span><span class="token punctuation">(</span><span class="token class-name">Person</span> person<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">return</span> jdbcTemplate<span class="token punctuation">.</span><span class="token function">update</span><span class="token punctuation">(</span><span class="token string">"update  person set name=?, location=?, birth_date=? where id = ?"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">{</span> person<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> person<span class="token punctuation">.</span><span class="token function">getLocation</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Timestamp</span><span class="token punctuation">(</span>person<span class="token punctuation">.</span><span class="token function">getBirthDate</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> person<span class="token punctuation">.</span><span class="token function">getId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> jdbcTemplate<span class="token punctuation">.</span><span class="token function">update</span><span class="token punctuation">(</span><span class="token string">"update person set name=?, location=?, birth_date=? where id = ?"</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">{</span> person<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> person<span class="token punctuation">.</span><span class="token function">getLocation</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Timestamp</span><span class="token punctuation">(</span>person<span class="token punctuation">.</span><span class="token function">getBirthDate</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getTime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> person<span class="token punctuation">.</span><span class="token function">getId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
 </code></pre></div>
@@ -88,19 +88,6 @@
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
 </code></pre></div>
-<p>application.properties:</p>
-<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown"># load data.sql AFTER jpa creates all tables
-spring.jpa.defer-datasource-initialization=true</code></pre></div>
-<h3>Entity Manager</h3>
-<div class="remark-highlight"><pre class="language-java"><code class="language-java">em<span class="token punctuation">.</span><span class="token function">flush</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment">// synchronize all changes with db - requires a transaction; a flush can still be rolled back on failure</span>
-em<span class="token punctuation">.</span><span class="token function">clear</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment">// make all managed entities unmanaged - any changes made to entity object are not synchronized after clear is called</span>
-em<span class="token punctuation">.</span><span class="token function">detach</span><span class="token punctuation">(</span>entity<span class="token punctuation">)</span> <span class="token comment">// detach specific entity</span>
-em<span class="token punctuation">.</span><span class="token function">refresh</span><span class="token punctuation">(</span>entity<span class="token punctuation">)</span> <span class="token comment">// repace entity contents with values in db</span>
-</code></pre></div>
-<h3>JPQL</h3>
-<p>Query using entities instead of db tables.</p>
-<div class="remark-highlight"><pre class="language-java"><code class="language-java"><span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&#x3C;</span><span class="token class-name">Course</span><span class="token punctuation">></span></span> courses <span class="token operator">=</span> em<span class="token punctuation">.</span><span class="token function">createQuery</span><span class="token punctuation">(</span><span class="token string">"SELECT c from Course c where name like '%foo'"</span><span class="token punctuation">,</span> <span class="token class-name">Course</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getResultList</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-</code></pre></div>
 <h3>Relationships</h3>
 <div class="remark-highlight"><pre class="language-java"><code class="language-java"><span class="token annotation punctuation">@Entity</span>
 <span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Course</span> <span class="token punctuation">{</span>
@@ -123,6 +110,13 @@ em<span class="token punctuation">.</span><span class="token function">refresh</
 
   <span class="token annotation punctuation">@ManyToOne</span> <span class="token comment">// adds course_id field to Review table; eager fetched by default</span>
   <span class="token keyword">private</span> <span class="token class-name">Course</span> course<span class="token punctuation">;</span>
+
+  <span class="token annotation punctuation">@Enumerated</span><span class="token punctuation">(</span><span class="token class-name">EnumType</span><span class="token punctuation">.</span>STRING<span class="token punctuation">)</span> <span class="token comment">// by default, the ordinal (number) is stored which is bad if you ever need to add an enum entry between others</span>
+  <span class="token keyword">private</span> <span class="token class-name">ReviewRating</span> rating<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">public</span> <span class="token keyword">enum</span> <span class="token class-name">ReviewRating</span> <span class="token punctuation">{</span>
+  ONE<span class="token punctuation">,</span> TWO<span class="token punctuation">,</span> THREE<span class="token punctuation">,</span> FOUR<span class="token punctuation">,</span> FIVE
 <span class="token punctuation">}</span>
 
 <span class="token annotation punctuation">@Entity</span>
@@ -137,6 +131,16 @@ em<span class="token punctuation">.</span><span class="token function">refresh</
   <span class="token annotation punctuation">@ManyToMany</span>
   <span class="token annotation punctuation">@JoinTable</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"student_course"</span><span class="token punctuation">,</span> joinColumns <span class="token operator">=</span> <span class="token annotation punctuation">@JoinColumn</span><span class="token punctuation">(</span>name<span class="token operator">=</span><span class="token string">"student_id"</span><span class="token punctuation">)</span><span class="token punctuation">,</span> inverseJoinColumns <span class="token operator">=</span> <span class="token annotation punctuation">@JoinColumn</span><span class="token punctuation">(</span>name<span class="token operator">=</span><span class="token string">"course_id"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
   <span class="token keyword">private</span> <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&#x3C;</span><span class="token class-name">Course</span><span class="token punctuation">></span></span> courses <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token generics"><span class="token punctuation">&#x3C;</span><span class="token punctuation">></span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// since its embedded, the address fields are stored directly in student</span>
+  <span class="token annotation punctuation">@Embedded</span>
+  <span class="token keyword">private</span> <span class="token class-name">Address</span> address<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@Embeddable</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Address</span> <span class="token punctuation">{</span>
+  <span class="token keyword">private</span> <span class="token class-name">String</span> line1<span class="token punctuation">;</span>
+  <span class="token keyword">private</span> <span class="token class-name">String</span> line<span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
 
 <span class="token annotation punctuation">@Entity</span>
@@ -159,6 +163,64 @@ em<span class="token punctuation">.</span><span class="token function">persist</
 <div class="remark-highlight"><pre class="language-java"><code class="language-java"><span class="token class-name">Course</span> c <span class="token operator">=</span> em<span class="token punctuation">.</span><span class="token function">getReference</span><span class="token punctuation">(</span><span class="token class-name">Course</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> <span class="token generics"><span class="token punctuation">&#x3C;</span>primaryKey<span class="token punctuation">></span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 student<span class="token punctuation">.</span><span class="token function">addCourse</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">;</span>
 em<span class="token punctuation">.</span><span class="token function">persist</span><span class="token punctuation">(</span>student<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// this triggers select * on all courses, delete on each course, the insert of each course</span>
+</code></pre></div>
+<p>application.properties:</p>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown"># load data.sql AFTER jpa creates all tables
+spring.jpa.defer-datasource-initialization=true</code></pre></div>
+<h3>Entity Manager</h3>
+<div class="remark-highlight"><pre class="language-java"><code class="language-java">em<span class="token punctuation">.</span><span class="token function">flush</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment">// synchronize all changes with db - requires a transaction; a flush can still be rolled back on failure</span>
+em<span class="token punctuation">.</span><span class="token function">clear</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment">// make all managed entities unmanaged - any changes made to entity object are not synchronized after clear is called</span>
+em<span class="token punctuation">.</span><span class="token function">detach</span><span class="token punctuation">(</span>entity<span class="token punctuation">)</span> <span class="token comment">// detach specific entity</span>
+em<span class="token punctuation">.</span><span class="token function">refresh</span><span class="token punctuation">(</span>entity<span class="token punctuation">)</span> <span class="token comment">// repace entity contents with values in db</span>
+</code></pre></div>
+<h3>Criteria Queries</h3>
+<div class="remark-highlight"><pre class="language-java"><code class="language-java"><span class="token class-name">CriteriaBuilder</span> cb <span class="token operator">=</span> em<span class="token punctuation">.</span><span class="token function">getCriteriaBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">CriteriaQuery</span><span class="token generics"><span class="token punctuation">&#x3C;</span><span class="token class-name">Course</span><span class="token punctuation">></span></span> cq <span class="token operator">=</span> cb<span class="token punctuation">.</span><span class="token function">createQuery</span><span class="token punctuation">(</span><span class="token class-name">Course</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">Root</span><span class="token generics"><span class="token punctuation">&#x3C;</span><span class="token class-name">Course</span><span class="token punctuation">></span></span> courseRoot <span class="token operator">=</span> cq<span class="token punctuation">.</span><span class="token function">from</span><span class="token punctuation">(</span><span class="token class-name">Course</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// select * from course;</span>
+<span class="token class-name">TypedQuery</span><span class="token generics"><span class="token punctuation">&#x3C;</span><span class="token class-name">Course</span><span class="token punctuation">></span></span> query <span class="token operator">=</span> em<span class="token punctuation">.</span><span class="token function">createQuery</span><span class="token punctuation">(</span>cq<span class="token punctuation">.</span><span class="token function">select</span><span class="token punctuation">(</span>courseRoot<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&#x3C;</span><span class="token class-name">Course</span><span class="token punctuation">></span></span> resultList <span class="token operator">=</span> query<span class="token punctuation">.</span><span class="token function">getResultList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+<span class="token comment">// select * from course where name like "%100 Steps"</span>
+<span class="token class-name">Predicate</span> like100Steps <span class="token operator">=</span> cb<span class="token punctuation">.</span><span class="token function">like</span><span class="token punctuation">(</span>courseRoot<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"name"</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"%100 Steps"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+cq<span class="token punctuation">.</span><span class="token function">where</span><span class="token punctuation">(</span>like100Steps<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">TypedQuery</span><span class="token generics"><span class="token punctuation">&#x3C;</span><span class="token class-name">Course</span><span class="token punctuation">></span></span> query <span class="token operator">=</span> em<span class="token punctuation">.</span><span class="token function">createQuery</span><span class="token punctuation">(</span>cq<span class="token punctuation">.</span><span class="token function">select</span><span class="token punctuation">(</span>courseRoot<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&#x3C;</span><span class="token class-name">Course</span><span class="token punctuation">></span></span> resultList <span class="token operator">=</span> query<span class="token punctuation">.</span><span class="token function">getResultList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+
+<span class="token comment">// select * from course where c.students is empty (select * from course left outer join students on course.id = student.course_id where student.id is null)</span>
+<span class="token class-name">Predicate</span> noStudents <span class="token operator">=</span> cb<span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span>courseRoot<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"students"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+cq<span class="token punctuation">.</span><span class="token function">where</span><span class="token punctuation">(</span>noStudents<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">TypedQuery</span><span class="token generics"><span class="token punctuation">&#x3C;</span><span class="token class-name">Course</span><span class="token punctuation">></span></span> query <span class="token operator">=</span> em<span class="token punctuation">.</span><span class="token function">createQuery</span><span class="token punctuation">(</span>cq<span class="token punctuation">.</span><span class="token function">select</span><span class="token punctuation">(</span>courseRoot<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&#x3C;</span><span class="token class-name">Course</span><span class="token punctuation">></span></span> resultList <span class="token operator">=</span> query<span class="token punctuation">.</span><span class="token function">getResultList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// select * from course inner join student_course on course.id = student_course.course_id inner join student on student.id = student_course.student_id;</span>
+<span class="token class-name">Join</span><span class="token generics"><span class="token punctuation">&#x3C;</span><span class="token class-name">Object</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">></span></span> join <span class="token operator">=</span> courseRoot<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span><span class="token string">"students"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// add JoinType.LEFT as second param to make left join</span>
+<span class="token class-name">TypedQuery</span><span class="token generics"><span class="token punctuation">&#x3C;</span><span class="token class-name">Course</span><span class="token punctuation">></span></span> query <span class="token operator">=</span> em<span class="token punctuation">.</span><span class="token function">createQuery</span><span class="token punctuation">(</span>cq<span class="token punctuation">.</span><span class="token function">select</span><span class="token punctuation">(</span>courseRoot<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&#x3C;</span><span class="token class-name">Course</span><span class="token punctuation">></span></span> resultList <span class="token operator">=</span> query<span class="token punctuation">.</span><span class="token function">getResultList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div>
+<h3>Collections</h3>
+<p><code>@ElementCollection</code> Declares an element collection mapping. Data for collection is in separate table. Used to set up relationship to primitive type or <code>@Embeddable</code>. Target object is not an entity. Limitations: can't query/persist/merge independently of parent object, target objects are always persisted/merged/removed with their parent object.</p>
+<p><code>@CollectionTable</code> Specifies the name of table that will hold the collection and provides the join column</p>
+<div class="remark-highlight"><pre class="language-java"><code class="language-java"><span class="token annotation punctuation">@Entity</span>
+<span class="token annotation punctuation">@Table</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"student"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Student</span> <span class="token punctuation">{</span>
+  <span class="token annotation punctuation">@Id</span>
+  <span class="token keyword">private</span> <span class="token keyword">int</span> id<span class="token punctuation">;</span>
+
+  <span class="token annotation punctuation">@ElementCollection</span>
+  <span class="token annotation punctuation">@CollectionTable</span><span class="token punctuation">(</span>
+    name <span class="token operator">=</span> <span class="token string">"image"</span>
+    joinColumns <span class="token operator">=</span> <span class="token annotation punctuation">@JoinColumn</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"student_id"</span><span class="token punctuation">)</span>
+  <span class="token punctuation">)</span>
+  <span class="token annotation punctuation">@Column</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"file_name"</span><span class="token punctuation">)</span> <span class="token comment">// creates image(student_id, file_name) table</span>
+  <span class="token keyword">private</span> <span class="token class-name">Set</span><span class="token generics"><span class="token punctuation">&#x3C;</span><span class="token class-name">String</span><span class="token punctuation">></span></span> images <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashSet</span><span class="token generics"><span class="token punctuation">&#x3C;</span><span class="token class-name">String</span><span class="token punctuation">></span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre></div>
+<h3>JPQL</h3>
+<p>Query using entities instead of db tables.</p>
+<div class="remark-highlight"><pre class="language-java"><code class="language-java"><span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&#x3C;</span><span class="token class-name">Course</span><span class="token punctuation">></span></span> courses <span class="token operator">=</span> em<span class="token punctuation">.</span><span class="token function">createQuery</span><span class="token punctuation">(</span><span class="token string">"SELECT c from Course c where name like '%foo'"</span><span class="token punctuation">,</span> <span class="token class-name">Course</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getResultList</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 </code></pre></div>
 <h3>Lazy Loading</h3>
 <p>set <code>fetch = FetchType.LAZY</code> on any association to lazy load it. Be sure to exclude it from <code>toString()</code>. If the entity is fetched from within a transaction, calling <code>getAssociation()</code> will fetch the association on-demand (ie a second query) as opposed to in a single query with a join. <code>*ToOne</code> is always eager fetched.</p>
@@ -203,11 +265,63 @@ firstPage<span class="token punctuation">.</span><span class="token function">ge
 </code></pre></div>
 <h3>Spring Data REST</h3>
 <p>Add <code>@RepositoryRestResource(path="courses")</code> to the repository. Add <code>@JsonIgnore</code> to entity fields you don't want to expose/return.</p>
+<h3>Soft Deletes in Hibernate</h3>
+<p>add <code>@SqlDelete(sql="update course set is_deleted = false where id = ?)</code> to the <code>@Entity</code> class. This query will run whenever an entity manager remove is run. This will not updated the cached entity - use <code>@PreRemove</code> for that.</p>
+<p>To filter out soft-deleted records from queries, add <code>@Where(clause = "is_deleted = false")</code>. This clause doesn't apply to native queries.</p>
+<p>Whenever an entity is deleted, <code>@PreRemove</code> is fired.</p>
+<h3>JPA Entity Lifecycle Methods</h3>
+<p><code>@PostLoad</code> called after an entity is retrieved.</p>
+<p><code>@PostPersist</code> called after an entity is persisted.</p>
+<p><code>@PostRemove</code> called after an entity is removed.</p>
+<p><code>@PostUpdate</code></p>
+<p><code>@PrePersist</code></p>
+<p><code>@PreRemove</code></p>
+<p><code>@PreUpdate</code></p>
+<h3>Tips</h3>
+<p>Ensure <code>toString()</code>, <code>hashCode()</code>, <code>equals()</code> only includes values directly on the entity and not relationships</p>
+<h3>When to use JPA</h3>
+<p>Use for simple, non-batch queries</p>
+<h3>Performance Tuning</h3>
+<p>Measure and monitor performance <em>before</em> optimizing performance.</p>
+<p>application.properties:</p>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">spring.jpa.properties.hibernate.generate_statistics=true
+logging.level.org.hibernate.stat=debug
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true</code></pre></div>
+<p>Add good indexes to ensure queries are efficient. Review the execution plan.</p>
+<p>Use a cache for reference data (dropdowns, static info)</p>
+<p>Make minimal use of eager fetching</p>
+<p>Avoid n + 1 problems - don't call <code>get&#x3C;Relationship></code> for lazy fetch relationships within a for loop</p>
+<ul>
+<li>use entitygraph to fetch relationships for specific queries rather than using eager fetch</li>
+<li>use a jpql query with a JOIN FETCH (<code>SELECT c FROM Course c JOIN FETCH c.students s</code>)</li>
+</ul>
+<h3>Caching</h3>
+<p>Two-levels of caching. Each transaction has its own cache associated with the persistence context (first-level cache - built into hibernate). The second-level cache spans requests/transactions/persistence contexts and requires additional configuration.</p>
+<ol>
+<li>in application.properties - turn on ehcache where you have to explicitly enable caching on entities</li>
+</ol>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">spring.jpa.properties.hibernate.cache.use_second_level_cache=true
+spring.jpa.properties.hibernate.cache.region.factory_class=org.hibernate.cache.ehcache.EhCacheRegionFactory
+spring.jpa.properties.javax.persistence.sharedCache.mode=ENABLE_SELECTIVE
+
+logging.level.net.sf.ehcache=debug</code></pre></div>
+<ol start="2">
+<li>Add <code>@Cacheable</code> on the entities to cache</li>
+</ol>
 <h3>H2 Setup</h3>
 <p>in application.properties:</p>
 <div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">spring.datasource.url=jdbc:h2:mem:testdb</code></pre></div>
 <p>When running, goto <code>/h2-console</code> to connect to an admin panel</p>
 <p>Spring boot will automatically run <code>src/main/resources/schema.sql</code> to create the schema for JPA-managed entites and <code>src/main/resources/data.sql</code> to populate it. If using a migration tool, do not use these files.</p>
+<h3>Other Database</h3>
+<p>Add database connector to your gradle/maven file</p>
+<p>in application.properties:</p>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">spring.jpa.hibernate.ddl-auto=none
+spring.datasource.url=&#x26;lt;conn-string&#x26;gt;
+spring.datasource.username=
+spring.datasource.password=</code></pre></div>
+<p>One strategy for setting up the schema is to use h2 in development to get all the CREATE TABLE queries from the logs</p>
 <h3>Questions</h3>
 <p>How to remove h2 for prod build</p>
 <p>jsonb for h2</p>

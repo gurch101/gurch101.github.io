@@ -92,4 +92,252 @@
 <li>thread pool should be sized appropriately to number of cores</li>
 <li>run processes in their own virtual env to ensure each process has dedicated CPU</li>
 </ul>
+<h3>Common Latency Costs</h3>
+<p>CPU latency - &#x3C; 10 ns</p>
+<p>mutex lock - 25 ns</p>
+<p>main memory - 100 ns</p>
+<p>1kb compression - 3 micro seconds</p>
+<p>send 1kb over 1 gbps network - 10 micro seconds</p>
+<p>read 4k randomly from SSD - 150 micro seconds</p>
+<p>round trip within one datacenter - 500 micro seconds</p>
+<p>read 1 mb sequentially from SSD - 1 ms</p>
+<p>send packet from California to Netherlands and back - 150 ms</p>
+<h3>Concurrency related latency</h3>
+<p>If you have work that can be executed in parallel, adding CPU/threads can increase throughput. For serially executed code, adding CPU/threads does not increase throughput. If there is a serial portion of code in your app, the limit for max throughput is the % of your code is parallel (log curve). This bottleneck will be reached with fewer CPUs with more serial code. Locks on shared resources introduce serially executed code.</p>
+<h5>Amdahl's law for concurrent tasks</h5>
+<p>C(N) = N/(1 + alpha(N-1))</p>
+<p>C is capacity, N is scaling dimension (CPU or load), alpha is resource contention (0 for linear performance). Serial code/queueing limits scalability.</p>
+<h5>Gunther's Universal Scalability Law</h5>
+<p>C(N) = N/(1 + alpha(N-1) + betaN(N-1))</p>
+<p>beta = coherence delay - volatile variables updated in one thread leads to updates across all threads. If you increase processes/CPU, the throughput can actually decrease.</p>
+<h3>Shared Resource Contention</h3>
+<ul>
+<li>Listen/accept network queue on web server</li>
+<li>Thread pool is limited by number of processors. Can lead to context switching. Throughput decreases if thread pool size is too low or too high. If threads are sitting around waiting, you can increase the size. If requests are fast, thread pool size should be the same number of CPUs. Generally slightly bigger than num cores to account for idle time.</li>
+<li>Threads get a connection from the connection pool. One thread takes one connection.</li>
+<li>CPU/disk/network contention</li>
+<li>locks around serial parts of code</li>
+</ul>
+<p>Approaches to minimize shared resource contention</p>
+<ul>
+<li>vertical scaling</li>
+<li>RAID to allow parallel access to disk</li>
+<li>find optimal thread pool size</li>
+<li>minimize lock scope</li>
+</ul>
+<p>Approaches to minimize lock contention</p>
+<ul>
+<li>reduce the duration the lock is held. Move out code that doesnt require a lock (don't log inside a lock scope), split locks into lower granularity, split locks for each partition of data</li>
+<li>replace exclusive locks with coordination mechanisms (readwritelock/stamped locks or atomic variables)</li>
+</ul>
+<h3>Pessimistic Locking</h3>
+<ul>
+<li>Threads must wait to acquire a lock</li>
+<li>Lock is held for a long time</li>
+<li>Used when contention is high</li>
+<li>May result in deadlocks</li>
+</ul>
+<div class="remark-highlight"><pre class="language-java"><code class="language-java">connection<span class="token punctuation">.</span><span class="token function">setAutoCommit</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+connection<span class="token punctuation">.</span>statement<span class="token punctuation">.</span><span class="token function">executeQuery</span><span class="token punctuation">(</span><span class="token string">"SELECT * FROM inventory WHERE product_id = 'xyz' FOR UPDATE"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// do work</span>
+
+connection<span class="token punctuation">.</span>statement<span class="token punctuation">.</span><span class="token function">executeUpdate</span><span class="token punctuation">(</span><span class="token string">"UPDATE inventory SET quantity=499 WHERE product_id = 'xyz'"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+connection<span class="token punctuation">.</span><span class="token function">commit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div>
+<h3>Optimistic Locking</h3>
+<ul>
+<li>Threads do not wait for a lock</li>
+<li>Threads backup when they discover contention</li>
+<li>Used when contention is low</li>
+<li>May result in starvation if many threads need to retry</li>
+</ul>
+<div class="remark-highlight"><pre class="language-java"><code class="language-java">connection<span class="token punctuation">.</span>statement<span class="token punctuation">.</span><span class="token function">executeQuery</span><span class="token punctuation">(</span><span class="token string">"SELECT * FROM inventory WHERE product_id = 'xyz'"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// do work</span>
+
+connection<span class="token punctuation">.</span><span class="token function">setAutoCommit</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">boolean</span> success <span class="token operator">=</span> connection<span class="token punctuation">.</span>statement<span class="token punctuation">.</span><span class="token function">executeUpdate</span><span class="token punctuation">(</span><span class="token string">"UPDATE inventory SET quantity=(quantity - 1) WHERE product_id = 'xyz' AND (quantity - 1) >= 0"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span>success<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment">// stale data - retry</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+  connection<span class="token punctuation">.</span><span class="token function">commit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre></div>
+<h3>Compare &#x26; Swap</h3>
+<p>CAS is an optimistic locking mechanism (implemented through java.util.concurrent.atomic.* in java). Also in nosql databases. Good performance because it is generally implemented at the hardware level.</p>
+<div class="remark-highlight"><pre class="language-java"><code class="language-java"><span class="token class-name">AtomicInteger</span> ai <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AtomicInteger</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// returns true if the value was 100 and sets 200 as the new value</span>
+<span class="token comment">// returns false if the value was not 100 as a result of a race condition with another thread</span>
+ai<span class="token punctuation">.</span><span class="token function">compareAndSet</span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">,</span> <span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div>
+<h3>Deadlocks</h3>
+<ul>
+<li>Lock ordering related. Ex simultaneous money transfer from accounts X and Y by threads t1 and t2. T1 from X to Y and T2 from Y to X. Acquire locks in a fixed global order.</li>
+<li>Request load related. Threads waiting for connections to multiple databases or threads waiting for other threads to be spawned to perform some work. Ex API gateway with 10 threads receives 10 requests which call service 1. Service 1 in turn uses the gateway to call service 2 but can't because threads are in use.</li>
+</ul>
+<h3>Coherence Delays</h3>
+<p>java guarantees that a volatile object is always read from main memory into CPU cache and written back to main memory when updated in a processor. Value in a CPU cache isn't visible by other CPU thread (two L1 caches).</p>
+<p>all variables accessed inside a synchronized block are read from main memory at the start of the sync block and flushed to main memory when the associated thread exits the sync block. Changes to the value marks the CPU cache value as dirty and forces reading from main memory.</p>
+<p>synchronized = locking + visibility</p>
+<p>volatile = visibility</p>
+<h3>Caching</h3>
+<ul>
+<li>db cache: buffer/page cache</li>
+<li>http cache: cache in the browser itself</li>
+<li>web content cache: cache static assets</li>
+<li>SSL session caching</li>
+<li>session caching: user-specific data</li>
+<li>object cache: prevent db query</li>
+</ul>
+<h5>Static Data Caching</h5>
+<ul>
+<li>GET method responses are idempotent and are good candidates for caching</li>
+<li>headers:
+<ul>
+<li>cache-control
+<ul>
+<li>no-cache: don't cache without validating with origin server</li>
+<li>must-revalidate: validate only after max-age</li>
+<li>no-store: don't cache at all</li>
+<li>public: any shared cache can cache</li>
+<li>private: only a client cache can cache</li>
+<li>max-age: max age of a resource in cache relative to resource request time</li>
+</ul>
+</li>
+<li>etag: hash code that indicates version of a resource</li>
+</ul>
+</li>
+</ul>
+<h5>Dynamic Data Caching</h5>
+<ul>
+<li>exclusive (local) cache. Low latency but can lead to duplication (same data cached on multiple nodes) and uneven load balancing (intelligent routing based on user/session).</li>
+<li>shared cache. Higher latency due to an extra hop but can scale out and handle large datasets.</li>
+</ul>
+<h5>Caching Challenges</h5>
+<ul>
+<li>limited cache space results in early evictions. Only cache small, frequently accessed, rarely changing objects</li>
+<li>cache invalidation &#x26; inconsistency. Requires update/deletion of cached value upon update. High TTL results in more cache hits but inconsistency increases as interval increases. Low TTL decreases inconsistency interval but cache hits go down.</li>
+</ul>
+<h3>Scalability</h3>
+<p>Performance is focused on fixed load. Goal is to minimize latency and maximize throughput.</p>
+<p>Scalability is focused on variable load. Goal is to maximize throughput.</p>
+<p>Vertical scalability: increase resources on current hardware. Easier to achieve but it is limited scalability.</p>
+<p>Horizontal scalability: increase hardware of the same specifications. Harder to achieve but offers unlimited scalability. Lets you scale down/repurpose hardware.</p>
+<p>Reverse proxy: client only knows the address of the reverse proxy. The reverse proxy acts as a load balancer.</p>
+<p>Have more specialized, modular components/workers/threads/instances that can work independently of one another. Independence is impeded by shared resources/data.</p>
+<h6>Stateful replication</h6>
+<ul>
+<li>sticky sessions where user data is stored in the web app node. Cookie pins requests to a specific node through a cookie. Requests are routed to the appropriate node.</li>
+<li>if node goes down, requests are routed to other nodes but latency will be high since data needs to be fetched from db.</li>
+<li>has lower latency vs stateless replication at the expense of lower throughput.</li>
+</ul>
+<h6>Stateless replication</h6>
+<ul>
+<li>higher scalability at the expense of higher latency. Store sessions in a shared cache (redis/memcached) or in cookies.</li>
+</ul>
+<h6>Database replication</h6>
+<ul>
+<li>increase read scalability by adding read replicas</li>
+<li>allows for high availability</li>
+<li>Primary/secondary setup:
+<ul>
+<li>async: low latency writes, eventually consistent, can be data loss. Good for read replicas.</li>
+<li>sync: consistent, high latency writes, low write availability. If primary goes down, you can't write at all. Good for backup.</li>
+</ul>
+</li>
+<li>Peer-to-peer: async, highly available, has write conflicts/transaction ordering issues. Bidirectional replication. Can be used for global data replication.</li>
+</ul>
+<h5>App server scalability</h5>
+<ul>
+<li>use specialized modules that run as microservices</li>
+<li>scale services that are under higher load indpendently of others</li>
+<li>microservices increases complexity - deployments, coordinated changes</li>
+<li>reduce request/response times by leveraging async services that communicate via mq. Async also be used to control db load by requiring infra for average load as opposed to peak load. MQ simply queues up backlog during peak periods. Reduces write load.</li>
+<li>cache frequently read, infrequently changed data into an object cache. Reduces read load on db.</li>
+<li>Can use separate DBs for each service to increase scalability. Can no longerdo interservice ACID transaction and need to deal with eventual consistency.</li>
+</ul>
+<h5>Database Partitioning</h5>
+<p>Vertical partitioning - split db by domains/services</p>
+<p>Horizontal partitioning - split db by range/hash on id (id 1..100 goes to node 1, hash(id) % N used to compute node). Usually done with a nosql database.</p>
+<ul>
+<li>range partitioning supports range queries (id > 1 and id &#x3C; 100 - goes to multiple nodes if range spans nodes) and exact matches. Hash partitioning only supports exact matches. Hash partitioning is generally faster.</li>
+<li>works through cluster-aware client/router/proxy libraries
+Disadvantages - can no longer do ACID transactions across db nodes. Data will be eventually consistent.</li>
+</ul>
+<h3>Load Balancing</h3>
+<p>Provides a single IP address for a component and distributes calls to underlying service instances.</p>
+<p>Discovery service is a registry for IPs of healthy instances. The API gateway service queries the discovery service to get the IP of the app instance based on load.</p>
+<p>External clients use DNS to discover the external load balancer. Internal clients use a local registry/config to discover an internal load balancer.</p>
+<p>Hardware LB can handle L4 (transport layer - TCP/UDP) and L7 (application layer - HTTP/FTP/SMTP) traffic and can handle many more connections. Software load balancers can only handle L7, fewer connections, but are free.</p>
+<p>L7 LBs act as a reverse proxy (takes a connection, creates connections to underlying services), route based on content (mime type), SSL termination.</p>
+<p>DNS can act as a load balancer where one DNS record has multiple A records. Used for routing in multi-region systems (GeoDNS) to ensure user is routed to closest datacenter. DNS does health checks against each region for HA.</p>
+<h3>Auto Scaling</h3>
+<ol>
+<li>Configure load thresholds</li>
+<li>Monitor CPU/network/disk load and health</li>
+<li>Launch new instances from VM/container image and assign IP</li>
+<li>Register new instance with LB</li>
+</ol>
+<h3>Service-Oriented Architecture</h3>
+<p>each service can have its own tech stack and can be scaled independently but shared a common interface and database schema.</p>
+<h3>Microservices</h3>
+<p>goal is high scalability through independence, frequent/independent development and deployment</p>
+<ul>
+<li>shared nothing architecture. Services are fully vertically partitioned and developed/deployed independently</li>
+<li>db/schema are independent</li>
+<li>service interface is loosely coupled through an ETL layer</li>
+<li>challenges: duplicate code, transaction failures, transaction rollbacks</li>
+</ul>
+<h5>Microservice Transactions</h5>
+<p>Since transactions involve multiple machines, local transactions are not possible.</p>
+<ul>
+<li>distributed ACID transactions (2 or 3 phase commit). Does not provide scalability since locks/transactions are open for a long time.
+<ul>
+<li>
+<ol>
+<li>coordinator service creates transaction in each service</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>coordinator service commits transaction in each service</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>compensating transactions - SAGA pattern; eventually consistent</li>
+</ul>
+<p>ACID within a service, compensating transactions across services</p>
+<h5>SAGA Pattern</h5>
+<ul>
+<li>logical undo of partially committed transactions</li>
+</ul>
+<p>Example:
+Order, inventory, and shipment services</p>
+<ol>
+<li>Create Order</li>
+<li>Reserve Inventory</li>
+<li>Create Shipment</li>
+</ol>
+<p>undo service actions on failure of any step. Need to handle cases where undo of any step fails. Sagas are executed asynchronously. Atomic, eventually consistent, not isolated, durable.</p>
+<h3>Microservice Communication Model</h3>
+<ul>
+<li>synchronous processing - immediate response; for read/query loads</li>
+<li>async processing - deferred response; for write/transaction loads; higher scalability/reliability</li>
+</ul>
+<h3>Event-Driven Transactions</h3>
+<p>Order request goes to order orchestrator which add events onto an MQ</p>
+<p>Insert events on MQ. Orchestrator waits until each response event is published to MQ before sending proceeding:
+Create Order Event (orchestrator)/Order Created Event(Order service)
+Reserve Inventory Event (orchestrator)/Inventory Reserved Event (Inventory service)
+Create Shipment Event (orchestrator)/Shipment Created Event (Shipment service)</p>
+<p>Service tracks whether it sent out a created event in case the node goes down after the action is done but before event is sent out. When node is back online, it polls its db to see which actions were done where events weren't sent out.</p>
+<p>If any step fails, add an "undo &#x3C;X> event" to</p>
+<p>The MQ can be horizontally partitioned by topic</p>
+<h3>TODO</h3>
+<p>Read Amdahl's law wiki page</p>
 </div></div></div></div></body></html>

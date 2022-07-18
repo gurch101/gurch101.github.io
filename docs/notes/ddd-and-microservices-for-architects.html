@@ -1,0 +1,141 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Domain-Driven Design and Microservices for Architects | Gurchet&#x27;s Development Blog</title><meta name="description" content="Udemy course notes"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Domain-Driven Design and Microservices for Architects</h1><div class="meta"><span>Sat Jun 11 2022</span><span>summary</span></div><div class="mt25 post"><p>Monolithic architectures</p>
+<ul>
+<li>large, modular code bases with tight coupling between components</li>
+<li>teams are organized by technology and business</li>
+<li>changes require coordination between teams and span across multiple business functions</li>
+</ul>
+<p>Microservice architectures</p>
+<ul>
+<li>collection of find grained, loosely coupled services built to realize a specific business capability</li>
+<li>interactions are via well-defined contracts over the network</li>
+</ul>
+<p>Business transformation examples:</p>
+<ul>
+<li>microsoft: packaged software to subscription model</li>
+<li>amazon: online bookstore to marketplace</li>
+<li>apple: computers to ipod, iphones, mac, music</li>
+<li>netflix: DVD mail service to streaming service</li>
+</ul>
+<p>Businesses change because of regulatory changes, competitive pressure, new opportunities, and customer demands</p>
+<p>Transformation is not a one-time initiative. Needs to be rapid and continuous.</p>
+<p>Each service is built and operated by a small team (two-pizza team) which evolves independently. Each team focuses on the business capabilities provided by their microservice. Leads to decentralized governance and well-defined business scope.</p>
+<p>Microservice advantages:</p>
+<ul>
+<li>requires minimal coordination with other teams</li>
+<li>regression testing is needed only for the changed service</li>
+<li>independent deployments</li>
+<li>failure in one service will not bring down entire system</li>
+<li>each service can scale independently</li>
+</ul>
+<p>Microservice disadvantages:</p>
+<ul>
+<li>poor network performance</li>
+<li>complexity managing data integrity</li>
+<li>harder to monitor and debug</li>
+</ul>
+<p>Creating a business case:</p>
+<ul>
+<li>quantify the business value</li>
+<li>have a roadmap</li>
+<li>describe requirements for success</li>
+<li>present a PoC</li>
+</ul>
+<h3>Introduction to Domain-Driven Design</h3>
+<p>A domain = sphere of knowledge, influence, or activity. A field or industry in which the business operates. The problem space.</p>
+<p>Each domain consists of sub-domains. Three types: generic, core, supporting</p>
+<p>No one expert know everything about the domain. Multiple domain experts are aligned to sub-domains.</p>
+<p>A domain is made up of vocabulary, entities/relationships, key concepts, and workflow activities.</p>
+<p>Teams central focus should be on the core domain and domain logic.</p>
+<p>Each sub-domain has a different level of complexity that is driven by the business rules, compliance, process/handovers, dynamicity</p>
+<h5>Modeling</h5>
+<p>Think about purpose of model and perspective of shareholders before constructing a model.</p>
+<p>conveys idea to stakeholders and provides a point of reference to create detailed specifications.</p>
+<p>Define common terminology for all domain concepts.</p>
+<p>Define relationships between concepts.</p>
+<p>4 + 1 modeling</p>
+<p>Logical view = functionality provided to end-user/business value</p>
+<p>Process view = workflow/interaction</p>
+<p>Development view = modules/subsystems</p>
+<p>Physical view = servers/db design</p>
+<p>Taken together, these views form scenarios/requirements</p>
+<p>knowledge crunching = convert SME knowledge into structured domain models</p>
+<p>Goal of a software development team is to help the business achieve its business goals, hence the team MUST understand the business model.</p>
+<h5>Business Model Canvas</h5>
+<p>A tool that helps discuss, communicate, design, and understand the organization's business model</p>
+<p>9 areas:
+key partners - who supplies resources?
+key activities
+key resources - what does the value prop need?
+value propositions
+customer relationships
+channels
+customer segments
+cost structure
+revenue streams</p>
+<h3>Domain-Driven Design Patterns</h3>
+<p>Generic subdomain: known solutions with best practices exist. No business advantage exists in re-inventing the wheel.</p>
+<p>Core subdomain: the business differentiator which gives the company a competitive advantage. Fast paced and ever evolving.</p>
+<p>Supporting subdomain: no business advantage but core depends on it.</p>
+<p>Known solutions available? Generic
+Adds business value? Core
+Core depends on it? Supporting</p>
+<p>Business should focus on core sub-domain, buy generic sub-domains, and outsource supporting domains.</p>
+<h5>Ubiquitous language</h5>
+<p>A common, evolving, language within each business context that is used by <em>all</em> stakeholders - business and technology experts. Used in code/tests, communication, documentation.</p>
+<h5>Bounded Context</h5>
+<p>Entities in one sub-domain are independent of other sub-domains, even if they share the same language (ie retail banking customer = employer + demographics, credit cards customer = income + credit history, compliance = kyc/fraud).</p>
+<p>Each bounded context has its own ubquitous language and is translated into one or more microservices.</p>
+<p>Discover bounded contexts by drawing boundaries around business functions</p>
+<p>A context map is a visual representation of the systems bounded contexts and the relationships between them</p>
+<ul>
+<li>
+<p>separate ways pattern - each bounded context is completely independent of one another</p>
+</li>
+<li>
+<p>Symmetric relationship - bounded contexts depend on one another.</p>
+<ul>
+<li>Partnership pattern. Teams must coordinate changes.</li>
+<li>Shared kernel pattern - use a shared library which contains shared models. Coordination is only needed on changes on the shared models.</li>
+</ul>
+</li>
+<li>
+<p>asymmetric relationship - one bounded context depends on another.</p>
+<ul>
+<li>customer-supplier pattern. Upstream bounded context fulfills a specific need of the downstream bounded context. Upstream BC adjusts to meet requirements of downstream BC.</li>
+<li>Conformist pattern. Upstream BC exposes models with no regard to ANY douwnstream BC. Downstream BC conforms to models exposed by upstream BC.</li>
+<li>Anti-corruption layer pattern. Downstream BC isolates translation logic in a separate layer.</li>
+</ul>
+</li>
+<li>
+<p>one-to-many relationships.</p>
+<ul>
+<li>Open host service. Upstream provider offers common services to other BC's. Published language is used by all downstream BCs.</li>
+</ul>
+</li>
+</ul>
+<h5>Entity Object</h5>
+<p>A business object that encapsulates attributes and well-defined domain logic (business rules, validations, calculations) that is within a bounded context. Entities are persisted in long term storage and have IDs to uniquely identify them. IE accounts, orders, etc</p>
+<h5>Value Object</h5>
+<p>An immutable object that doesnt map directly into the core concepts of the bounded context. Data types the encapsulate validation/format for non core concepts - IE EmailAddress. Do not have IDs - comparison requires full attribute-level comparison. Not persisted as an independent object but may be part of an entity.</p>
+<h5>Aggregate</h5>
+<p>An agregate object is a cluster of entities and value objects that are viewed as a unified whole from the domain concepts and data perspective. Has a unique identity. Example: Account is aggregate route, has transactions.</p>
+<p>The aggregate provides functions to operate on the inner objects. Do not interact with inner objects directly.</p>
+<p>Inner objects are only meaningful in the context of the root.</p>
+<h5>Repository</h5>
+<p>A repository object acts as a collection of aggregate objects in memory. It hides the storage level details of the aggregate.</p>
+<p>One repo per aggregate. Persistence operations are atomic.</p>
+<p>Used to keep the domain model indpeendent of the storage layer.</p>
+<h5>Anemic vs Rich Models</h5>
+<p>anemic model - a domain model composed of entities that do not exhibit operations applicable to the domain concepts</p>
+<p>rich model - business model is implement as an inherent part of the entity</p>
+<p>Anemic models are acceptable for apps with minimal business logic, simple CRUD, or shared logic that doesn't belong in a single model entity.</p>
+<h5>Domain Service</h5>
+<p>Implements domain functionality that may not be modeled as a behavior in any domain entity or value object. Does not maintain state between calls. Should be highly cohesive and do only one thing. May call other domain services.</p>
+<h5>Application Service</h5>
+<p>Does not implement domain functionality but depends on other domain objects/services. Stateless, define an external interface, exposed over network. Orchestrates execution of domain logic and transforms into response object. Can be used to consolidate results from several domain objects.</p>
+<h5>Infrastructure Service</h5>
+<p>A service that interacts with an external resource to address a concern that is not part of the primary problem domain.
+Examples - logging, notifications, persistence, external APIs. No dependency on any domain object.</p>
+<h3>TODO</h3>
+<p>look for practical DDD examples with persistence. How to do db-backed validation in an entity object?</p>
+</div></div></div></div></body></html>

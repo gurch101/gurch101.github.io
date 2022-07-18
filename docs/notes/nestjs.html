@@ -43,7 +43,9 @@
 <p>A provider is a class that can be injected as a dependency.</p>
 <p>Create a provider by calling <code>nest g service cats</code></p>
 <div class="remark-highlight"><pre class="language-js"><code class="language-js"><span class="token comment">// application-scoped by default - instantiated and resolved at bootup and destroyed at shut down</span>
-@<span class="token function"><span class="token maybe-class-name">Injectible</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword module">import</span> <span class="token imports"><span class="token punctuation">{</span> <span class="token maybe-class-name">Injectable</span> <span class="token punctuation">}</span></span> <span class="token keyword module">from</span> <span class="token string">'@nest/common'</span><span class="token punctuation">;</span>
+
+@<span class="token function"><span class="token maybe-class-name">Injectable</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 <span class="token keyword module">export</span> <span class="token keyword">class</span> <span class="token class-name">CatsService</span> <span class="token punctuation">{</span>
   <span class="token keyword">private</span> readonly cats<span class="token operator">:</span> <span class="token maybe-class-name">Cat</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
 

@@ -1,0 +1,85 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Gradle | Gurchet&#x27;s Development Blog</title><meta name="description" content="Udemy course notes"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Gradle</h1><div class="meta"><span>Sat May 28 2022</span><span>summary</span></div><div class="mt25 post"><p>gradle is an incremental build system. It checks if a task needs to be executed before it executes it.</p>
+<h3>build.gradle</h3>
+<p>Each block in a gradle file is a closure that receives a delegate object which has properties/functions in it</p>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">// Plugins add new tasks to your project by extending the gradle core. Promote re-use across multiple projects.
+plugins {
+  id &#x26;#39;java&#x26;#39; // lets you build/compile java source code - adds clean, compileJava, testClasses, jar tasks; requires project layout with src/main/java, src/main/resource, src/test/java
+}
+
+// servers that have dependencies from which you can download dependencies
+repository {
+  mavenCentral()
+}
+
+// 3rd party dependencies that your code needs
+dependencies {
+  // compile is deprecated, use implementation instead
+  implementation &#x26;#39;org.apache.commons:commons-math3:3.6.1&#x26;#39;
+
+  testImplementation &#x26;#39;junit:junit:4.12&#x26;#39;
+}
+
+jar {
+  baseName = &#x26;quot;$project-all&#x26;quot;
+  println &#x26;quot;$basename&#x26;quot;
+
+  manifest {
+    attributes &#x26;#39;Main-Class&#x26;#39;: &#x26;#39;com.package.MainClass&#x26;#39;
+  }
+
+  // bundle all dependencies into jar
+  from {
+    project.configurations.runtimeClasspath.collect {File file -&#x26;gt; project.zipTree(file)}
+  }
+}
+
+task myTask(type: ParentTask) {
+  // has all properties of ParentTask
+  // can access other task properties by using otherTask.propName
+}
+</code></pre></div>
+<h3>Dependency Management</h3>
+<p>run <code>dependencies</code> task to see all dependencies. To exclude transitive dependencies,</p>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">dependencies {
+  implementation(&#x26;#39;some.package&#x26;#39;) {
+    exclude group &#x26;#39;some.transtive.dep&#x26;#39;, module: &#x26;#39;dep-core&#x26;#39;
+  }
+}</code></pre></div>
+<p>To get a dependency report, add <code>project-report</code> plugin which gives you an <code>htmlDependencyReport</code> task</p>
+<h3>Multi-Project Builds</h3>
+<p>Allows clear isolation between modules which leads to more efficient builds and testing</p>
+<p>Each project/subproject has its own gradle build configuration.</p>
+<p>The root project will have a <code>settings.gradle</code> file</p>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">rootProject.name = &#x26;#39;myRootProjectName&#x26;#39;
+
+include &#x26;#39;subProject1, &#x26;#39;subProject2&#x26;#39;, &#x26;#39;subProject3&#x26;#39;</code></pre></div>
+<p>in <code>build.gradle</code>:</p>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">subprojects {
+  apply plugin: &#x26;#39;java&#x26;#39;
+
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
+
+  repositories {
+    mavenCentral()
+  }
+}
+
+project(&#x26;#39;:subProject1&#x26;#39;) {
+  dependencies {
+    // define dependency on another subproject
+    implementation project(&#x26;#39;:subproject2&#x26;#39;)
+  }
+}
+
+project(&#x26;#39;:subProject2&#x26;#39;) {
+  // gives access to implementation and api dependencies
+  apply plugin: &#x26;#39;java-library&#x26;#39;
+  dependencies {
+
+  }
+}</code></pre></div>
+<h3>TODO</h3>
+<p>use git commit hash as project version</p>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">    version &#x26;#39;git rev-parse --short HEAD&#x26;#39;.execute().getText().trim()</code></pre></div>
+</div></div></div></div></body></html>
