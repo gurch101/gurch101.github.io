@@ -529,6 +529,9 @@ CREATE TABLE posts (
   created_at TIMESTAMP,
   updated_at TIMESTAMP,
   url VARCHAR(200),
+  caption VARCHAR(240),
+  lat REAL,
+  lng REAL,
   user_id INTEGER REFERENCES users(id)
 );
 
@@ -580,4 +583,17 @@ CREATE TABLE likes(
 );
 
 -- simplest alternative is to create a separate table for each like type. Would require UNION queries for analytics
+
+
+-- photo/caption tags/mentions - can use one table where x/y are null for captions
+-- alt: separate photo_tags, caption_tags table
+CREATE TABLE tags(
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  post_id INTEGER REFERENCES posts(id),
+  x INTEGER,
+  y INTEGER,
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP
+);
 ```

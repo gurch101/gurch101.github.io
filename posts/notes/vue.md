@@ -8,7 +8,7 @@ type: notes
 
 # Vue
 
-Can be used to control parts of HTML pages in a multi-page application or can be used for single page applications
+Can be used to control parts of HTML pages in a multi-page application or can be used for single page applications.
 
 ```html
 <div id="app">
@@ -576,4 +576,251 @@ Child:
     inject: ["users", "addUser"],
   };
 </script>
+```
+
+### Internals
+
+Vue wraps data objects with js proxies.
+
+```js
+const data = {
+  message: "Hello!",
+};
+
+const handler = {
+  set(target, key, value) {
+    // target is the object that was wrapped
+    // key is the attribute that was changed
+    // value is the new value
+
+    target[key] = value;
+  },
+};
+
+const proxy = new Proxy(data, handler);
+
+data.message = "Greetings!";
+```
+
+You can use `Vue.createApp` to create multiple apps on one site. Each app is standalone.
+
+Vue apps/components can also have a template property
+
+```js
+Vue.createApp({
+  template: '<div>Hello World</div>
+});
+```
+
+```js
+export default {
+  template: "<div>Hello World</div>",
+};
+```
+
+Vue uses a virtual dom to detect changes and only changes are put in the browser dom.
+
+### Lifecycle
+
+Lifecycle methods are not put in the `method` stanza
+
+- beforeCreate
+- created
+- beforeMount (template compiled)
+- mounted (in browser dom)
+- beforeUpdate
+- updated (change is visible in dom)
+- beforeUnmount
+- unmounted
+
+### Refs
+
+```html
+<template>
+  <input type="text"  ref="userText" />
+  </template>
+  <script>
+    export default {
+      methods: {
+        printText() {
+          console.log(this.$refs.userText.value);
+        }
+      }
+    }
+```
+
+### Composition API
+
+options API = data/methods/watchers/computed
+
+For bigger apps, composition API enables data/methods/watchers to be grouped together by feature in a setup method and improves re-use.
+
+```html
+<template>
+  <div>
+    <!-- don't need .value in the template -->
+    <h1>{{ userName }} {{user.name}}</h1>
+    <h3>{{ age }} {{user.age}}</h3>
+    <button @click="setAge()">Update Age</button>
+    <input type="text" ref="lastNameInput" />
+  </div>
+</template>
+<script>
+  // also has onBeforeMount, onMounted, onBeforeUpdate, onUpdated, onBeforeUnmount, onUnmounted
+  import { ref, reactive, toRefs, computed, watch, provide } from "vue";
+
+  export default {
+    // components/props are same as options
+    // setup only runs once - replaces beforeCreate/created
+    // can use context.$emit
+    setup(props, context) {
+      const userName = ref("default"); // create a reactive value
+      const age = ref(31);
+      // value is retrieved by lastNameInput.value.value
+      const lastNameInput = ref(null);
+
+      const user = ref({
+        name: "default",
+        age: 31,
+      });
+
+      // reactive only works with objects; doesn't require .value to access
+      const rUser = reactive({
+        name: "default",
+        age: 31,
+      });
+
+      // makes the object AND each value inside the object a ref so you can
+      const trUser = toRefs({
+        name: "default",
+        age: 31,
+      });
+
+      // treated as a readonly ref - can use via label.value
+      const label = computed(function () {
+        return `${userName.value} - ${age.value}`;
+      });
+
+      // can pass an array of dependencies to watch
+      // function will get get array of newVals, oldVals
+      watch(userName, function (newVal, oldVal) {
+        console.log("new username", newVal);
+      });
+
+      setTimeout(() => {
+        userName.value = "some new value";
+        user.value.name = "some other value";
+        rUser.name = "some other value";
+        rUser.age = 41;
+      }, 2000);
+
+      function setAge() {
+        age = 42;
+      }
+
+      // use inject function in consumer, ie const age = inject('userAge');
+      // you should only change injected values where you provide them
+      provide("userAge", age);
+
+      // anything returned here is available in the template
+      return {
+        userName,
+        age,
+        user,
+        setAge,
+        label,
+        lastNameInput,
+      };
+    },
+  };
+</script>
+```
+
+Alternative syntax:
+
+```html
+<script setup>
+  const userName = ref("default"); // create a reactive value
+
+  setTimeout(() => {
+    userName.value = "some new value";
+  }, 2000);
+</script>
+```
+
+### Mixins
+
+take the component code config (data, methods, watchers) and put it in a js file.
+
+mixin:
+
+```js
+// options exposed by mixin are merged with options exposed with component. Component option overrides the value set by the mixin. If lifecycle methods exist in both, the mixin one runs first, then the component.
+export default {
+  data() {
+    return {
+      alertIsVisible: false,
+    };
+  },
+  methods: {
+    showAlert() {
+      this.alertIsVisible = true;
+    },
+    hideAlert() {
+      this.alertIsVisible = false;
+    },
+  },
+};
+```
+
+component:
+
+```js
+export default {
+  components: {
+    UserAlert,
+  },
+  mixins: [myMixin],
+};
+```
+
+Mixins can be registered globally via `app.mixin(myMixin)`. This adds the mixin to every component.
+
+### Mixins using Composition API
+
+```js
+import { ref } from "vue";
+
+export default function useAlert() {
+  const alertIsvisible = ref(false);
+
+  function showAlert() {
+    alertIsVisible.value = true;
+  }
+
+  function hideAlert() {
+    alertIsVisible.value = false;
+  }
+
+  return {
+    alertIsVisible,
+    showAlert,
+    hideAlert,
+  };
+}
+```
+
+In component:
+
+```js
+export default {
+  setup() {
+    const { alertIsVisible, showAlert, hideAlert } = useAlert();
+    return {
+      alertIsVisible,
+      showAlert,
+      hideAlert,
+    };
+  },
+};
 ```
