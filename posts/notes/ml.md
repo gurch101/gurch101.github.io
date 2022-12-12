@@ -8,6 +8,164 @@ type: notes
 
 # Machine Learning
 
+## Coursera Machine Learning Course 1
+
+Give computers the ability to learn without being explicitly programmed
+
+Supervised Learning
+
+- used most in real-world applications and has seen rapid advancements
+- algorithms that learn input to output mappings given input/output examples to learn from.
+- regression: predict a number amongst infinitely many possible outputs
+  - housing prices
+- classification: predict a finite number of categories
+  - tumor classification
+
+Unsupervised Learning
+
+- given inputs but not outputs - goal is to find something interesting in unlabeled data
+- recommender systems/reinforcement learning
+- clustering: group together similar data
+  - similar news articles
+  - DNA microarray clustering
+  - customer/market segmentation
+- anomaly detection: find unusual data points
+- dimensionality reduction: compress data using fewer numbers
+
+### Linear Regression
+
+- Plot data on x/y plot. Add line of best fit, use formula for line to predict other inputs.
+- Also useful to put data in a table where inputs/outputs are separate columns.
+- training set: input and output dataset used to train the model
+- x = input variable/feature
+- y = output variable/target
+- m = number of training examples
+- (x, y) = single training example
+- w/b are model parameters (coefficients/weights)
+
+- given a training set, and a learning algorithm, generate a function that can predict y given x
+- fwb(x) = wx + b
+
+### Sum of Squared Error
+
+- goal of cost function is to find w,b such that y prediction is close to y target for all (x,y)
+- squared error cost function: J(w,b) = 1 / 2m \* sum((ypred - ytarget) ^ 2)
+- divide by 2m so that we dont get bigger errors for a larger training set. Using 2 makes the gradient descent derivative cleaner.
+- square the error so that the sum doesnt go to zero when -ve/+ve errors are added together
+- goal is to minimize J(w,b)
+- a line in the model graph is a point on the cost graph
+
+Simple example where b = 0
+
+![Sum of Squared Errors Graph](/images/sse.png)
+
+w and b - sum of squared error cost function for linear regression will always be bowl shaped
+![Contour Graph](/images/contour.png)
+
+### Gradient Descent
+
+- Used to find w, b that minimizes J(w,b). Gradient descent can be used to minimize any function. Finds local minima.
+- Algorithm:
+
+  - start with some w,b (for linear regression, use 0,0)
+  - keep changing w,b to reduce J(w,b)
+
+    - w = w - a \* d/dwJ(w,b)
+    - b = b - a \* d/dbJ(w,b)
+    - a = learning rate (between 0 and 1). Controls the size of the "step" taken when changing a parameter
+
+  - repeat until w/b no longer change much
+
+![Gradient Descent](/images/gradientdescent.png)
+
+![Formula](/images/gradientdescentformula.png)
+
+If the learning rate is too large, it might never converge and may get further from the minimum. If too small, it will take very long.
+
+Even when using a fixed learning rate, each update step is smaller since the slope is smaller as we approach the local minima.
+
+For sum of squared errors, gradient descent will always find the global minimum.
+
+Batch gradient descent looks at all training examples.
+
+```py
+import numpy as np
+import matplotlib.pyplot as plt
+
+x_train = np.array([1.0, 2.0])
+y_train = np.array([300.0, 500.0])
+
+w = 200
+b = 100
+tmp_f_wb = compute_model_output(x_train, w, b)
+
+plt.plot(x_train, tmp_f_wb, c='b', label='Our Prediction')
+plt.scatter(x_train, y_train, marker='x', c='r', label='Actual Values')
+plt.title('Housing Prices')
+plt.ylabel('Price (in 1000s of dollars)')
+plt.xlabel('Size (1000 sqft)')
+plt.show()
+
+def compute_model_output(x, w, b):
+    # m is the number of training examples
+    m = x.shape[0] # alt is len(x_train)
+    f_wb = np.zeros(m)
+    for i in range(m):
+        f_wb[i] = w * x[i] + b
+    return f_wb
+
+def compute_cost(x, y, w, b):
+  m = x.shape[0]
+  cost_sum = 0
+  for i in range(m):
+    f_wb = w * x[i] + b
+    cost = (f_wb - y[i]) ** 2
+    cost_sum = cost_sum + cost
+  return (1 / (2 * m)) * cost_sum
+
+def compute_gradient(x, y, w, b):
+  m = x.shape[0]
+  dj_dw = 0
+  dj_db = 0
+  for i in range(m):
+    f_wb = w * x[i] + b
+    dj_dw_i = (f_wb - y[i]) * x[i]
+    dj_db_i = f_wb - y[i]
+    dj_db += dj_db_i
+    dj_dw += dj_dw_i
+  dj_dw = dj_dw/m
+  dj_db = dj_db/m
+  return dj_dw, dj_db
+
+def gradient_descent(x, y, w_in, b_in, alpha, num_iters, cost_function, gradient_function):
+  w = copy.deepcopy(w_in)
+  J_history = []
+  p_history = []
+  b = b_in
+  w = w_in
+  for i in range(num_iters):
+    dj_dw, dj_db = gradient_function(x, y, w, b)
+    b = b - alpha * dj_db
+    w = w - alpha * dj_dw
+
+    if i < 100000:
+      J_history.append(cost_function(x,y,w,b))
+      p_history.append([w,b])
+  return w, b, J_history, p_history
+
+
+# initialize parameters
+w_init = 0
+b_init = 0
+# some gradient descent settings
+iterations = 10000
+tmp_alpha = 1.0e-2
+# run gradient descent
+w_final, b_final, J_hist, p_hist = gradient_descent(x_train ,y_train, w_init, b_init, tmp_alpha,
+                                                    iterations, compute_cost, compute_gradient)
+print(f"(w,b) found by gradient descent: ({w_final:8.4f},{b_final:8.4f})")
+```
+
 ### Decision Trees
 
 ```py
@@ -86,7 +244,7 @@ output = pd.DataFrame({'Id': test_data.Id,
 output.to_csv('submission.csv', index=False)
 ```
 
-### Common Operations 
+### Common Operations
 
 ```py
 import pandas as pd
@@ -202,10 +360,15 @@ left.join(right, lsuffix='_CAN', rsuffix='_UK')
 powerlifting_combined = powerlifting_meets.set_index("MeetID").join(powerlifting_competitors.set_index("MeetID"))
 ```
 
-
 next:
 https://developers.google.com/machine-learning/crash-course
 
 https://course.fast.ai/
 
 https://courses.dataschool.io/
+
+https://www.coursera.org/learn/machine-learning
+
+### Problems
+
+use speech recognition principles to build a wav -> midi maker

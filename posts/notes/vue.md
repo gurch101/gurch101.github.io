@@ -6,8 +6,6 @@ category: summary
 type: notes
 ---
 
-# Vue
-
 Can be used to control parts of HTML pages in a multi-page application or can be used for single page applications.
 
 ```html
@@ -690,7 +688,7 @@ For bigger apps, composition API enables data/methods/watchers to be grouped tog
         age: 31,
       });
 
-      // makes the object AND each value inside the object a ref so you can
+      // makes the object AND each value inside the object a ref
       const trUser = toRefs({
         name: "default",
         age: 31,
@@ -706,6 +704,10 @@ For bigger apps, composition API enables data/methods/watchers to be grouped tog
       watch(userName, function (newVal, oldVal) {
         console.log("new username", newVal);
       });
+
+      // to watch for changes in a prop
+      const { user } = toRefs(props);
+      watch(user, function (newVal, oldVal) {});
 
       setTimeout(() => {
         userName.value = "some new value";
@@ -823,4 +825,37 @@ export default {
     };
   },
 };
+```
+
+### Http Requests
+
+post/submit data. Add `@submit.prevent` to any form.
+
+```js
+fetch(url, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    // someJson
+  }),
+});
+```
+
+get data. Fetch inside of mounted/created.
+
+```js
+try {
+  // response.ok - if false, server-side error
+  const response = await fetch(url);
+  if(response.ok) {
+    const json = await response.json();
+  } else {
+    throw new Error('could not get data!');
+  }
+} catch(error => {
+  // this will be a client-side error
+  console.log(error);
+})
 ```
