@@ -1,4 +1,188 @@
 <!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Machine Learning Notes | Gurchet&#x27;s Development Blog</title><meta name="description" content="Machine Learning Notes"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Machine Learning Notes</h1><div class="meta"><span>Thu Jan 14 2021</span><span>notes</span></div><div class="mt25 post"><h1>Machine Learning</h1>
+<h2>Coursera Machine Learning Course 1</h2>
+<p>Give computers the ability to learn without being explicitly programmed</p>
+<p>Supervised Learning</p>
+<ul>
+<li>used most in real-world applications and has seen rapid advancements</li>
+<li>algorithms that learn input to output mappings given input/output examples to learn from.</li>
+<li>regression: predict a number amongst infinitely many possible outputs
+<ul>
+<li>housing prices</li>
+</ul>
+</li>
+<li>classification: predict a finite number of categories
+<ul>
+<li>tumor classification</li>
+</ul>
+</li>
+</ul>
+<p>Unsupervised Learning</p>
+<ul>
+<li>given inputs but not outputs - goal is to find something interesting in unlabeled data</li>
+<li>recommender systems/reinforcement learning</li>
+<li>clustering: group together similar data
+<ul>
+<li>similar news articles</li>
+<li>DNA microarray clustering</li>
+<li>customer/market segmentation</li>
+</ul>
+</li>
+<li>anomaly detection: find unusual data points</li>
+<li>dimensionality reduction: compress data using fewer numbers</li>
+</ul>
+<h3>Linear Regression</h3>
+<ul>
+<li>
+<p>Plot data on x/y plot. Add line of best fit, use formula for line to predict other inputs.</p>
+</li>
+<li>
+<p>Also useful to put data in a table where inputs/outputs are separate columns.</p>
+</li>
+<li>
+<p>training set: input and output dataset used to train the model</p>
+</li>
+<li>
+<p>x = input variable/feature</p>
+</li>
+<li>
+<p>y = output variable/target</p>
+</li>
+<li>
+<p>m = number of training examples</p>
+</li>
+<li>
+<p>(x, y) = single training example</p>
+</li>
+<li>
+<p>w/b are model parameters (coefficients/weights)</p>
+</li>
+<li>
+<p>given a training set, and a learning algorithm, generate a function that can predict y given x</p>
+</li>
+<li>
+<p>fwb(x) = wx + b</p>
+</li>
+</ul>
+<h3>Sum of Squared Error</h3>
+<ul>
+<li>goal of cost function is to find w,b such that y prediction is close to y target for all (x,y)</li>
+<li>squared error cost function: J(w,b) = 1 / 2m * sum((ypred - ytarget) ^ 2)</li>
+<li>divide by 2m so that we dont get bigger errors for a larger training set. Using 2 makes the gradient descent derivative cleaner.</li>
+<li>square the error so that the sum doesnt go to zero when -ve/+ve errors are added together</li>
+<li>goal is to minimize J(w,b)</li>
+<li>a line in the model graph is a point on the cost graph</li>
+</ul>
+<p>Simple example where b = 0</p>
+<p><img src="/images/sse.png" alt="Sum of Squared Errors Graph"></p>
+<p>w and b - sum of squared error cost function for linear regression will always be bowl shaped
+<img src="/images/contour.png" alt="Contour Graph"></p>
+<h3>Gradient Descent</h3>
+<ul>
+<li>
+<p>Used to find w, b that minimizes J(w,b). Gradient descent can be used to minimize any function. Finds local minima.</p>
+</li>
+<li>
+<p>Algorithm:</p>
+<ul>
+<li>
+<p>start with some w,b (for linear regression, use 0,0)</p>
+</li>
+<li>
+<p>keep changing w,b to reduce J(w,b)</p>
+<ul>
+<li>w = w - a * d/dwJ(w,b)</li>
+<li>b = b - a * d/dbJ(w,b)</li>
+<li>a = learning rate (between 0 and 1). Controls the size of the "step" taken when changing a parameter</li>
+</ul>
+</li>
+<li>
+<p>repeat until w/b no longer change much</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/gradientdescent.png" alt="Gradient Descent"></p>
+<p><img src="/images/gradientdescentformula.png" alt="Formula"></p>
+<p>If the learning rate is too large, it might never converge and may get further from the minimum. If too small, it will take very long.</p>
+<p>Even when using a fixed learning rate, each update step is smaller since the slope is smaller as we approach the local minima.</p>
+<p>For sum of squared errors, gradient descent will always find the global minimum.</p>
+<p>Batch gradient descent looks at all training examples.</p>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">import</span> matplotlib<span class="token punctuation">.</span>pyplot <span class="token keyword">as</span> plt
+
+x_train <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">1.0</span><span class="token punctuation">,</span> <span class="token number">2.0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+y_train <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">300.0</span><span class="token punctuation">,</span> <span class="token number">500.0</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+w <span class="token operator">=</span> <span class="token number">200</span>
+b <span class="token operator">=</span> <span class="token number">100</span>
+tmp_f_wb <span class="token operator">=</span> compute_model_output<span class="token punctuation">(</span>x_train<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">)</span>
+
+plt<span class="token punctuation">.</span>plot<span class="token punctuation">(</span>x_train<span class="token punctuation">,</span> tmp_f_wb<span class="token punctuation">,</span> c<span class="token operator">=</span><span class="token string">'b'</span><span class="token punctuation">,</span> label<span class="token operator">=</span><span class="token string">'Our Prediction'</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>scatter<span class="token punctuation">(</span>x_train<span class="token punctuation">,</span> y_train<span class="token punctuation">,</span> marker<span class="token operator">=</span><span class="token string">'x'</span><span class="token punctuation">,</span> c<span class="token operator">=</span><span class="token string">'r'</span><span class="token punctuation">,</span> label<span class="token operator">=</span><span class="token string">'Actual Values'</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>title<span class="token punctuation">(</span><span class="token string">'Housing Prices'</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>ylabel<span class="token punctuation">(</span><span class="token string">'Price (in 1000s of dollars)'</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>xlabel<span class="token punctuation">(</span><span class="token string">'Size (1000 sqft)'</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">compute_model_output</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token comment"># m is the number of training examples</span>
+    m <span class="token operator">=</span> x<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token comment"># alt is len(x_train)</span>
+    f_wb <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span>m<span class="token punctuation">)</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        f_wb<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> w <span class="token operator">*</span> x<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> b
+    <span class="token keyword">return</span> f_wb
+
+<span class="token keyword">def</span> <span class="token function">compute_cost</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">:</span>
+  m <span class="token operator">=</span> x<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+  cost_sum <span class="token operator">=</span> <span class="token number">0</span>
+  <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    f_wb <span class="token operator">=</span> w <span class="token operator">*</span> x<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> b
+    cost <span class="token operator">=</span> <span class="token punctuation">(</span>f_wb <span class="token operator">-</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">**</span> <span class="token number">2</span>
+    cost_sum <span class="token operator">=</span> cost_sum <span class="token operator">+</span> cost
+  <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">2</span> <span class="token operator">*</span> m<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">*</span> cost_sum
+
+<span class="token keyword">def</span> <span class="token function">compute_gradient</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">:</span>
+  m <span class="token operator">=</span> x<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+  dj_dw <span class="token operator">=</span> <span class="token number">0</span>
+  dj_db <span class="token operator">=</span> <span class="token number">0</span>
+  <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    f_wb <span class="token operator">=</span> w <span class="token operator">*</span> x<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+</span> b
+    dj_dw_i <span class="token operator">=</span> <span class="token punctuation">(</span>f_wb <span class="token operator">-</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">*</span> x<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+    dj_db_i <span class="token operator">=</span> f_wb <span class="token operator">-</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+    dj_db <span class="token operator">+=</span> dj_db_i
+    dj_dw <span class="token operator">+=</span> dj_dw_i
+  dj_dw <span class="token operator">=</span> dj_dw<span class="token operator">/</span>m
+  dj_db <span class="token operator">=</span> dj_db<span class="token operator">/</span>m
+  <span class="token keyword">return</span> dj_dw<span class="token punctuation">,</span> dj_db
+
+<span class="token keyword">def</span> <span class="token function">gradient_descent</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w_in<span class="token punctuation">,</span> b_in<span class="token punctuation">,</span> alpha<span class="token punctuation">,</span> num_iters<span class="token punctuation">,</span> cost_function<span class="token punctuation">,</span> gradient_function<span class="token punctuation">)</span><span class="token punctuation">:</span>
+  w <span class="token operator">=</span> copy<span class="token punctuation">.</span>deepcopy<span class="token punctuation">(</span>w_in<span class="token punctuation">)</span>
+  J_history <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+  p_history <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+  b <span class="token operator">=</span> b_in
+  w <span class="token operator">=</span> w_in
+  <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_iters<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    dj_dw<span class="token punctuation">,</span> dj_db <span class="token operator">=</span> gradient_function<span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">)</span>
+    b <span class="token operator">=</span> b <span class="token operator">-</span> alpha <span class="token operator">*</span> dj_db
+    w <span class="token operator">=</span> w <span class="token operator">-</span> alpha <span class="token operator">*</span> dj_dw
+
+    <span class="token keyword">if</span> i <span class="token operator">&#x3C;</span> <span class="token number">100000</span><span class="token punctuation">:</span>
+      J_history<span class="token punctuation">.</span>append<span class="token punctuation">(</span>cost_function<span class="token punctuation">(</span>x<span class="token punctuation">,</span>y<span class="token punctuation">,</span>w<span class="token punctuation">,</span>b<span class="token punctuation">)</span><span class="token punctuation">)</span>
+      p_history<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">[</span>w<span class="token punctuation">,</span>b<span class="token punctuation">]</span><span class="token punctuation">)</span>
+  <span class="token keyword">return</span> w<span class="token punctuation">,</span> b<span class="token punctuation">,</span> J_history<span class="token punctuation">,</span> p_history
+
+
+<span class="token comment"># initialize parameters</span>
+w_init <span class="token operator">=</span> <span class="token number">0</span>
+b_init <span class="token operator">=</span> <span class="token number">0</span>
+<span class="token comment"># some gradient descent settings</span>
+iterations <span class="token operator">=</span> <span class="token number">10000</span>
+tmp_alpha <span class="token operator">=</span> <span class="token number">1.0e-2</span>
+<span class="token comment"># run gradient descent</span>
+w_final<span class="token punctuation">,</span> b_final<span class="token punctuation">,</span> J_hist<span class="token punctuation">,</span> p_hist <span class="token operator">=</span> gradient_descent<span class="token punctuation">(</span>x_train <span class="token punctuation">,</span>y_train<span class="token punctuation">,</span> w_init<span class="token punctuation">,</span> b_init<span class="token punctuation">,</span> tmp_alpha<span class="token punctuation">,</span>
+                                                    iterations<span class="token punctuation">,</span> compute_cost<span class="token punctuation">,</span> compute_gradient<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"(w,b) found by gradient descent: (</span><span class="token interpolation"><span class="token punctuation">{</span>w_final<span class="token punctuation">:</span><span class="token format-spec">8.4f</span><span class="token punctuation">}</span></span><span class="token string">,</span><span class="token interpolation"><span class="token punctuation">{</span>b_final<span class="token punctuation">:</span><span class="token format-spec">8.4f</span><span class="token punctuation">}</span></span><span class="token string">)"</span></span><span class="token punctuation">)</span>
+</code></pre></div>
 <h3>Decision Trees</h3>
 <div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> pandas <span class="token keyword">as</span> pd
 <span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>tree <span class="token keyword">import</span> DecisionTreeRegressor
@@ -183,4 +367,7 @@ powerlifting_combined <span class="token operator">=</span> powerlifting_meets<s
 https://developers.google.com/machine-learning/crash-course</p>
 <p>https://course.fast.ai/</p>
 <p>https://courses.dataschool.io/</p>
+<p>https://www.coursera.org/learn/machine-learning</p>
+<h3>Problems</h3>
+<p>use speech recognition principles to build a wav -> midi maker</p>
 </div></div></div></div></body></html>

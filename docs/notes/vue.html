@@ -1,5 +1,4 @@
-<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Vue Notes | Gurchet&#x27;s Development Blog</title><meta name="description" content="Udemy Course Notes"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Vue Notes</h1><div class="meta"><span>Fri Jul 15 2022</span><span>summary</span></div><div class="mt25 post"><h1>Vue</h1>
-<p>Can be used to control parts of HTML pages in a multi-page application or can be used for single page applications.</p>
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Vue Notes | Gurchet&#x27;s Development Blog</title><meta name="description" content="Udemy Course Notes"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Vue Notes</h1><div class="meta"><span>Fri Jul 15 2022</span><span>summary</span></div><div class="mt25 post"><p>Can be used to control parts of HTML pages in a multi-page application or can be used for single page applications.</p>
 <div class="remark-highlight"><pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>div</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>app<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
   <span class="token comment">&#x3C;!-- setName automatically called with event object --></span>
   <span class="token comment">&#x3C;!-- v-bind:value shorthand is :value --></span>
@@ -581,7 +580,7 @@ data<span class="token punctuation">.</span><span class="token property-access">
         age<span class="token operator">:</span> <span class="token number">31</span><span class="token punctuation">,</span>
       <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-      <span class="token comment">// makes the object AND each value inside the object a ref so you can</span>
+      <span class="token comment">// makes the object AND each value inside the object a ref</span>
       <span class="token keyword">const</span> trUser <span class="token operator">=</span> <span class="token function">toRefs</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
         name<span class="token operator">:</span> <span class="token string">"default"</span><span class="token punctuation">,</span>
         age<span class="token operator">:</span> <span class="token number">31</span><span class="token punctuation">,</span>
@@ -597,6 +596,10 @@ data<span class="token punctuation">.</span><span class="token property-access">
       <span class="token function">watch</span><span class="token punctuation">(</span>userName<span class="token punctuation">,</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">newVal<span class="token punctuation">,</span> oldVal</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token console class-name">console</span><span class="token punctuation">.</span><span class="token method function property-access">log</span><span class="token punctuation">(</span><span class="token string">"new username"</span><span class="token punctuation">,</span> newVal<span class="token punctuation">)</span><span class="token punctuation">;</span>
       <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+      <span class="token comment">// to watch for changes in a prop</span>
+      <span class="token keyword">const</span> <span class="token punctuation">{</span> user <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">toRefs</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token function">watch</span><span class="token punctuation">(</span>user<span class="token punctuation">,</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token parameter">newVal<span class="token punctuation">,</span> oldVal</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
       <span class="token function">setTimeout</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=></span> <span class="token punctuation">{</span>
         userName<span class="token punctuation">.</span><span class="token property-access">value</span> <span class="token operator">=</span> <span class="token string">"some new value"</span><span class="token punctuation">;</span>
@@ -696,5 +699,31 @@ data<span class="token punctuation">.</span><span class="token property-access">
     <span class="token punctuation">}</span><span class="token punctuation">;</span>
   <span class="token punctuation">}</span><span class="token punctuation">,</span>
 <span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div>
+<h3>Http Requests</h3>
+<p>post/submit data. Add <code>@submit.prevent</code> to any form.</p>
+<div class="remark-highlight"><pre class="language-js"><code class="language-js"><span class="token function">fetch</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  method<span class="token operator">:</span> <span class="token string">"POST"</span><span class="token punctuation">,</span>
+  headers<span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token string">"Content-Type"</span><span class="token operator">:</span> <span class="token string">"application/json"</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  body<span class="token operator">:</span> <span class="token known-class-name class-name">JSON</span><span class="token punctuation">.</span><span class="token method function property-access">stringify</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token comment">// someJson</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div>
+<p>get data. Fetch inside of mounted/created.</p>
+<div class="remark-highlight"><pre class="language-js"><code class="language-js"><span class="token keyword control-flow">try</span> <span class="token punctuation">{</span>
+  <span class="token comment">// response.ok - if false, server-side error</span>
+  <span class="token keyword">const</span> response <span class="token operator">=</span> <span class="token keyword control-flow">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span>url<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword control-flow">if</span><span class="token punctuation">(</span>response<span class="token punctuation">.</span><span class="token property-access">ok</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> json <span class="token operator">=</span> <span class="token keyword control-flow">await</span> response<span class="token punctuation">.</span><span class="token method function property-access">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span> <span class="token keyword control-flow">else</span> <span class="token punctuation">{</span>
+    <span class="token keyword control-flow">throw</span> <span class="token keyword">new</span> <span class="token class-name">Error</span><span class="token punctuation">(</span><span class="token string">'could not get data!'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span> <span class="token keyword control-flow">catch</span><span class="token punctuation">(</span><span class="token parameter">error</span> <span class="token arrow operator">=></span> <span class="token punctuation">{</span>
+  <span class="token comment">// this will be a client-side error</span>
+  <span class="token console class-name">console</span><span class="token punctuation">.</span><span class="token method function property-access">log</span><span class="token punctuation">(</span>error<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
 </code></pre></div>
 </div></div></div></div></body></html>
