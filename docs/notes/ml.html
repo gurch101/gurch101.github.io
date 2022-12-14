@@ -183,6 +183,123 @@ w_final<span class="token punctuation">,</span> b_final<span class="token punctu
                                                     iterations<span class="token punctuation">,</span> compute_cost<span class="token punctuation">,</span> compute_gradient<span class="token punctuation">)</span>
 <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"(w,b) found by gradient descent: (</span><span class="token interpolation"><span class="token punctuation">{</span>w_final<span class="token punctuation">:</span><span class="token format-spec">8.4f</span><span class="token punctuation">}</span></span><span class="token string">,</span><span class="token interpolation"><span class="token punctuation">{</span>b_final<span class="token punctuation">:</span><span class="token format-spec">8.4f</span><span class="token punctuation">}</span></span><span class="token string">)"</span></span><span class="token punctuation">)</span>
 </code></pre></div>
+<h5>Multiple Linear Regression</h5>
+<p>Support multiple features</p>
+<p>xj = jth feature
+n = number of features
+x^i = features of the ith training example
+X^ij = value of j feature in ith training example</p>
+<p>model:
+fwb(x) = w1x1 + w2x2 + ... + wnxn + b</p>
+<p>store weights in a row vector
+store x in a row vector
+b is a single number</p>
+<p>fwb(x) = w dotproduct x + b</p>
+<p>dotproduct is elementwise sum of products</p>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py">w <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">1.0</span><span class="token punctuation">,</span><span class="token number">2.5</span><span class="token punctuation">,</span><span class="token operator">-</span><span class="token number">3.3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+b <span class="token operator">=</span> <span class="token number">4</span>
+x <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token number">20</span><span class="token punctuation">,</span><span class="token number">30</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token comment"># computer does product in parallel rather than a serial for loop</span>
+f <span class="token operator">=</span> np<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>w<span class="token punctuation">,</span>x<span class="token punctuation">)</span> <span class="token operator">+</span> b
+</code></pre></div>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> copy<span class="token punctuation">,</span> math
+<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+
+X_train <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">2104</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">45</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">1416</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">40</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">852</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">35</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+y_train <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">460</span><span class="token punctuation">,</span> <span class="token number">232</span><span class="token punctuation">,</span> <span class="token number">178</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+b_init <span class="token operator">=</span> <span class="token number">785.1811367994083</span>
+w_init <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span> <span class="token number">0.39133535</span><span class="token punctuation">,</span> <span class="token number">18.75376741</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">53.36032453</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">26.42131618</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">predict_single_loop</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">:</span>
+  <span class="token keyword">return</span> np<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>x<span class="token punctuation">,</span> w<span class="token punctuation">)</span> <span class="token operator">+</span> b
+
+
+<span class="token keyword">def</span> <span class="token function">compute_cost</span><span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">:</span>
+  m <span class="token operator">=</span> X<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+  cost <span class="token operator">=</span> <span class="token number">0.0</span>
+  <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    f_wb_i <span class="token operator">=</span> np<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> w<span class="token punctuation">)</span> <span class="token operator">+</span> b
+    cost <span class="token operator">=</span> cost <span class="token operator">+</span> <span class="token punctuation">(</span>f_wb_i <span class="token operator">-</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">**</span><span class="token number">2</span>
+  <span class="token keyword">return</span> cost <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">2</span><span class="token operator">*</span>m<span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">compute_gradient</span><span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">:</span>
+  m<span class="token punctuation">,</span>n <span class="token operator">=</span> X<span class="token punctuation">.</span>shape
+  dj_dw <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span>n<span class="token punctuation">,</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  dj_db <span class="token operator">=</span> <span class="token number">0</span>
+
+  <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    err <span class="token operator">=</span> <span class="token punctuation">(</span>np<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> w<span class="token punctuation">)</span> <span class="token operator">+</span> b<span class="token punctuation">)</span> <span class="token operator">-</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+    <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+      dj_dw<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> dj_dw<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+</span> err <span class="token operator">*</span> X<span class="token punctuation">[</span>i<span class="token punctuation">,</span>j<span class="token punctuation">]</span>
+    dj_db <span class="token operator">=</span> dj_db <span class="token operator">+</span> err
+
+  <span class="token keyword">return</span> dj_dw <span class="token operator">/</span> m<span class="token punctuation">,</span> dj_db <span class="token operator">/</span> m
+
+<span class="token keyword">def</span> <span class="token function">gradient_descent</span><span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w_in<span class="token punctuation">,</span> b_in<span class="token punctuation">,</span> cost_function<span class="token punctuation">,</span> gradient_function<span class="token punctuation">,</span> alpha<span class="token punctuation">,</span> num_iters<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""</span>
+<span class="token triple-quoted-string string">    Performs batch gradient descent to learn theta. Updates theta by taking</span>
+<span class="token triple-quoted-string string">    num_iters gradient steps with learning rate alpha</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    Args:</span>
+<span class="token triple-quoted-string string">      X (ndarray (m,n))   : Data, m examples with n features</span>
+<span class="token triple-quoted-string string">      y (ndarray (m,))    : target values</span>
+<span class="token triple-quoted-string string">      w_in (ndarray (n,)) : initial model parameters</span>
+<span class="token triple-quoted-string string">      b_in (scalar)       : initial model parameter</span>
+<span class="token triple-quoted-string string">      cost_function       : function to compute cost</span>
+<span class="token triple-quoted-string string">      gradient_function   : function to compute the gradient</span>
+<span class="token triple-quoted-string string">      alpha (float)       : Learning rate</span>
+<span class="token triple-quoted-string string">      num_iters (int)     : number of iterations to run gradient descent</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    Returns:</span>
+<span class="token triple-quoted-string string">      w (ndarray (n,)) : Updated values of parameters</span>
+<span class="token triple-quoted-string string">      b (scalar)       : Updated value of parameter</span>
+<span class="token triple-quoted-string string">      """</span>
+
+    <span class="token comment"># An array to store cost J and w's at each iteration primarily for graphing later</span>
+    J_history <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    w <span class="token operator">=</span> copy<span class="token punctuation">.</span>deepcopy<span class="token punctuation">(</span>w_in<span class="token punctuation">)</span>  <span class="token comment">#avoid modifying global w within function</span>
+    b <span class="token operator">=</span> b_in
+
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_iters<span class="token punctuation">)</span><span class="token punctuation">:</span>
+
+        <span class="token comment"># Calculate the gradient and update the parameters</span>
+        dj_db<span class="token punctuation">,</span>dj_dw <span class="token operator">=</span> gradient_function<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">)</span>   <span class="token comment">##None</span>
+
+        <span class="token comment"># Update Parameters using w, b, alpha and gradient</span>
+        w <span class="token operator">=</span> w <span class="token operator">-</span> alpha <span class="token operator">*</span> dj_dw               <span class="token comment">##None</span>
+        b <span class="token operator">=</span> b <span class="token operator">-</span> alpha <span class="token operator">*</span> dj_db               <span class="token comment">##None</span>
+
+        <span class="token comment"># Save cost J at each iteration</span>
+        <span class="token keyword">if</span> i<span class="token operator">&#x3C;</span><span class="token number">100000</span><span class="token punctuation">:</span>      <span class="token comment"># prevent resource exhaustion</span>
+            J_history<span class="token punctuation">.</span>append<span class="token punctuation">(</span> cost_function<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+        <span class="token comment"># Print cost every at intervals 10 times or as many iterations if &#x3C; 10</span>
+        <span class="token keyword">if</span> i<span class="token operator">%</span> math<span class="token punctuation">.</span>ceil<span class="token punctuation">(</span>num_iters <span class="token operator">/</span> <span class="token number">10</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Iteration </span><span class="token interpolation"><span class="token punctuation">{</span>i<span class="token punctuation">:</span><span class="token format-spec">4d</span><span class="token punctuation">}</span></span><span class="token string">: Cost </span><span class="token interpolation"><span class="token punctuation">{</span>J_history<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">:</span><span class="token format-spec">8.2f</span><span class="token punctuation">}</span></span><span class="token string">   "</span></span><span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> w<span class="token punctuation">,</span> b<span class="token punctuation">,</span> J_history <span class="token comment">#return final w,b and J history for graphing</span>
+
+
+<span class="token comment"># initialize parameters</span>
+initial_w <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros_like<span class="token punctuation">(</span>w_init<span class="token punctuation">)</span>
+initial_b <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">.</span>
+<span class="token comment"># some gradient descent settings</span>
+iterations <span class="token operator">=</span> <span class="token number">1000</span>
+alpha <span class="token operator">=</span> <span class="token number">5.0e-7</span>
+<span class="token comment"># run gradient descent</span>
+w_final<span class="token punctuation">,</span> b_final<span class="token punctuation">,</span> J_hist <span class="token operator">=</span> gradient_descent<span class="token punctuation">(</span>X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">,</span> initial_w<span class="token punctuation">,</span> initial_b<span class="token punctuation">,</span>
+                                                    compute_cost<span class="token punctuation">,</span> compute_gradient<span class="token punctuation">,</span>
+                                                    alpha<span class="token punctuation">,</span> iterations<span class="token punctuation">)</span>
+</code></pre></div>
+<p>Normal equation can be used as an alternative to gradient descent for linear regression without iterations. It doesn't generalize to other learning algorithms and it can be slow for a large number of features.</p>
+<h5>Feature Scaling</h5>
+<p>some inputs can take a large range of values, others a small range of values (ex sqft vs # of bedrooms). Large inputs will likely have small weights, small values will have larger weights. The contour plot of the cost function will be an oval signifying small changes in one dimension can have a large impact - takes longer to find a local minima. Scaling features to operate on a similar scale produces a contour plot that is more circular -> a more direct path to the minima can be found.</p>
+<p>can be scaled by input feature/max(feature across all rows)
+alt: mean normalization - (input feature - mean)/(max - min)
+alt: z-score normalization - (input feature - mean)/stddev</p>
+<p>aim to get features roughly between -1 to 1. Only need to rescale features that are too large or too small.</p>
+<p>Feature scaling will improve the performance of gradient descent since it makes a more direct path to a minimum.</p>
 <h3>Decision Trees</h3>
 <div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> pandas <span class="token keyword">as</span> pd
 <span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>tree <span class="token keyword">import</span> DecisionTreeRegressor
@@ -240,6 +357,34 @@ forest_model <span class="token operator">=</span> RandomForestRegressor<span cl
 forest_model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>train_X<span class="token punctuation">,</span> train_y<span class="token punctuation">)</span>
 melb_preds <span class="token operator">=</span> forest_model<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>val_X<span class="token punctuation">)</span>
 <span class="token keyword">print</span><span class="token punctuation">(</span>mean_absolute_error<span class="token punctuation">(</span>val_y<span class="token punctuation">,</span> melb_preds<span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre></div>
+<h1>Numpy</h1>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+
+<span class="token comment"># vector creation</span>
+a <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span>
+<span class="token comment"># returns vector of 4 elements from 0-1</span>
+a <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>random_sample<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span>
+returns vector of <span class="token number">0</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span>
+a <span class="token operator">=</span> np<span class="token punctuation">.</span>arange<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">.</span><span class="token punctuation">)</span>
+a <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>rand<span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span>
+a <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token comment"># one row of five elements</span>
+a <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token comment"># vectors have a shape property</span>
+a<span class="token punctuation">.</span>shape
+<span class="token comment"># slicing is done with start:stop:step</span>
+a<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">:</span><span class="token number">7</span><span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">]</span>
+a<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
+a<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
+a<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">:</span><span class="token number">7</span><span class="token punctuation">:</span><span class="token number">1</span><span class="token punctuation">]</span>
+<span class="token comment"># operations</span>
+np<span class="token punctuation">.</span><span class="token builtin">sum</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span>
+np<span class="token punctuation">.</span>mean<span class="token punctuation">(</span>a<span class="token punctuation">)</span>
+a<span class="token operator">**</span><span class="token number">2</span>
+<span class="token comment"># element-wise sum/product</span>
+a <span class="token operator">+</span> a
+a <span class="token operator">*</span> <span class="token number">5</span>
 </code></pre></div>
 <h1>Pandas</h1>
 <h3>I/O</h3>
@@ -369,5 +514,6 @@ https://developers.google.com/machine-learning/crash-course</p>
 <p>https://courses.dataschool.io/</p>
 <p>https://www.coursera.org/learn/machine-learning</p>
 <h3>Problems</h3>
-<p>use speech recognition principles to build a wav -> midi maker</p>
+<p>use speech recognition principles to build a wav -> midi maker
+build a mike tysons punch out solver</p>
 </div></div></div></div></body></html>
