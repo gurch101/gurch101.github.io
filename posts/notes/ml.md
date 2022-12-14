@@ -166,6 +166,140 @@ w_final, b_final, J_hist, p_hist = gradient_descent(x_train ,y_train, w_init, b_
 print(f"(w,b) found by gradient descent: ({w_final:8.4f},{b_final:8.4f})")
 ```
 
+##### Multiple Linear Regression
+
+Support multiple features
+
+xj = jth feature
+n = number of features
+x^i = features of the ith training example
+X^ij = value of j feature in ith training example
+
+model:
+fwb(x) = w1x1 + w2x2 + ... + wnxn + b
+
+store weights in a row vector
+store x in a row vector
+b is a single number
+
+fwb(x) = w dotproduct x + b
+
+dotproduct is elementwise sum of products
+
+```py
+w = np.array([1.0,2.5,-3.3])
+b = 4
+x = np.array([10,20,30])
+# computer does product in parallel rather than a serial for loop
+f = np.dot(w,x) + b
+```
+
+```py
+import copy, math
+import numpy as np
+
+X_train = np.array([[2104, 5, 1, 45], [1416, 3, 2, 40], [852, 2, 1, 35]])
+y_train = np.array([460, 232, 178])
+
+b_init = 785.1811367994083
+w_init = np.array([ 0.39133535, 18.75376741, -53.36032453, -26.42131618])
+
+def predict_single_loop(x, w, b):
+  return np.dot(x, w) + b
+
+
+def compute_cost(X, y, w, b):
+  m = X.shape[0]
+  cost = 0.0
+  for i in range(m):
+    f_wb_i = np.dot(X[i], w) + b
+    cost = cost + (f_wb_i - y[i])**2
+  return cost / (2*m)
+
+def compute_gradient(X, y, w, b):
+  m,n = X.shape
+  dj_dw = np.zeros((n,))
+  dj_db = 0
+
+  for i in range(m):
+    err = (np.dot(X[i], w) + b) - y[i]
+    for j in range(n):
+      dj_dw[j] = dj_dw[j] + err * X[i,j]
+    dj_db = dj_db + err
+
+  return dj_dw / m, dj_db / m
+
+def gradient_descent(X, y, w_in, b_in, cost_function, gradient_function, alpha, num_iters):
+    """
+    Performs batch gradient descent to learn theta. Updates theta by taking
+    num_iters gradient steps with learning rate alpha
+
+    Args:
+      X (ndarray (m,n))   : Data, m examples with n features
+      y (ndarray (m,))    : target values
+      w_in (ndarray (n,)) : initial model parameters
+      b_in (scalar)       : initial model parameter
+      cost_function       : function to compute cost
+      gradient_function   : function to compute the gradient
+      alpha (float)       : Learning rate
+      num_iters (int)     : number of iterations to run gradient descent
+
+    Returns:
+      w (ndarray (n,)) : Updated values of parameters
+      b (scalar)       : Updated value of parameter
+      """
+
+    # An array to store cost J and w's at each iteration primarily for graphing later
+    J_history = []
+    w = copy.deepcopy(w_in)  #avoid modifying global w within function
+    b = b_in
+
+    for i in range(num_iters):
+
+        # Calculate the gradient and update the parameters
+        dj_db,dj_dw = gradient_function(X, y, w, b)   ##None
+
+        # Update Parameters using w, b, alpha and gradient
+        w = w - alpha * dj_dw               ##None
+        b = b - alpha * dj_db               ##None
+
+        # Save cost J at each iteration
+        if i<100000:      # prevent resource exhaustion
+            J_history.append( cost_function(X, y, w, b))
+
+        # Print cost every at intervals 10 times or as many iterations if < 10
+        if i% math.ceil(num_iters / 10) == 0:
+            print(f"Iteration {i:4d}: Cost {J_history[-1]:8.2f}   ")
+
+    return w, b, J_history #return final w,b and J history for graphing
+
+
+# initialize parameters
+initial_w = np.zeros_like(w_init)
+initial_b = 0.
+# some gradient descent settings
+iterations = 1000
+alpha = 5.0e-7
+# run gradient descent
+w_final, b_final, J_hist = gradient_descent(X_train, y_train, initial_w, initial_b,
+                                                    compute_cost, compute_gradient,
+                                                    alpha, iterations)
+```
+
+Normal equation can be used as an alternative to gradient descent for linear regression without iterations. It doesn't generalize to other learning algorithms and it can be slow for a large number of features.
+
+##### Feature Scaling
+
+some inputs can take a large range of values, others a small range of values (ex sqft vs # of bedrooms). Large inputs will likely have small weights, small values will have larger weights. The contour plot of the cost function will be an oval signifying small changes in one dimension can have a large impact - takes longer to find a local minima. Scaling features to operate on a similar scale produces a contour plot that is more circular -> a more direct path to the minima can be found.
+
+can be scaled by input feature/max(feature across all rows)
+alt: mean normalization - (input feature - mean)/(max - min)
+alt: z-score normalization - (input feature - mean)/stddev
+
+aim to get features roughly between -1 to 1. Only need to rescale features that are too large or too small.
+
+Feature scaling will improve the performance of gradient descent since it makes a more direct path to a minimum.
+
 ### Decision Trees
 
 ```py
@@ -229,6 +363,37 @@ forest_model = RandomForestRegressor(random_state=1)
 forest_model.fit(train_X, train_y)
 melb_preds = forest_model.predict(val_X)
 print(mean_absolute_error(val_y, melb_preds))
+```
+
+# Numpy
+
+```py
+import numpy as np
+
+# vector creation
+a = np.zeros(4)
+# returns vector of 4 elements from 0-1
+a = np.random.random_sample(4)
+returns vector of 0,1,2,3
+a = np.arange(4.)
+a = np.random.rand(4)
+a = np.array([1,2,3,4])
+# one row of five elements
+a = np.zeros((1,5))
+# vectors have a shape property
+a.shape
+# slicing is done with start:stop:step
+a[2:7:1]
+a[3:]
+a[:]
+a[:, 2:7:1]
+# operations
+np.sum(a)
+np.mean(a)
+a**2
+# element-wise sum/product
+a + a
+a * 5
 ```
 
 # Pandas
@@ -372,3 +537,4 @@ https://www.coursera.org/learn/machine-learning
 ### Problems
 
 use speech recognition principles to build a wav -> midi maker
+build a mike tysons punch out solver
