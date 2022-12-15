@@ -107,6 +107,9 @@
 <p>Even when using a fixed learning rate, each update step is smaller since the slope is smaller as we approach the local minima.</p>
 <p>For sum of squared errors, gradient descent will always find the global minimum.</p>
 <p>Batch gradient descent looks at all training examples.</p>
+<p>To make sure gradient descent is converging, plot J (y axis) vs # iterations (x axis). This is known as the learning curve. If the cost sometimes goes up, the learning rate might be too large.</p>
+<p><img src="/images/learningcurve.png" alt="Learning Curve"></p>
+<p>Alternative: if cost decreases by &#x3C;= epsilon in one iteration, then declare convergence</p>
 <div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
 <span class="token keyword">import</span> matplotlib<span class="token punctuation">.</span>pyplot <span class="token keyword">as</span> plt
 
@@ -280,26 +283,41 @@ w_init <span class="token operator">=</span> np<span class="token punctuation">.
 
     <span class="token keyword">return</span> w<span class="token punctuation">,</span> b<span class="token punctuation">,</span> J_history <span class="token comment">#return final w,b and J history for graphing</span>
 
+<span class="token keyword">def</span> <span class="token function">zscore_normalize_features</span><span class="token punctuation">(</span>X<span class="token punctuation">)</span><span class="token punctuation">:</span>
+  <span class="token comment"># avg of each column</span>
+  mu <span class="token operator">=</span> np<span class="token punctuation">.</span>mean<span class="token punctuation">(</span>X<span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
+  <span class="token comment"># stddev of each column</span>
+  sigma <span class="token operator">=</span> np<span class="token punctuation">.</span>std<span class="token punctuation">(</span>X<span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
+  X_norm <span class="token operator">=</span> <span class="token punctuation">(</span>X <span class="token operator">-</span> mu<span class="token punctuation">)</span> <span class="token operator">/</span> sigma
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>X_norm<span class="token punctuation">,</span> mu<span class="token punctuation">,</span> sigma<span class="token punctuation">)</span>
 
 <span class="token comment"># initialize parameters</span>
 initial_w <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros_like<span class="token punctuation">(</span>w_init<span class="token punctuation">)</span>
 initial_b <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">.</span>
 <span class="token comment"># some gradient descent settings</span>
 iterations <span class="token operator">=</span> <span class="token number">1000</span>
-alpha <span class="token operator">=</span> <span class="token number">5.0e-7</span>
+alpha <span class="token operator">=</span> <span class="token number">1.0e-1</span>
+X_norm<span class="token punctuation">,</span> mu<span class="token punctuation">,</span> sigma <span class="token operator">=</span> zscore_normalize_Features<span class="token punctuation">(</span>X_train<span class="token punctuation">)</span>
 <span class="token comment"># run gradient descent</span>
-w_final<span class="token punctuation">,</span> b_final<span class="token punctuation">,</span> J_hist <span class="token operator">=</span> gradient_descent<span class="token punctuation">(</span>X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">,</span> initial_w<span class="token punctuation">,</span> initial_b<span class="token punctuation">,</span>
+w_final<span class="token punctuation">,</span> b_final<span class="token punctuation">,</span> J_hist <span class="token operator">=</span> gradient_descent<span class="token punctuation">(</span>X_norm<span class="token punctuation">,</span> y_train<span class="token punctuation">,</span> initial_w<span class="token punctuation">,</span> initial_b<span class="token punctuation">,</span>
                                                     compute_cost<span class="token punctuation">,</span> compute_gradient<span class="token punctuation">,</span>
                                                     alpha<span class="token punctuation">,</span> iterations<span class="token punctuation">)</span>
+
+<span class="token comment"># to predict new input, normalize the features</span>
+x_house <span class="token operator">=</span> np<span class="token punctuation">.</span>array<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token number">1200</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">40</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+x_house_norm <span class="token operator">=</span> <span class="token punctuation">(</span>x_house <span class="token operator">-</span> X_mu<span class="token punctuation">)</span> <span class="token operator">/</span> X_sigma
+x_house_predict <span class="token operator">=</span> np<span class="token punctuation">.</span>dor<span class="token punctuation">(</span>x_house_norm<span class="token punctuation">,</span> w_final<span class="token punctuation">)</span> <span class="token operator">+</span> b_final
 </code></pre></div>
 <p>Normal equation can be used as an alternative to gradient descent for linear regression without iterations. It doesn't generalize to other learning algorithms and it can be slow for a large number of features.</p>
 <h5>Feature Scaling</h5>
-<p>some inputs can take a large range of values, others a small range of values (ex sqft vs # of bedrooms). Large inputs will likely have small weights, small values will have larger weights. The contour plot of the cost function will be an oval signifying small changes in one dimension can have a large impact - takes longer to find a local minima. Scaling features to operate on a similar scale produces a contour plot that is more circular -> a more direct path to the minima can be found.</p>
+<p>some inputs can take a large range of values, others a small range of values (ex sqft vs # of bedrooms). Large inputs will likely have small weights, small values will have larger weights. The contour plot of the cost function will be asymmetric signifying small changes in one dimension can have a large impact - takes longer to find a local minima. Scaling features to operate on a similar scale produces a contour plot that is more circular -> a more direct path to the minima can be found.</p>
 <p>can be scaled by input feature/max(feature across all rows)
 alt: mean normalization - (input feature - mean)/(max - min)
-alt: z-score normalization - (input feature - mean)/stddev</p>
+alt: z-score normalization - (input feature - mean)/stddev. After z-score normalization, all features will have a mean of 0 and a standard deviation of 1.</p>
 <p>aim to get features roughly between -1 to 1. Only need to rescale features that are too large or too small.</p>
 <p>Feature scaling will improve the performance of gradient descent since it makes a more direct path to a minimum.</p>
+<h3>Feature Engineering</h3>
+<p>Use intuition to design new features by transforming or combining original features. For example, for housing prices dataset that has lot frontage and depth as separate features, you can create a new feature to represent area.</p>
 <h3>Decision Trees</h3>
 <div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> pandas <span class="token keyword">as</span> pd
 <span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>tree <span class="token keyword">import</span> DecisionTreeRegressor
