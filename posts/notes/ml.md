@@ -88,6 +88,12 @@ For sum of squared errors, gradient descent will always find the global minimum.
 
 Batch gradient descent looks at all training examples.
 
+To make sure gradient descent is converging, plot J (y axis) vs # iterations (x axis). This is known as the learning curve. If the cost sometimes goes up, the learning rate might be too large.
+
+![Learning Curve](/images/learningcurve.png)
+
+Alternative: if cost decreases by <= epsilon in one iteration, then declare convergence
+
 ```py
 import numpy as np
 import matplotlib.pyplot as plt
@@ -273,32 +279,49 @@ def gradient_descent(X, y, w_in, b_in, cost_function, gradient_function, alpha, 
 
     return w, b, J_history #return final w,b and J history for graphing
 
+def zscore_normalize_features(X):
+  # avg of each column
+  mu = np.mean(X, axis=0)
+  # stddev of each column
+  sigma = np.std(X, axis=0)
+  X_norm = (X - mu) / sigma
+  return (X_norm, mu, sigma)
 
 # initialize parameters
 initial_w = np.zeros_like(w_init)
 initial_b = 0.
 # some gradient descent settings
 iterations = 1000
-alpha = 5.0e-7
+alpha = 1.0e-1
+X_norm, mu, sigma = zscore_normalize_Features(X_train)
 # run gradient descent
-w_final, b_final, J_hist = gradient_descent(X_train, y_train, initial_w, initial_b,
+w_final, b_final, J_hist = gradient_descent(X_norm, y_train, initial_w, initial_b,
                                                     compute_cost, compute_gradient,
                                                     alpha, iterations)
+
+# to predict new input, normalize the features
+x_house = np.array([1200,3,1,40])
+x_house_norm = (x_house - X_mu) / X_sigma
+x_house_predict = np.dor(x_house_norm, w_final) + b_final
 ```
 
 Normal equation can be used as an alternative to gradient descent for linear regression without iterations. It doesn't generalize to other learning algorithms and it can be slow for a large number of features.
 
 ##### Feature Scaling
 
-some inputs can take a large range of values, others a small range of values (ex sqft vs # of bedrooms). Large inputs will likely have small weights, small values will have larger weights. The contour plot of the cost function will be an oval signifying small changes in one dimension can have a large impact - takes longer to find a local minima. Scaling features to operate on a similar scale produces a contour plot that is more circular -> a more direct path to the minima can be found.
+some inputs can take a large range of values, others a small range of values (ex sqft vs # of bedrooms). Large inputs will likely have small weights, small values will have larger weights. The contour plot of the cost function will be asymmetric signifying small changes in one dimension can have a large impact - takes longer to find a local minima. Scaling features to operate on a similar scale produces a contour plot that is more circular -> a more direct path to the minima can be found.
 
 can be scaled by input feature/max(feature across all rows)
 alt: mean normalization - (input feature - mean)/(max - min)
-alt: z-score normalization - (input feature - mean)/stddev
+alt: z-score normalization - (input feature - mean)/stddev. After z-score normalization, all features will have a mean of 0 and a standard deviation of 1.
 
 aim to get features roughly between -1 to 1. Only need to rescale features that are too large or too small.
 
 Feature scaling will improve the performance of gradient descent since it makes a more direct path to a minimum.
+
+### Feature Engineering
+
+Use intuition to design new features by transforming or combining original features. For example, for housing prices dataset that has lot frontage and depth as separate features, you can create a new feature to represent area.
 
 ### Decision Trees
 
