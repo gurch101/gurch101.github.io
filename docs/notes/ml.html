@@ -205,6 +205,7 @@ x <span class="token operator">=</span> np<span class="token punctuation">.</spa
 <span class="token comment"># computer does product in parallel rather than a serial for loop</span>
 f <span class="token operator">=</span> np<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>w<span class="token punctuation">,</span>x<span class="token punctuation">)</span> <span class="token operator">+</span> b
 </code></pre></div>
+<h5>Linear Regression by Hand</h5>
 <div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> copy<span class="token punctuation">,</span> math
 <span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
 
@@ -318,6 +319,134 @@ alt: z-score normalization - (input feature - mean)/stddev. After z-score normal
 <p>Feature scaling will improve the performance of gradient descent since it makes a more direct path to a minimum.</p>
 <h3>Feature Engineering</h3>
 <p>Use intuition to design new features by transforming or combining original features. For example, for housing prices dataset that has lot frontage and depth as separate features, you can create a new feature to represent area.</p>
+<h3>Polynomial Regression</h3>
+<p>If data is nonlinear, polynomial regression can be used to get curved lines. Simply add features that are raised to a power and run linear regression. Gradient descent naturally 'picks' the 'correct' feature by emphasizing its associated weight. The best features will be linear relative to the target (plot X^n against Y to see if linear line is generated).</p>
+<h5>Linear Regression with Scikit-Learn</h5>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>linear_model <span class="token keyword">import</span> SGDRegressor
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>preprocessing <span class="token keyword">import</span> StandardScalar
+
+scaler <span class="token operator">=</span> StandardScaler<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token comment">#z-score normalization</span>
+X_norm <span class="token operator">=</span> scaler<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>X_train<span class="token punctuation">)</span>
+<span class="token comment"># selects a sparese subset of features most relevant to the target variable</span>
+sgdr <span class="token operator">=</span> SGDRegressor<span class="token punctuation">(</span>max_iter<span class="token operator">=</span><span class="token number">1000</span><span class="token punctuation">)</span>
+sgdr<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_norm<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span>
+<span class="token comment"># sgdr._n_iter_, sgdr.t_ = number of completed iteration, number of weight updates</span>
+b_norm <span class="token operator">=</span> sgdr<span class="token punctuation">.</span>intercept_
+w_norm <span class="token operator">=</span> sgdr<span class="token punctuation">.</span>coef_
+y_pred_sgd <span class="token operator">=</span> sgdr<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>X_norm<span class="token punctuation">)</span>
+y_pred <span class="token operator">=</span> np<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>X_norm<span class="token punctuation">,</span> w_norm<span class="token punctuation">)</span> <span class="token operator">+</span> b_norm <span class="token comment"># y_pred = y_pred_sgd</span>
+
+<span class="token comment"># plot predictions and targets vs original features</span>
+fig<span class="token punctuation">,</span>ax<span class="token operator">=</span>plt<span class="token punctuation">.</span>subplots<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">4</span><span class="token punctuation">,</span>figsize<span class="token operator">=</span><span class="token punctuation">(</span><span class="token number">12</span><span class="token punctuation">,</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">,</span>sharey<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span><span class="token builtin">len</span><span class="token punctuation">(</span>ax<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    ax<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>scatter<span class="token punctuation">(</span>X_train<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span>y_train<span class="token punctuation">,</span> label <span class="token operator">=</span> <span class="token string">'target'</span><span class="token punctuation">)</span>
+    ax<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>scatter<span class="token punctuation">(</span>X_train<span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">,</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span>y_pred<span class="token punctuation">,</span>color<span class="token operator">=</span>dlc<span class="token punctuation">[</span><span class="token string">"dlorange"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> label <span class="token operator">=</span> <span class="token string">'predict'</span><span class="token punctuation">)</span>
+ax<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>set_ylabel<span class="token punctuation">(</span><span class="token string">"Price"</span><span class="token punctuation">)</span><span class="token punctuation">;</span> ax<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>legend<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+fig<span class="token punctuation">.</span>suptitle<span class="token punctuation">(</span><span class="token string">"target versus prediction using z-score normalized model"</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token comment"># alt:</span>
+<span class="token comment"># show the line of best fit in single input variable</span>
+plt<span class="token punctuation">.</span>plot<span class="token punctuation">(</span>x_train<span class="token punctuation">,</span> predicted<span class="token punctuation">,</span> c <span class="token operator">=</span> <span class="token string">'b'</span><span class="token punctuation">)</span>
+<span class="token comment"># show a scatter plot of the raw data</span>
+plt<span class="token punctuation">.</span>scatter<span class="token punctuation">(</span>x_train<span class="token punctuation">,</span> y_train<span class="token punctuation">,</span> marker<span class="token operator">=</span><span class="token string">'x'</span><span class="token punctuation">,</span> c<span class="token operator">=</span><span class="token string">'r'</span><span class="token punctuation">)</span>
+</code></pre></div>
+<h5>Categorical data</h5>
+<p>One-hot encoding can be used to represent categorical variables as numerical data.</p>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py">pd<span class="token punctuation">.</span>get_dummies<span class="token punctuation">(</span>data<span class="token operator">=</span>df<span class="token punctuation">,</span> drop_first<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+</code></pre></div>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">Color
+red
+green
+blue</code></pre></div>
+<p>is converted to:</p>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">red green blue
+1   0     0
+0   1     0
+0   0     1</code></pre></div>
+<p>A label encoder can be used to replace categories with a number from 0 to num categories</p>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>preprocessing <span class="token keyword">import</span> LabelEncoder
+
+encoder <span class="token operator">=</span> LabelEncoder<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+cat_col <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+<span class="token keyword">for</span> col <span class="token keyword">in</span> train_data<span class="token punctuation">.</span>select_dtypes<span class="token punctuation">(</span><span class="token string">'object'</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+  cat_col<span class="token punctuation">.</span>append<span class="token punctuation">(</span>col<span class="token punctuation">)</span>
+train_data<span class="token punctuation">[</span>cat_col<span class="token punctuation">]</span> <span class="token operator">=</span> encoder<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>cat_col<span class="token punctuation">)</span>
+</code></pre></div>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">Color
+red
+green
+blue</code></pre></div>
+<p>is converted to:</p>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">Color
+0
+1
+2</code></pre></div>
+<h3>Kaggle</h3>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> pandas <span class="token keyword">as</span> pd
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>model_selection <span class="token keyword">import</span> train_test_split
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>preprocessing <span class="token keyword">import</span> StandardScaler
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>linear_model <span class="token keyword">import</span> SGDRegressor
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>metrics <span class="token keyword">import</span> mean_absolute_error
+<span class="token keyword">from</span> xgboost <span class="token keyword">import</span> XGBRegressor
+<span class="token keyword">import</span> seaborn <span class="token keyword">as</span> sns
+
+<span class="token comment"># don't replace NA with NaN</span>
+train_data <span class="token operator">=</span> pd<span class="token punctuation">.</span>read_csv<span class="token punctuation">(</span><span class="token string">'/path/to/csv'</span><span class="token punctuation">,</span> na_filter<span class="token operator">=</span><span class="token boolean">False</span><span class="token punctuation">)</span>
+<span class="token comment"># remove actual NaN rows</span>
+train_data<span class="token punctuation">.</span>dropna<span class="token punctuation">(</span>inplace<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+<span class="token comment"># one-hot encoding</span>
+train_data <span class="token operator">=</span> pd<span class="token punctuation">.</span>get_dummies<span class="token punctuation">(</span>data<span class="token operator">=</span>df<span class="token punctuation">,</span> drop_first<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+
+X <span class="token operator">=</span> train_data<span class="token punctuation">.</span>drop<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">'SalePrice'</span><span class="token punctuation">,</span> <span class="token string">'Id'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span>
+y <span class="token operator">=</span> train_data<span class="token punctuation">[</span><span class="token string">'SalePrice'</span><span class="token punctuation">]</span>
+
+x_train<span class="token punctuation">,</span>x_test<span class="token punctuation">,</span>y_train<span class="token punctuation">,</span>y_test <span class="token operator">=</span> train_test_split<span class="token punctuation">(</span>X<span class="token punctuation">,</span>Y<span class="token punctuation">,</span>test_size<span class="token operator">=</span><span class="token number">0.3</span><span class="token punctuation">,</span>train_size<span class="token operator">=</span><span class="token number">0.7</span><span class="token punctuation">)</span>
+XG <span class="token operator">=</span> XGBRegressor<span class="token punctuation">(</span><span class="token punctuation">)</span>
+XG<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>x_train<span class="token punctuation">,</span>y_train<span class="token punctuation">)</span>
+score <span class="token operator">=</span> XG<span class="token punctuation">.</span>score<span class="token punctuation">(</span>x_test<span class="token punctuation">,</span>y_test<span class="token punctuation">)</span>
+
+sgdr <span class="token operator">=</span> SGDRegressor<span class="token punctuation">(</span><span class="token punctuation">)</span>
+scaler <span class="token operator">=</span> StandardScaler<span class="token punctuation">(</span><span class="token punctuation">)</span>
+X_norm <span class="token operator">=</span> scaler<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>X<span class="token punctuation">)</span>
+x_train<span class="token punctuation">,</span>x_test<span class="token punctuation">,</span>y_train<span class="token punctuation">,</span>y_test <span class="token operator">=</span> train_test_split<span class="token punctuation">(</span>X_norm<span class="token punctuation">,</span>Y<span class="token punctuation">,</span>test_size<span class="token operator">=</span><span class="token number">0.3</span><span class="token punctuation">,</span>train_size<span class="token operator">=</span><span class="token number">0.7</span><span class="token punctuation">)</span>
+sgdr<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>x_train<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span>
+score <span class="token operator">=</span> sgdr<span class="token punctuation">.</span>score<span class="token punctuation">(</span>x_test<span class="token punctuation">,</span>y_test<span class="token punctuation">)</span>
+
+<span class="token keyword">print</span><span class="token punctuation">(</span>mean_absolute_error<span class="token punctuation">(</span>y_test<span class="token punctuation">,</span> sgdr<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>x_test<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token comment"># get the highest correlating features</span>
+corr_m <span class="token operator">=</span> x_train<span class="token punctuation">.</span>corr<span class="token punctuation">(</span><span class="token punctuation">)</span>
+fig2<span class="token punctuation">,</span> ax <span class="token operator">=</span> plt<span class="token punctuation">.</span>subplots<span class="token punctuation">(</span>figsize<span class="token operator">=</span><span class="token punctuation">(</span><span class="token number">30</span><span class="token punctuation">,</span> <span class="token number">30</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+sns<span class="token punctuation">.</span>heatmap<span class="token punctuation">(</span>corr_m<span class="token punctuation">,</span> vmax<span class="token operator">=</span><span class="token number">0.8</span><span class="token punctuation">,</span> square<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">,</span>cmap<span class="token operator">=</span><span class="token string">"coolwarm"</span><span class="token punctuation">,</span>annot<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span>
+highest_corr_features <span class="token operator">=</span> corr_m<span class="token punctuation">.</span>index<span class="token punctuation">[</span><span class="token builtin">abs</span><span class="token punctuation">(</span>corr_m<span class="token punctuation">[</span><span class="token string">"SalePrice"</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0.5</span><span class="token punctuation">]</span>
+</code></pre></div>
+<h3>Classification</h3>
+<p>output variable can take on a small number of possible values</p>
+<p>logistic regression is used to solve classification problems</p>
+<p>examples:
+is email spam?
+is transaction fraudulent?
+is tumor malignant?</p>
+<p>Linear regression is impacted by outliers which can shift the decision boundary/threshold</p>
+<p><img src="/images/regression-for-classification.png" alt="linear regression for classification"></p>
+<p>Logistic regression is used to classify data into 0 and 1. Can use sigmoid function (1 / (1 + e^-z)). (s curve the has y intercept at 0.5, between 0 and 1). Set z = w dotproduct x + b. Result can be thought of as the probabilit that class is 1.</p>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">def</span> <span class="token function">sigmoid</span><span class="token punctuation">(</span>z<span class="token punctuation">)</span><span class="token punctuation">:</span>
+  g <span class="token operator">=</span> <span class="token number">1</span><span class="token operator">/</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">+</span> np<span class="token punctuation">.</span>exp<span class="token punctuation">(</span><span class="token operator">-</span>z<span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token keyword">return</span> g
+</code></pre></div>
+<p>If a threshold of 0.5 is used, model predicts 1 when w dotproduct x + b >= 0. For non-linear decision boundaries, use same principles of polynomial regression.</p>
+<p>Sum of squared errors is not a good cost function for logistic regression because its not a convex - gradient descent will fall into a local minimum, not the global minimum.</p>
+<p>Instead, use logistic loss function which is convex and can reach a global minimum:</p>
+<p><img src="/images/logistic-loss.png" alt="Logistic Loss">
+<img src="/images/logistic-loss-negative.png" alt="Logicistic Loss Negative Case">
+<img src="/images/simplified-loss.png" alt="Simplified Loss"></p>
+<p>Logistic Cost function:
+<img src="/images/logistic-cost.png" alt="Logistic Cost"></p>
 <h3>Decision Trees</h3>
 <div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> pandas <span class="token keyword">as</span> pd
 <span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>tree <span class="token keyword">import</span> DecisionTreeRegressor
@@ -527,11 +656,24 @@ left<span class="token punctuation">.</span>join<span class="token punctuation">
 powerlifting_combined <span class="token operator">=</span> powerlifting_meets<span class="token punctuation">.</span>set_index<span class="token punctuation">(</span><span class="token string">"MeetID"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>join<span class="token punctuation">(</span>powerlifting_competitors<span class="token punctuation">.</span>set_index<span class="token punctuation">(</span><span class="token string">"MeetID"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
 </code></pre></div>
 <p>next:
-https://developers.google.com/machine-learning/crash-course</p>
+https://www.coursera.org/projects/used-car-price-prediction-using-machine-learning-models</p>
+<p>https://developers.google.com/machine-learning/crash-course</p>
 <p>https://course.fast.ai/</p>
 <p>https://courses.dataschool.io/</p>
 <p>https://www.coursera.org/learn/machine-learning</p>
+<p>https://www.amazon.ca/Grokking-Machine-Learning-Luis-Serrano/dp/1617295914</p>
+<p>https://www.amazon.ca/Grokking-Artificial-Intelligence-Algorithms-Hurbans/dp/161729618X/ref=pd_lpo_2?pd_rd_w=2IkSF&#x26;content-id=amzn1.sym.bc8b374c-8130-4c45-bf24-4fcc0d96f4d6&#x26;pf_rd_p=bc8b374c-8130-4c45-bf24-4fcc0d96f4d6&#x26;pf_rd_r=50QQ4KNVZFECYAE6ZK4Y&#x26;pd_rd_wg=4gcj6&#x26;pd_rd_r=df9b5ab5-7424-43b0-a89b-1429044164f8&#x26;pd_rd_i=161729618X&#x26;psc=1</p>
+<p>https://www.amazon.ca/Grokking-Deep-Learning-Andrew-Trask/dp/1617293709/ref=pd_bxgy_sccl_1/139-6089511-3105238?pd_rd_w=Nenof&#x26;content-id=amzn1.sym.17b2b149-58e2-4824-ba79-851c5f351fdc&#x26;pf_rd_p=17b2b149-58e2-4824-ba79-851c5f351fdc&#x26;pf_rd_r=50QQ4KNVZFECYAE6ZK4Y&#x26;pd_rd_wg=HJRUU&#x26;pd_rd_r=85270beb-f7ff-4720-b6b0-e8165b411269&#x26;pd_rd_i=1617293709&#x26;psc=1</p>
+<p>Learn about scikit learn GridSearchCV</p>
 <h3>Problems</h3>
 <p>use speech recognition principles to build a wav -> midi maker
-build a mike tysons punch out solver</p>
+build a mike tysons punch out solver
+make a deepfake to put your face throughout history
+crawl every Dataphile spec and make it searchable</p>
+<h3>Questions</h3>
+<p>which features should I use? Maybe use GridSearchCV?
+how do I know if I need to engineer features?
+what do you do with dates?
+how do you with deal with NaNs?
+how do you do non-binary classification?</p>
 </div></div></div></div></body></html>
