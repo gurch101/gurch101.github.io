@@ -200,6 +200,8 @@ x = np.array([10,20,30])
 f = np.dot(w,x) + b
 ```
 
+##### Linear Regression by Hand
+
 ```py
 import copy, math
 import numpy as np
@@ -322,6 +324,177 @@ Feature scaling will improve the performance of gradient descent since it makes 
 ### Feature Engineering
 
 Use intuition to design new features by transforming or combining original features. For example, for housing prices dataset that has lot frontage and depth as separate features, you can create a new feature to represent area.
+
+### Polynomial Regression
+
+If data is nonlinear, polynomial regression can be used to get curved lines. Simply add features that are raised to a power and run linear regression. Gradient descent naturally 'picks' the 'correct' feature by emphasizing its associated weight. The best features will be linear relative to the target (plot X^n against Y to see if linear line is generated).
+
+##### Linear Regression with Scikit-Learn
+
+```py
+import numpy as np
+from sklearn.linear_model import SGDRegressor
+from sklearn.preprocessing import StandardScalar
+
+scaler = StandardScaler()
+#z-score normalization
+X_norm = scaler.fit_transform(X_train)
+# selects a sparese subset of features most relevant to the target variable
+sgdr = SGDRegressor(max_iter=1000)
+sgdr.fit(X_norm, y_train)
+# sgdr._n_iter_, sgdr.t_ = number of completed iteration, number of weight updates
+b_norm = sgdr.intercept_
+w_norm = sgdr.coef_
+y_pred_sgd = sgdr.predict(X_norm)
+y_pred = np.dot(X_norm, w_norm) + b_norm # y_pred = y_pred_sgd
+
+# plot predictions and targets vs original features
+fig,ax=plt.subplots(1,4,figsize=(12,3),sharey=True)
+for i in range(len(ax)):
+    ax[i].scatter(X_train[:,i],y_train, label = 'target')
+    ax[i].scatter(X_train[:,i],y_pred,color=dlc["dlorange"], label = 'predict')
+ax[0].set_ylabel("Price"); ax[0].legend();
+fig.suptitle("target versus prediction using z-score normalized model")
+plt.show()
+
+# alt:
+# show the line of best fit in single input variable
+plt.plot(x_train, predicted, c = 'b')
+# show a scatter plot of the raw data
+plt.scatter(x_train, y_train, marker='x', c='r')
+```
+
+##### Categorical data
+
+One-hot encoding can be used to represent categorical variables as numerical data.
+
+```py
+pd.get_dummies(data=df, drop_first=True)
+```
+
+```
+Color
+red
+green
+blue
+```
+
+is converted to:
+
+```
+red green blue
+1   0     0
+0   1     0
+0   0     1
+```
+
+A label encoder can be used to replace categories with a number from 0 to num categories
+
+```py
+from sklearn.preprocessing import LabelEncoder
+
+encoder = LabelEncoder()
+
+cat_col = []
+for col in train_data.select_dtypes('object'):
+  cat_col.append(col)
+train_data[cat_col] = encoder.fit_transform(cat_col)
+```
+
+```
+Color
+red
+green
+blue
+```
+
+is converted to:
+
+```
+Color
+0
+1
+2
+```
+
+### Kaggle
+
+```py
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import SGDRegressor
+from sklearn.metrics import mean_absolute_error
+from xgboost import XGBRegressor
+import seaborn as sns
+
+# don't replace NA with NaN
+train_data = pd.read_csv('/path/to/csv', na_filter=False)
+# remove actual NaN rows
+train_data.dropna(inplace=True)
+# one-hot encoding
+train_data = pd.get_dummies(data=df, drop_first=True)
+
+X = train_data.drop(['SalePrice', 'Id'], axis=1)
+y = train_data['SalePrice']
+
+x_train,x_test,y_train,y_test = train_test_split(X,Y,test_size=0.3,train_size=0.7)
+XG = XGBRegressor()
+XG.fit(x_train,y_train)
+score = XG.score(x_test,y_test)
+
+sgdr = SGDRegressor()
+scaler = StandardScaler()
+X_norm = scaler.fit_transform(X)
+x_train,x_test,y_train,y_test = train_test_split(X_norm,Y,test_size=0.3,train_size=0.7)
+sgdr.fit(x_train, y_train)
+score = sgdr.score(x_test,y_test)
+
+print(mean_absolute_error(y_test, sgdr.predict(x_test)))
+
+# get the highest correlating features
+corr_m = x_train.corr()
+fig2, ax = plt.subplots(figsize=(30, 30))
+sns.heatmap(corr_m, vmax=0.8, square=True,cmap="coolwarm",annot=True)
+plt.show()
+highest_corr_features = corr_m.index[abs(corr_m["SalePrice"]) > 0.5]
+```
+
+### Classification
+
+output variable can take on a small number of possible values
+
+logistic regression is used to solve classification problems
+
+examples:
+is email spam?
+is transaction fraudulent?
+is tumor malignant?
+
+Linear regression is impacted by outliers which can shift the decision boundary/threshold
+
+![linear regression for classification](/images/regression-for-classification.png)
+
+Logistic regression is used to classify data into 0 and 1. Can use sigmoid function (1 / (1 + e^-z)). (s curve the has y intercept at 0.5, between 0 and 1). Set z = w dotproduct x + b. Result can be thought of as the probabilit that class is 1.
+
+```py
+def sigmoid(z):
+  g = 1/(1 + np.exp(-z))
+  return g
+```
+
+If a threshold of 0.5 is used, model predicts 1 when w dotproduct x + b >= 0. For non-linear decision boundaries, use same principles of polynomial regression.
+
+Sum of squared errors is not a good cost function for logistic regression because its not a convex - gradient descent will fall into a local minimum, not the global minimum.
+
+Instead, use logistic loss function which is convex and can reach a global minimum:
+
+![Logistic Loss](/images/logistic-loss.png)
+![Logicistic Loss Negative Case](/images/logistic-loss-negative.png)
+![Simplified Loss](/images/simplified-loss.png)
+
+Logistic Cost function:
+![Logistic Cost](/images/logistic-cost.png)
 
 ### Decision Trees
 
@@ -549,6 +722,8 @@ powerlifting_combined = powerlifting_meets.set_index("MeetID").join(powerlifting
 ```
 
 next:
+https://www.coursera.org/projects/used-car-price-prediction-using-machine-learning-models
+
 https://developers.google.com/machine-learning/crash-course
 
 https://course.fast.ai/
@@ -557,7 +732,25 @@ https://courses.dataschool.io/
 
 https://www.coursera.org/learn/machine-learning
 
+https://www.amazon.ca/Grokking-Machine-Learning-Luis-Serrano/dp/1617295914
+
+https://www.amazon.ca/Grokking-Artificial-Intelligence-Algorithms-Hurbans/dp/161729618X/ref=pd_lpo_2?pd_rd_w=2IkSF&content-id=amzn1.sym.bc8b374c-8130-4c45-bf24-4fcc0d96f4d6&pf_rd_p=bc8b374c-8130-4c45-bf24-4fcc0d96f4d6&pf_rd_r=50QQ4KNVZFECYAE6ZK4Y&pd_rd_wg=4gcj6&pd_rd_r=df9b5ab5-7424-43b0-a89b-1429044164f8&pd_rd_i=161729618X&psc=1
+
+https://www.amazon.ca/Grokking-Deep-Learning-Andrew-Trask/dp/1617293709/ref=pd_bxgy_sccl_1/139-6089511-3105238?pd_rd_w=Nenof&content-id=amzn1.sym.17b2b149-58e2-4824-ba79-851c5f351fdc&pf_rd_p=17b2b149-58e2-4824-ba79-851c5f351fdc&pf_rd_r=50QQ4KNVZFECYAE6ZK4Y&pd_rd_wg=HJRUU&pd_rd_r=85270beb-f7ff-4720-b6b0-e8165b411269&pd_rd_i=1617293709&psc=1
+
+Learn about scikit learn GridSearchCV
+
 ### Problems
 
 use speech recognition principles to build a wav -> midi maker
 build a mike tysons punch out solver
+make a deepfake to put your face throughout history
+crawl every Dataphile spec and make it searchable
+
+### Questions
+
+which features should I use? Maybe use GridSearchCV?
+how do I know if I need to engineer features?
+what do you do with dates?
+how do you with deal with NaNs?
+how do you do non-binary classification?
