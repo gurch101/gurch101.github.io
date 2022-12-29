@@ -1,5 +1,4 @@
-<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Machine Learning Notes | Gurchet&#x27;s Development Blog</title><meta name="description" content="Machine Learning Notes"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Machine Learning Notes</h1><div class="meta"><span>Thu Jan 14 2021</span><span>notes</span></div><div class="mt25 post"><h1>Machine Learning</h1>
-<h2>Coursera Machine Learning Course 1</h2>
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Supervised Machine Learning - Regression and Classification | Gurchet&#x27;s Development Blog</title><meta name="description" content="Coursera ML Specialization Course 1 Notes"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Supervised Machine Learning - Regression and Classification</h1><div class="meta"><span>Thu Jan 14 2021</span><span>notes</span></div><div class="mt25 post"><h1>Supervised Machine Learning - Regression and Classification</h1>
 <p>Give computers the ability to learn without being explicitly programmed</p>
 <p>Supervised Learning</p>
 <ul>
@@ -447,63 +446,204 @@ is tumor malignant?</p>
 <img src="/images/simplified-loss.png" alt="Simplified Loss"></p>
 <p>Logistic Cost function:
 <img src="/images/logistic-cost.png" alt="Logistic Cost"></p>
-<h3>Decision Trees</h3>
-<div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> pandas <span class="token keyword">as</span> pd
-<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>tree <span class="token keyword">import</span> DecisionTreeRegressor
-<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>metrics <span class="token keyword">import</span> mean_absolute_error
-<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>model_selection <span class="token keyword">import</span> train_test_split
+<p>Gradient Descent
+<img src="/images/gradient-descent-logicistic-regression.png" alt="Gradient Descent for Logistic Regression"></p>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">def</span> <span class="token function">compute_gradient_logistic</span><span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">:</span>
+  m<span class="token punctuation">,</span>n <span class="token operator">=</span> X<span class="token punctuation">.</span>shape
+  dj_dw <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span>n<span class="token punctuation">,</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  dj_db <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">.</span>
+  <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    f_wb_i <span class="token operator">=</span> sigmoid<span class="token punctuation">(</span>np<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span>w<span class="token punctuation">)</span> <span class="token operator">+</span> b<span class="token punctuation">)</span>
+    err_i <span class="token operator">=</span> f_wb_i <span class="token operator">-</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+    <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+      dj_dw<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> dj_dw<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+</span> err_i <span class="token operator">*</span> X<span class="token punctuation">[</span>i<span class="token punctuation">,</span>j<span class="token punctuation">]</span>
+    dj_db <span class="token operator">=</span> dj_db <span class="token operator">+</span> err_i
+  dj_dw <span class="token operator">=</span> dj_dw<span class="token operator">/</span>m
+  dj_db <span class="token operator">=</span> dj_db<span class="token operator">/</span>m
+  <span class="token keyword">return</span> dj_db<span class="token punctuation">,</span> dj_dw
 
-data <span class="token operator">=</span> pd<span class="token punctuation">.</span>read_csv<span class="token punctuation">(</span>path<span class="token punctuation">)</span>
-<span class="token comment"># get percentiles, mean, std of each column</span>
-data<span class="token punctuation">.</span>describe<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">gradient_descent</span><span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w_in<span class="token punctuation">,</span> b_in<span class="token punctuation">,</span> alpha<span class="token punctuation">,</span> num_iters<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""</span>
+<span class="token triple-quoted-string string">    Performs batch gradient descent</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    Args:</span>
+<span class="token triple-quoted-string string">      X (ndarray (m,n)   : Data, m examples with n features</span>
+<span class="token triple-quoted-string string">      y (ndarray (m,))   : target values</span>
+<span class="token triple-quoted-string string">      w_in (ndarray (n,)): Initial values of model parameters</span>
+<span class="token triple-quoted-string string">      b_in (scalar)      : Initial values of model parameter</span>
+<span class="token triple-quoted-string string">      alpha (float)      : Learning rate</span>
+<span class="token triple-quoted-string string">      num_iters (scalar) : number of iterations to run gradient descent</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    Returns:</span>
+<span class="token triple-quoted-string string">      w (ndarray (n,))   : Updated values of parameters</span>
+<span class="token triple-quoted-string string">      b (scalar)         : Updated value of parameter</span>
+<span class="token triple-quoted-string string">    """</span>
+    <span class="token comment"># An array to store cost J and w's at each iteration primarily for graphing later</span>
+    J_history <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    w <span class="token operator">=</span> copy<span class="token punctuation">.</span>deepcopy<span class="token punctuation">(</span>w_in<span class="token punctuation">)</span>  <span class="token comment">#avoid modifying global w within function</span>
+    b <span class="token operator">=</span> b_in
 
-<span class="token comment"># list all columns</span>
-data<span class="token punctuation">.</span>columns
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_iters<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token comment"># Calculate the gradient and update the parameters</span>
+        dj_db<span class="token punctuation">,</span> dj_dw <span class="token operator">=</span> compute_gradient_logistic<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">)</span>
 
-<span class="token comment"># get predictive column</span>
-y <span class="token operator">=</span> data<span class="token punctuation">.</span>Price
+        <span class="token comment"># Update Parameters using w, b, alpha and gradient</span>
+        w <span class="token operator">=</span> w <span class="token operator">-</span> alpha <span class="token operator">*</span> dj_dw
+        b <span class="token operator">=</span> b <span class="token operator">-</span> alpha <span class="token operator">*</span> dj_db
 
-<span class="token comment"># get features</span>
-X <span class="token operator">=</span> data<span class="token punctuation">[</span><span class="token string">'Rooms'</span><span class="token punctuation">,</span> <span class="token string">'Bathroom'</span><span class="token punctuation">.</span> <span class="token string">'Landsize'</span><span class="token punctuation">]</span>
+        <span class="token comment"># Save cost J at each iteration</span>
+        <span class="token keyword">if</span> i<span class="token operator">&#x3C;</span><span class="token number">100000</span><span class="token punctuation">:</span>      <span class="token comment"># prevent resource exhaustion</span>
+            J_history<span class="token punctuation">.</span>append<span class="token punctuation">(</span> compute_cost_logistic<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">)</span> <span class="token punctuation">)</span>
 
-<span class="token comment"># show first bunch of rows</span>
-X<span class="token punctuation">.</span>head<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token comment"># Print cost every at intervals 10 times or as many iterations if &#x3C; 10</span>
+        <span class="token keyword">if</span> i<span class="token operator">%</span> math<span class="token punctuation">.</span>ceil<span class="token punctuation">(</span>num_iters <span class="token operator">/</span> <span class="token number">10</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string-interpolation"><span class="token string">f"Iteration </span><span class="token interpolation"><span class="token punctuation">{</span>i<span class="token punctuation">:</span><span class="token format-spec">4d</span><span class="token punctuation">}</span></span><span class="token string">: Cost </span><span class="token interpolation"><span class="token punctuation">{</span>J_history<span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">}</span></span><span class="token string">   "</span></span><span class="token punctuation">)</span>
 
-train_X<span class="token punctuation">,</span> val_X<span class="token punctuation">,</span> train_y<span class="token punctuation">,</span> val_y <span class="token operator">=</span> train_test_split<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> random_state <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> w<span class="token punctuation">,</span> b<span class="token punctuation">,</span> J_history         <span class="token comment">#return final w,b and J history for graphing</span>
 
+<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>linear_model <span class="token keyword">import</span> LogisticRegression
 
-<span class="token keyword">def</span> <span class="token function">get_mae</span><span class="token punctuation">(</span>max_leaf_nodes<span class="token punctuation">,</span> train_X<span class="token punctuation">,</span> val_X<span class="token punctuation">,</span> train_y<span class="token punctuation">,</span> val_y<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token comment"># random_state ensures same results for each run, max_leaf_nodes is used to control tree depth</span>
-    <span class="token comment"># too deep = overfitting, too shallow = underfitting</span>
-    model <span class="token operator">=</span> DecisionTreeRegressor<span class="token punctuation">(</span>random_state<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span> max_leaf_nodes<span class="token operator">=</span>max_leaf_nodes<span class="token punctuation">)</span>
-    model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>train_X<span class="token punctuation">,</span> train_y<span class="token punctuation">)</span>
-    preds_val <span class="token operator">=</span> model<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>val_X<span class="token punctuation">)</span>
-    <span class="token comment"># abs(predicted - actual) / N</span>
-    mae <span class="token operator">=</span> mean_absolute_error<span class="token punctuation">(</span>val_y<span class="token punctuation">,</span> preds_val<span class="token punctuation">)</span>
-    <span class="token keyword">return</span><span class="token punctuation">(</span>mae<span class="token punctuation">)</span>
-
-candidate_max_leaf_nodes <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">25</span><span class="token punctuation">,</span> <span class="token number">50</span><span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">,</span> <span class="token number">250</span><span class="token punctuation">,</span> <span class="token number">500</span><span class="token punctuation">]</span>
-<span class="token comment"># Write loop to find the ideal tree size from candidate_max_leaf_nodes</span>
-scores <span class="token operator">=</span> <span class="token punctuation">{</span> leaf_size<span class="token punctuation">:</span> get_mae<span class="token punctuation">(</span>leaf_size<span class="token punctuation">,</span> train_X<span class="token punctuation">,</span> val_X<span class="token punctuation">,</span> train_y<span class="token punctuation">,</span> val_y<span class="token punctuation">)</span> <span class="token keyword">for</span> leaf_size <span class="token keyword">in</span> candidate_max_leaf_nodes<span class="token punctuation">}</span>
-
-<span class="token comment"># Store the best value of max_leaf_nodes (it will be either 5, 25, 50, 100, 250 or 500)</span>
-best_tree_size <span class="token operator">=</span> <span class="token builtin">min</span><span class="token punctuation">(</span>scores<span class="token punctuation">,</span> key<span class="token operator">=</span>scores<span class="token punctuation">.</span>get<span class="token punctuation">)</span>
-
-<span class="token comment"># now that all param decisions are made, fit to entire dataset</span>
-final_model <span class="token operator">=</span> DecisionTreeRegressor<span class="token punctuation">(</span>max_leaf_nodes<span class="token operator">=</span>best_tree_size<span class="token punctuation">,</span> random_state<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
-
-final_model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">)</span>
-
+lr_model <span class="token operator">=</span> LogisticRegression<span class="token punctuation">(</span><span class="token punctuation">)</span>
+lr_model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">)</span>
+y_pred <span class="token operator">=</span> lr_model<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>X<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Accuracy on training set:"</span><span class="token punctuation">,</span> lr_model<span class="token punctuation">.</span>score<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">)</span><span class="token punctuation">)</span>
 </code></pre></div>
-<h3>Random Forests</h3>
-<p>A random forest uses many trees and makes predictions by averaging the prediction of each tree</p>
-<div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>ensemble <span class="token keyword">import</span> RandomForestRegressor
-<span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>metrics <span class="token keyword">import</span> mean_absolute_error
+<h3>Overfitting</h3>
+<p>underfitting = model does not fit the training set well. High bias.
+generalization = fits training set and brand new examples well.
+overfitting = model fits the training set extremely well but will not generalize to new examples. High variance.</p>
+<p>Overfitting can be addressed by:</p>
+<ol>
+<li>collecting more training examples.</li>
+<li>Use fewer features</li>
+<li>Regularization - reduce the size of weights. Makes the line smoother.</li>
+</ol>
+<p><img src="/images/regularization.png" alt="Regularization"></p>
+<p><img src="/images/regularizedgradientdescent.png" alt="Regularized Gradient Descent"></p>
+<p>above minimizes the mean squared error while trying to keep wj small.</p>
+<p>If lambda is 0, model overfits. If lambda is very large, model underfits (f(x) = b).</p>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">def</span> <span class="token function">compute_cost_linear_reg</span><span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">,</span> lambda_ <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""</span>
+<span class="token triple-quoted-string string">    Computes the cost over all examples</span>
+<span class="token triple-quoted-string string">    Args:</span>
+<span class="token triple-quoted-string string">      X (ndarray (m,n): Data, m examples with n features</span>
+<span class="token triple-quoted-string string">      y (ndarray (m,)): target values</span>
+<span class="token triple-quoted-string string">      w (ndarray (n,)): model parameters</span>
+<span class="token triple-quoted-string string">      b (scalar)      : model parameter</span>
+<span class="token triple-quoted-string string">      lambda_ (scalar): Controls amount of regularization</span>
+<span class="token triple-quoted-string string">    Returns:</span>
+<span class="token triple-quoted-string string">      total_cost (scalar):  cost</span>
+<span class="token triple-quoted-string string">    """</span>
 
-forest_model <span class="token operator">=</span> RandomForestRegressor<span class="token punctuation">(</span>random_state<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span>
-forest_model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>train_X<span class="token punctuation">,</span> train_y<span class="token punctuation">)</span>
-melb_preds <span class="token operator">=</span> forest_model<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>val_X<span class="token punctuation">)</span>
-<span class="token keyword">print</span><span class="token punctuation">(</span>mean_absolute_error<span class="token punctuation">(</span>val_y<span class="token punctuation">,</span> melb_preds<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    m  <span class="token operator">=</span> X<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+    n  <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>w<span class="token punctuation">)</span>
+    cost <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">.</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        f_wb_i <span class="token operator">=</span> np<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> w<span class="token punctuation">)</span> <span class="token operator">+</span> b                                   <span class="token comment">#(n,)(n,)=scalar, see np.dot</span>
+        cost <span class="token operator">=</span> cost <span class="token operator">+</span> <span class="token punctuation">(</span>f_wb_i <span class="token operator">-</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">**</span><span class="token number">2</span>                               <span class="token comment">#scalar</span>
+    cost <span class="token operator">=</span> cost <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token number">2</span> <span class="token operator">*</span> m<span class="token punctuation">)</span>                                              <span class="token comment">#scalar</span>
+
+    reg_cost <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        reg_cost <span class="token operator">+=</span> <span class="token punctuation">(</span>w<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token operator">**</span><span class="token number">2</span><span class="token punctuation">)</span>                                          <span class="token comment">#scalar</span>
+    reg_cost <span class="token operator">=</span> <span class="token punctuation">(</span>lambda_<span class="token operator">/</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token operator">*</span>m<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">*</span> reg_cost                              <span class="token comment">#scalar</span>
+
+    total_cost <span class="token operator">=</span> cost <span class="token operator">+</span> reg_cost                                       <span class="token comment">#scalar</span>
+    <span class="token keyword">return</span> total_cost
+
+<span class="token keyword">def</span> <span class="token function">compute_cost_logistic_reg</span><span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">,</span> lambda_ <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""</span>
+<span class="token triple-quoted-string string">    Computes the cost over all examples</span>
+<span class="token triple-quoted-string string">    Args:</span>
+<span class="token triple-quoted-string string">    Args:</span>
+<span class="token triple-quoted-string string">      X (ndarray (m,n): Data, m examples with n features</span>
+<span class="token triple-quoted-string string">      y (ndarray (m,)): target values</span>
+<span class="token triple-quoted-string string">      w (ndarray (n,)): model parameters</span>
+<span class="token triple-quoted-string string">      b (scalar)      : model parameter</span>
+<span class="token triple-quoted-string string">      lambda_ (scalar): Controls amount of regularization</span>
+<span class="token triple-quoted-string string">    Returns:</span>
+<span class="token triple-quoted-string string">      total_cost (scalar):  cost</span>
+<span class="token triple-quoted-string string">    """</span>
+
+    m<span class="token punctuation">,</span>n  <span class="token operator">=</span> X<span class="token punctuation">.</span>shape
+    cost <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">.</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        z_i <span class="token operator">=</span> np<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> w<span class="token punctuation">)</span> <span class="token operator">+</span> b                                      <span class="token comment">#(n,)(n,)=scalar, see np.dot</span>
+        f_wb_i <span class="token operator">=</span> sigmoid<span class="token punctuation">(</span>z_i<span class="token punctuation">)</span>                                          <span class="token comment">#scalar</span>
+        cost <span class="token operator">+=</span>  <span class="token operator">-</span>y<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">*</span>np<span class="token punctuation">.</span>log<span class="token punctuation">(</span>f_wb_i<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token operator">-</span>y<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">*</span>np<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token number">1</span><span class="token operator">-</span>f_wb_i<span class="token punctuation">)</span>      <span class="token comment">#scalar</span>
+
+    cost <span class="token operator">=</span> cost<span class="token operator">/</span>m                                                      <span class="token comment">#scalar</span>
+
+    reg_cost <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        reg_cost <span class="token operator">+=</span> <span class="token punctuation">(</span>w<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token operator">**</span><span class="token number">2</span><span class="token punctuation">)</span>                                          <span class="token comment">#scalar</span>
+    reg_cost <span class="token operator">=</span> <span class="token punctuation">(</span>lambda_<span class="token operator">/</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token operator">*</span>m<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">*</span> reg_cost                              <span class="token comment">#scalar</span>
+
+    total_cost <span class="token operator">=</span> cost <span class="token operator">+</span> reg_cost                                       <span class="token comment">#scalar</span>
+    <span class="token keyword">return</span> total_cost                                                  <span class="token comment">#scalar</span>
+
+<span class="token keyword">def</span> <span class="token function">compute_gradient_linear_reg</span><span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">,</span> lambda_<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""</span>
+<span class="token triple-quoted-string string">    Computes the gradient for linear regression</span>
+<span class="token triple-quoted-string string">    Args:</span>
+<span class="token triple-quoted-string string">      X (ndarray (m,n): Data, m examples with n features</span>
+<span class="token triple-quoted-string string">      y (ndarray (m,)): target values</span>
+<span class="token triple-quoted-string string">      w (ndarray (n,)): model parameters</span>
+<span class="token triple-quoted-string string">      b (scalar)      : model parameter</span>
+<span class="token triple-quoted-string string">      lambda_ (scalar): Controls amount of regularization</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    Returns:</span>
+<span class="token triple-quoted-string string">      dj_dw (ndarray (n,)): The gradient of the cost w.r.t. the parameters w.</span>
+<span class="token triple-quoted-string string">      dj_db (scalar):       The gradient of the cost w.r.t. the parameter b.</span>
+<span class="token triple-quoted-string string">    """</span>
+    m<span class="token punctuation">,</span>n <span class="token operator">=</span> X<span class="token punctuation">.</span>shape           <span class="token comment">#(number of examples, number of features)</span>
+    dj_dw <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span>n<span class="token punctuation">,</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    dj_db <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">.</span>
+
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        err <span class="token operator">=</span> <span class="token punctuation">(</span>np<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> w<span class="token punctuation">)</span> <span class="token operator">+</span> b<span class="token punctuation">)</span> <span class="token operator">-</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+        <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            dj_dw<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> dj_dw<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+</span> err <span class="token operator">*</span> X<span class="token punctuation">[</span>i<span class="token punctuation">,</span> j<span class="token punctuation">]</span>
+        dj_db <span class="token operator">=</span> dj_db <span class="token operator">+</span> err
+    dj_dw <span class="token operator">=</span> dj_dw <span class="token operator">/</span> m
+    dj_db <span class="token operator">=</span> dj_db <span class="token operator">/</span> m
+
+    <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        dj_dw<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> dj_dw<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+</span> <span class="token punctuation">(</span>lambda_<span class="token operator">/</span>m<span class="token punctuation">)</span> <span class="token operator">*</span> w<span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+
+    <span class="token keyword">return</span> dj_db<span class="token punctuation">,</span> dj_dw
+
+<span class="token keyword">def</span> <span class="token function">compute_gradient_logistic_reg</span><span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">,</span> lambda_<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""</span>
+<span class="token triple-quoted-string string">    Computes the gradient for linear regression</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    Args:</span>
+<span class="token triple-quoted-string string">      X (ndarray (m,n): Data, m examples with n features</span>
+<span class="token triple-quoted-string string">      y (ndarray (m,)): target values</span>
+<span class="token triple-quoted-string string">      w (ndarray (n,)): model parameters</span>
+<span class="token triple-quoted-string string">      b (scalar)      : model parameter</span>
+<span class="token triple-quoted-string string">      lambda_ (scalar): Controls amount of regularization</span>
+<span class="token triple-quoted-string string">    Returns</span>
+<span class="token triple-quoted-string string">      dj_dw (ndarray Shape (n,)): The gradient of the cost w.r.t. the parameters w.</span>
+<span class="token triple-quoted-string string">      dj_db (scalar)            : The gradient of the cost w.r.t. the parameter b.</span>
+<span class="token triple-quoted-string string">    """</span>
+    m<span class="token punctuation">,</span>n <span class="token operator">=</span> X<span class="token punctuation">.</span>shape
+    dj_dw <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span>n<span class="token punctuation">,</span><span class="token punctuation">)</span><span class="token punctuation">)</span>                            <span class="token comment">#(n,)</span>
+    dj_db <span class="token operator">=</span> <span class="token number">0.0</span>                                       <span class="token comment">#scalar</span>
+
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        f_wb_i <span class="token operator">=</span> sigmoid<span class="token punctuation">(</span>np<span class="token punctuation">.</span>dot<span class="token punctuation">(</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span>w<span class="token punctuation">)</span> <span class="token operator">+</span> b<span class="token punctuation">)</span>          <span class="token comment">#(n,)(n,)=scalar</span>
+        err_i  <span class="token operator">=</span> f_wb_i  <span class="token operator">-</span> y<span class="token punctuation">[</span>i<span class="token punctuation">]</span>                       <span class="token comment">#scalar</span>
+        <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            dj_dw<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> dj_dw<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+</span> err_i <span class="token operator">*</span> X<span class="token punctuation">[</span>i<span class="token punctuation">,</span>j<span class="token punctuation">]</span>      <span class="token comment">#scalar</span>
+        dj_db <span class="token operator">=</span> dj_db <span class="token operator">+</span> err_i
+    dj_dw <span class="token operator">=</span> dj_dw<span class="token operator">/</span>m                                   <span class="token comment">#(n,)</span>
+    dj_db <span class="token operator">=</span> dj_db<span class="token operator">/</span>m                                   <span class="token comment">#scalar</span>
+
+    <span class="token keyword">for</span> j <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        dj_dw<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> dj_dw<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">+</span> <span class="token punctuation">(</span>lambda_<span class="token operator">/</span>m<span class="token punctuation">)</span> <span class="token operator">*</span> w<span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+
+    <span class="token keyword">return</span> dj_db<span class="token punctuation">,</span> dj_dw
 </code></pre></div>
 <h1>Numpy</h1>
 <div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
