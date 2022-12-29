@@ -1,14 +1,12 @@
 ---
-title: Machine Learning Notes
+title: Supervised Machine Learning - Regression and Classification
 date: 2021-01-15
-description: Machine Learning Notes
+description: Coursera ML Specialization Course 1 Notes
 category: notes
 type: notes
 ---
 
-# Machine Learning
-
-## Coursera Machine Learning Course 1
+# Supervised Machine Learning - Regression and Classification
 
 Give computers the ability to learn without being explicitly programmed
 
@@ -496,69 +494,214 @@ Instead, use logistic loss function which is convex and can reach a global minim
 Logistic Cost function:
 ![Logistic Cost](/images/logistic-cost.png)
 
-### Decision Trees
+Gradient Descent
+![Gradient Descent for Logistic Regression](/images/gradient-descent-logicistic-regression.png)
 
 ```py
-import pandas as pd
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.metrics import mean_absolute_error
-from sklearn.model_selection import train_test_split
+def compute_gradient_logistic(X, y, w, b):
+  m,n = X.shape
+  dj_dw = np.zeros((n,))
+  dj_db = 0.
+  for i in range(m):
+    f_wb_i = sigmoid(np.dot(X[i],w) + b)
+    err_i = f_wb_i - y[i]
+    for j in range(n):
+      dj_dw[j] = dj_dw[j] + err_i * X[i,j]
+    dj_db = dj_db + err_i
+  dj_dw = dj_dw/m
+  dj_db = dj_db/m
+  return dj_db, dj_dw
 
-data = pd.read_csv(path)
-# get percentiles, mean, std of each column
-data.describe()
+def gradient_descent(X, y, w_in, b_in, alpha, num_iters):
+    """
+    Performs batch gradient descent
 
-# list all columns
-data.columns
+    Args:
+      X (ndarray (m,n)   : Data, m examples with n features
+      y (ndarray (m,))   : target values
+      w_in (ndarray (n,)): Initial values of model parameters
+      b_in (scalar)      : Initial values of model parameter
+      alpha (float)      : Learning rate
+      num_iters (scalar) : number of iterations to run gradient descent
 
-# get predictive column
-y = data.Price
+    Returns:
+      w (ndarray (n,))   : Updated values of parameters
+      b (scalar)         : Updated value of parameter
+    """
+    # An array to store cost J and w's at each iteration primarily for graphing later
+    J_history = []
+    w = copy.deepcopy(w_in)  #avoid modifying global w within function
+    b = b_in
 
-# get features
-X = data['Rooms', 'Bathroom'. 'Landsize']
+    for i in range(num_iters):
+        # Calculate the gradient and update the parameters
+        dj_db, dj_dw = compute_gradient_logistic(X, y, w, b)
 
-# show first bunch of rows
-X.head()
+        # Update Parameters using w, b, alpha and gradient
+        w = w - alpha * dj_dw
+        b = b - alpha * dj_db
 
-train_X, val_X, train_y, val_y = train_test_split(X, y, random_state = 0)
+        # Save cost J at each iteration
+        if i<100000:      # prevent resource exhaustion
+            J_history.append( compute_cost_logistic(X, y, w, b) )
 
+        # Print cost every at intervals 10 times or as many iterations if < 10
+        if i% math.ceil(num_iters / 10) == 0:
+            print(f"Iteration {i:4d}: Cost {J_history[-1]}   ")
 
-def get_mae(max_leaf_nodes, train_X, val_X, train_y, val_y):
-    # random_state ensures same results for each run, max_leaf_nodes is used to control tree depth
-    # too deep = overfitting, too shallow = underfitting
-    model = DecisionTreeRegressor(random_state=1, max_leaf_nodes=max_leaf_nodes)
-    model.fit(train_X, train_y)
-    preds_val = model.predict(val_X)
-    # abs(predicted - actual) / N
-    mae = mean_absolute_error(val_y, preds_val)
-    return(mae)
+    return w, b, J_history         #return final w,b and J history for graphing
 
-candidate_max_leaf_nodes = [5, 25, 50, 100, 250, 500]
-# Write loop to find the ideal tree size from candidate_max_leaf_nodes
-scores = { leaf_size: get_mae(leaf_size, train_X, val_X, train_y, val_y) for leaf_size in candidate_max_leaf_nodes}
+from sklearn.linear_model import LogisticRegression
 
-# Store the best value of max_leaf_nodes (it will be either 5, 25, 50, 100, 250 or 500)
-best_tree_size = min(scores, key=scores.get)
-
-# now that all param decisions are made, fit to entire dataset
-final_model = DecisionTreeRegressor(max_leaf_nodes=best_tree_size, random_state=0)
-
-final_model.fit(X, y)
-
+lr_model = LogisticRegression()
+lr_model.fit(X, y)
+y_pred = lr_model.predict(X)
+print("Accuracy on training set:", lr_model.score(X, y))
 ```
 
-### Random Forests
+### Overfitting
 
-A random forest uses many trees and makes predictions by averaging the prediction of each tree
+underfitting = model does not fit the training set well. High bias.
+generalization = fits training set and brand new examples well.
+overfitting = model fits the training set extremely well but will not generalize to new examples. High variance.
+
+Overfitting can be addressed by:
+
+1. collecting more training examples.
+2. Use fewer features
+3. Regularization - reduce the size of weights. Makes the line smoother.
+
+![Regularization](/images/regularization.png)
+
+![Regularized Gradient Descent](/images/regularizedgradientdescent.png)
+
+above minimizes the mean squared error while trying to keep wj small.
+
+If lambda is 0, model overfits. If lambda is very large, model underfits (f(x) = b).
 
 ```py
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_absolute_error
+def compute_cost_linear_reg(X, y, w, b, lambda_ = 1):
+    """
+    Computes the cost over all examples
+    Args:
+      X (ndarray (m,n): Data, m examples with n features
+      y (ndarray (m,)): target values
+      w (ndarray (n,)): model parameters
+      b (scalar)      : model parameter
+      lambda_ (scalar): Controls amount of regularization
+    Returns:
+      total_cost (scalar):  cost
+    """
 
-forest_model = RandomForestRegressor(random_state=1)
-forest_model.fit(train_X, train_y)
-melb_preds = forest_model.predict(val_X)
-print(mean_absolute_error(val_y, melb_preds))
+    m  = X.shape[0]
+    n  = len(w)
+    cost = 0.
+    for i in range(m):
+        f_wb_i = np.dot(X[i], w) + b                                   #(n,)(n,)=scalar, see np.dot
+        cost = cost + (f_wb_i - y[i])**2                               #scalar
+    cost = cost / (2 * m)                                              #scalar
+
+    reg_cost = 0
+    for j in range(n):
+        reg_cost += (w[j]**2)                                          #scalar
+    reg_cost = (lambda_/(2*m)) * reg_cost                              #scalar
+
+    total_cost = cost + reg_cost                                       #scalar
+    return total_cost
+
+def compute_cost_logistic_reg(X, y, w, b, lambda_ = 1):
+    """
+    Computes the cost over all examples
+    Args:
+    Args:
+      X (ndarray (m,n): Data, m examples with n features
+      y (ndarray (m,)): target values
+      w (ndarray (n,)): model parameters
+      b (scalar)      : model parameter
+      lambda_ (scalar): Controls amount of regularization
+    Returns:
+      total_cost (scalar):  cost
+    """
+
+    m,n  = X.shape
+    cost = 0.
+    for i in range(m):
+        z_i = np.dot(X[i], w) + b                                      #(n,)(n,)=scalar, see np.dot
+        f_wb_i = sigmoid(z_i)                                          #scalar
+        cost +=  -y[i]*np.log(f_wb_i) - (1-y[i])*np.log(1-f_wb_i)      #scalar
+
+    cost = cost/m                                                      #scalar
+
+    reg_cost = 0
+    for j in range(n):
+        reg_cost += (w[j]**2)                                          #scalar
+    reg_cost = (lambda_/(2*m)) * reg_cost                              #scalar
+
+    total_cost = cost + reg_cost                                       #scalar
+    return total_cost                                                  #scalar
+
+def compute_gradient_linear_reg(X, y, w, b, lambda_):
+    """
+    Computes the gradient for linear regression
+    Args:
+      X (ndarray (m,n): Data, m examples with n features
+      y (ndarray (m,)): target values
+      w (ndarray (n,)): model parameters
+      b (scalar)      : model parameter
+      lambda_ (scalar): Controls amount of regularization
+
+    Returns:
+      dj_dw (ndarray (n,)): The gradient of the cost w.r.t. the parameters w.
+      dj_db (scalar):       The gradient of the cost w.r.t. the parameter b.
+    """
+    m,n = X.shape           #(number of examples, number of features)
+    dj_dw = np.zeros((n,))
+    dj_db = 0.
+
+    for i in range(m):
+        err = (np.dot(X[i], w) + b) - y[i]
+        for j in range(n):
+            dj_dw[j] = dj_dw[j] + err * X[i, j]
+        dj_db = dj_db + err
+    dj_dw = dj_dw / m
+    dj_db = dj_db / m
+
+    for j in range(n):
+        dj_dw[j] = dj_dw[j] + (lambda_/m) * w[j]
+
+    return dj_db, dj_dw
+
+def compute_gradient_logistic_reg(X, y, w, b, lambda_):
+    """
+    Computes the gradient for linear regression
+
+    Args:
+      X (ndarray (m,n): Data, m examples with n features
+      y (ndarray (m,)): target values
+      w (ndarray (n,)): model parameters
+      b (scalar)      : model parameter
+      lambda_ (scalar): Controls amount of regularization
+    Returns
+      dj_dw (ndarray Shape (n,)): The gradient of the cost w.r.t. the parameters w.
+      dj_db (scalar)            : The gradient of the cost w.r.t. the parameter b.
+    """
+    m,n = X.shape
+    dj_dw = np.zeros((n,))                            #(n,)
+    dj_db = 0.0                                       #scalar
+
+    for i in range(m):
+        f_wb_i = sigmoid(np.dot(X[i],w) + b)          #(n,)(n,)=scalar
+        err_i  = f_wb_i  - y[i]                       #scalar
+        for j in range(n):
+            dj_dw[j] = dj_dw[j] + err_i * X[i,j]      #scalar
+        dj_db = dj_db + err_i
+    dj_dw = dj_dw/m                                   #(n,)
+    dj_db = dj_db/m                                   #scalar
+
+    for j in range(n):
+        dj_dw[j] = dj_dw[j] + (lambda_/m) * w[j]
+
+    return dj_db, dj_dw
 ```
 
 # Numpy
@@ -739,6 +882,8 @@ https://www.amazon.ca/Grokking-Artificial-Intelligence-Algorithms-Hurbans/dp/161
 https://www.amazon.ca/Grokking-Deep-Learning-Andrew-Trask/dp/1617293709/ref=pd_bxgy_sccl_1/139-6089511-3105238?pd_rd_w=Nenof&content-id=amzn1.sym.17b2b149-58e2-4824-ba79-851c5f351fdc&pf_rd_p=17b2b149-58e2-4824-ba79-851c5f351fdc&pf_rd_r=50QQ4KNVZFECYAE6ZK4Y&pd_rd_wg=HJRUU&pd_rd_r=85270beb-f7ff-4720-b6b0-e8165b411269&pd_rd_i=1617293709&psc=1
 
 Learn about scikit learn GridSearchCV
+
+https://e2eml.school/blog.html
 
 ### Problems
 
