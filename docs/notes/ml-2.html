@@ -1,5 +1,4 @@
-<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Advanced Learning Algorithms | Gurchet&#x27;s Development Blog</title><meta name="description" content="Coursera ML Specialization Course 2 Notes"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Advanced Learning Algorithms</h1><div class="meta"><span>Thu Jan 14 2021</span><span>notes</span></div><div class="mt25 post"><h1>Advanced Learning Algorithms</h1>
-<p>Neural networks</p>
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Advanced Learning Algorithms | Gurchet&#x27;s Development Blog</title><meta name="description" content="Coursera ML Specialization Course 2 Notes"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Advanced Learning Algorithms</h1><div class="meta"><span>Thu Jan 14 2021</span><span>notes</span></div><div class="mt25 post"><p>Neural networks</p>
 <ul>
 <li>inference/prediction</li>
 <li>training</li>
@@ -222,6 +221,103 @@ fig<span class="token punctuation">.</span>tight_layout<span class="token punctu
 fig<span class="token punctuation">.</span>suptitle<span class="token punctuation">(</span><span class="token string">"Label, yhat"</span><span class="token punctuation">,</span> fontsize<span class="token operator">=</span><span class="token number">16</span><span class="token punctuation">)</span>
 plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span>
 </code></pre></div>
+<h3>Neural Network Training</h3>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token comment"># 1. Initialize the model</span>
+model <span class="token operator">=</span> Sequential<span class="token punctuation">(</span><span class="token punctuation">[</span>Dense<span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span><span class="token punctuation">,</span> Dense<span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token comment"># 2. Compile the model with a loss function</span>
+<span class="token comment"># this is the same as the logistic loss function</span>
+<span class="token comment"># for regression, use MeanSquaredError()</span>
+model<span class="token punctuation">.</span><span class="token builtin">compile</span><span class="token punctuation">(</span>loss<span class="token operator">=</span>BinaryCrossentropy<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token comment"># 3. Fit the model to the data by minimizing the cost function using backpropagation</span>
+model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X<span class="token punctuation">,</span>y<span class="token punctuation">,</span> epochs<span class="token operator">=</span><span class="token number">100</span><span class="token punctuation">)</span>
+</code></pre></div>
+<h3>Activation Functions</h3>
+<p>Activation functions allow model fit more complex data</p>
+<p>Linear/no activation function:
+z = wx + b
+Sigmoid:
+1/(1+e^-z)
+ReLU:
+max(0,Z)</p>
+<p><img src="/images/activationfns.png" alt="Activation Functions"></p>
+<p>For output layer:
+For binary classification, choose sigmoid function (probability y = 1)
+For regression problems, choose linear function (y can be + or -)
+For regression problems where y can only be positive, choose ReLU</p>
+<p>For hidden layer:
+ReLU is most common choice</p>
+<ul>
+<li>faster to compute</li>
+<li>faster to learn. flat in the left of the graph whereas sigmoid goes flat twice. Gradient descent is slower for sigmoid.</li>
+</ul>
+<p>If linear function was used for all layers, model is equivalent to linear regression
+If hidden layers are all linear and output layer is sigmoid, model is equivalent to logistic regression</p>
+<h3>Multi-class Classification</h3>
+<p>classification with more than 2 labels. For example, identifying digits 0-9, identifying parts of speech.</p>
+<p>softmax is a generalization of logistic regression for multiclass classification</p>
+<p><img src="/images/softmax.png" alt="Softmax"></p>
+<p><img src="/images/softmaxgen.png" alt="Generalized Softmax"></p>
+<p>Smaller aj, bigger loss</p>
+<p><img src="/images/softmaxloss.png" alt="Softmax Loss"></p>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py">model <span class="token operator">=</span> Sequential<span class="token punctuation">(</span><span class="token punctuation">[</span>
+    Dense<span class="token punctuation">(</span>units<span class="token operator">=</span><span class="token number">25</span><span class="token punctuation">,</span> activation<span class="token operator">=</span><span class="token string">'relu'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    Dense<span class="token punctuation">(</span>units<span class="token operator">=</span><span class="token number">15</span><span class="token punctuation">,</span> activation<span class="token operator">=</span><span class="token string">'relu'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    Dense<span class="token punctuation">(</span>units<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">,</span> activation<span class="token operator">=</span><span class="token string">'linear'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+<span class="token comment"># each input only has one possible category</span>
+<span class="token comment"># use from_logits=True to account for numerical roundoff error</span>
+model<span class="token punctuation">.</span><span class="token builtin">compile</span><span class="token punctuation">(</span>loss<span class="token operator">=</span>SparseCategoricalCrossEntropy<span class="token punctuation">(</span>from_logits<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X<span class="token punctuation">,</span>Y<span class="token punctuation">,</span>epochs<span class="token operator">=</span><span class="token number">100</span><span class="token punctuation">)</span>
+
+logit <span class="token operator">=</span> model<span class="token punctuation">(</span>X<span class="token punctuation">)</span>
+
+<span class="token comment"># gives probabilities</span>
+f_x <span class="token operator">=</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>softmax<span class="token punctuation">(</span>logit<span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">my_softmax</span><span class="token punctuation">(</span>z<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    ez <span class="token operator">=</span> np<span class="token punctuation">.</span>exp<span class="token punctuation">(</span>z<span class="token punctuation">)</span> <span class="token comment"># element-wise exponential</span>
+    sm <span class="token operator">=</span> ez<span class="token operator">/</span>np<span class="token punctuation">.</span><span class="token builtin">sum</span><span class="token punctuation">(</span>ez<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> sm
+</code></pre></div>
+<h3>Multi-label Classification</h3>
+<p>classification where each input can be associated with more than one label. For example, an image that has multiple different objects in it.</p>
+<p>Possible approaches:</p>
+<ul>
+<li>have separate neural networks for each object</li>
+<li>have one neural network with an output for each object. Each output unit has sigmoid activations.</li>
+</ul>
+<h3>Advanced Optimization</h3>
+<p>Adam algorithm (adaptive moment estimation) adjusts alpha (learning rate) to reach minimum faster. If parameters keeps moving in same direction, increase alpha. If parameters keep oscillating, decrease alpha.</p>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token comment"># tweak the learning rate to see which performs the best</span>
+model<span class="token punctuation">.</span><span class="token builtin">compile</span><span class="token punctuation">(</span>optimizer<span class="token operator">=</span>tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>optimizers<span class="token punctuation">.</span>Adam<span class="token punctuation">(</span>learning_rate<span class="token operator">=</span><span class="token number">1e</span><span class="token operator">-</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+loss<span class="token operator">=</span>tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>losses<span class="token punctuation">.</span>SparseCategoricalCrossentropy<span class="token punctuation">(</span>from_logits<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre></div>
+<h3>Convolutional Layers</h3>
+<ul>
+<li>each neuron looks at part of the previous layers inputs rather than all of them (Dense).</li>
+<li>faster computation</li>
+<li>needs less training data and is less prone to overfitting</li>
+</ul>
+<h3>Debugging &#x26; Evaluation</h3>
+<p>Regression Evaluation</p>
+<ul>
+<li>split training set into training/test set. Fit params for training. Compute test error and training error. If jtrain is low and jtest is high, you have overfitting.</li>
+</ul>
+<p><img src="/images/modelevaluation.png" alt="Model evaluation"></p>
+<p>Classification Evaluation</p>
+<p><img src="/images/classificationevaluation.png" alt="Classification evaluation"></p>
+<p>Split training into training, cross-validation, and test sets. Create multiple models and minimize cost on the cross validation set. Use test set to estimate generalization error.</p>
+<p><img src="/images/crossvalidation.png" alt="Cross validation"></p>
+<p>Possible Improvements</p>
+<ul>
+<li>Get more training examples</li>
+<li>Try smaller sets of features</li>
+<li>Get additional features</li>
+<li>Try adding polynomial features</li>
+<li>change lambda</li>
+</ul>
 <h3>Decision Trees</h3>
 <div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> pandas <span class="token keyword">as</span> pd
 <span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>tree <span class="token keyword">import</span> DecisionTreeRegressor
@@ -282,4 +378,5 @@ melb_preds <span class="token operator">=</span> forest_model<span class="token 
 </code></pre></div>
 <h3>Questions</h3>
 <p>Why do neural networks use the sigmoid function? why not just raw vaules like linear regression?</p>
+<p>How many layers should I use? how many units per layer?</p>
 </div></div></div></div></body></html>
