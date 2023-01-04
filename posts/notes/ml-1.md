@@ -6,8 +6,6 @@ category: notes
 type: notes
 ---
 
-# Supervised Machine Learning - Regression and Classification
-
 Give computers the ability to learn without being explicitly programmed
 
 Supervised Learning
@@ -175,8 +173,11 @@ print(f"(w,b) found by gradient descent: ({w_final:8.4f},{b_final:8.4f})")
 Support multiple features
 
 xj = jth feature
+
 n = number of features
+
 x^i = features of the ith training example
+
 X^ij = value of j feature in ith training example
 
 model:
@@ -307,12 +308,14 @@ x_house_predict = np.dor(x_house_norm, w_final) + b_final
 
 Normal equation can be used as an alternative to gradient descent for linear regression without iterations. It doesn't generalize to other learning algorithms and it can be slow for a large number of features.
 
-##### Feature Scaling
+### Feature Scaling
 
 some inputs can take a large range of values, others a small range of values (ex sqft vs # of bedrooms). Large inputs will likely have small weights, small values will have larger weights. The contour plot of the cost function will be asymmetric signifying small changes in one dimension can have a large impact - takes longer to find a local minima. Scaling features to operate on a similar scale produces a contour plot that is more circular -> a more direct path to the minima can be found.
 
 can be scaled by input feature/max(feature across all rows)
+
 alt: mean normalization - (input feature - mean)/(max - min)
+
 alt: z-score normalization - (input feature - mean)/stddev. After z-score normalization, all features will have a mean of 0 and a standard deviation of 1.
 
 aim to get features roughly between -1 to 1. Only need to rescale features that are too large or too small.
@@ -335,9 +338,9 @@ from sklearn.linear_model import SGDRegressor
 from sklearn.preprocessing import StandardScalar
 
 scaler = StandardScaler()
-#z-score normalization
+# z-score normalization
 X_norm = scaler.fit_transform(X_train)
-# selects a sparese subset of features most relevant to the target variable
+# selects a sparse subset of features most relevant to the target variable
 sgdr = SGDRegressor(max_iter=1000)
 sgdr.fit(X_norm, y_train)
 # sgdr._n_iter_, sgdr.t_ = number of completed iteration, number of weight updates
@@ -357,7 +360,7 @@ plt.show()
 
 # alt:
 # show the line of best fit in single input variable
-plt.plot(x_train, predicted, c = 'b')
+plt.plot(x_train, y_pred, c = 'b')
 # show a scatter plot of the raw data
 plt.scatter(x_train, y_train, marker='x', c='r')
 ```
@@ -473,7 +476,7 @@ Linear regression is impacted by outliers which can shift the decision boundary/
 
 ![linear regression for classification](/images/regression-for-classification.png)
 
-Logistic regression is used to classify data into 0 and 1. Can use sigmoid function (1 / (1 + e^-z)). (s curve the has y intercept at 0.5, between 0 and 1). Set z = w dotproduct x + b. Result can be thought of as the probabilit that class is 1.
+Logistic regression is used to classify data into 0 and 1. Can use sigmoid function (1 / (1 + e^-z)). (s curve the has y intercept at 0.5, between 0 and 1). Set z = w dotproduct x + b. Result can be thought of as the probability that class is 1.
 
 ```py
 def sigmoid(z):
@@ -495,7 +498,7 @@ Logistic Cost function:
 ![Logistic Cost](/images/logistic-cost.png)
 
 Gradient Descent
-![Gradient Descent for Logistic Regression](/images/gradient-descent-logicistic-regression.png)
+![Gradient Descent for Logistic Regression](/images/gradient-descent-logistic-regression.png)
 
 ```py
 def compute_gradient_logistic(X, y, w, b):
@@ -884,6 +887,12 @@ https://www.amazon.ca/Grokking-Deep-Learning-Andrew-Trask/dp/1617293709/ref=pd_b
 Learn about scikit learn GridSearchCV
 
 https://e2eml.school/blog.html
+
+https://cds.nyu.edu/deep-learning/
+
+https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/
+
+https://github.com/oxford-cs-deepnlp-2017
 
 ### Problems
 

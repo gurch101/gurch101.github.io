@@ -6,8 +6,6 @@ category: notes
 type: notes
 ---
 
-# Advanced Learning Algorithms
-
 Neural networks
 
 - inference/prediction
@@ -248,6 +246,186 @@ fig.suptitle("Label, yhat", fontsize=16)
 plt.show()
 ```
 
+### Neural Network Training
+
+```py
+
+# 1. Initialize the model
+model = Sequential([Dense(...), Dense(...)])
+# 2. Compile the model with a loss function
+# this is the same as the logistic loss function
+# for regression, use MeanSquaredError()
+model.compile(loss=BinaryCrossentropy())
+# 3. Fit the model to the data by minimizing the cost function using backpropagation
+model.fit(X,y, epochs=100)
+```
+
+### Activation Functions
+
+Activation functions allow model fit more complex data
+
+Linear/no activation function:
+z = wx + b
+Sigmoid:
+1/(1+e^-z)
+ReLU:
+max(0,Z)
+
+![Activation Functions](/images/activationfns.png)
+
+For output layer:
+For binary classification, choose sigmoid function (probability y = 1)
+For regression problems, choose linear function (y can be + or -)
+For regression problems where y can only be positive, choose ReLU
+
+For hidden layer:
+ReLU is most common choice
+
+- faster to compute
+- faster to learn. flat in the left of the graph whereas sigmoid goes flat twice. Gradient descent is slower for sigmoid.
+
+If linear function was used for all layers, model is equivalent to linear regression
+If hidden layers are all linear and output layer is sigmoid, model is equivalent to logistic regression
+
+### Multi-class Classification
+
+classification with more than 2 labels. For example, identifying digits 0-9, identifying parts of speech.
+
+softmax is a generalization of logistic regression for multiclass classification
+
+![Softmax](/images/softmax.png)
+
+![Generalized Softmax](/images/softmaxgen.png)
+
+Smaller aj, bigger loss
+
+![Softmax Loss](/images/softmaxloss.png)
+
+```py
+model = Sequential([
+    Dense(units=25, activation='relu'),
+    Dense(units=15, activation='relu'),
+    Dense(units=10, activation='linear'),
+])
+
+# each input only has one possible category
+# use from_logits=True to account for numerical roundoff error
+model.compile(loss=SparseCategoricalCrossEntropy(from_logits=True))
+
+model.fit(X,Y,epochs=100)
+
+logit = model(X)
+
+# gives probabilities
+f_x = tf.nn.softmax(logit)
+
+def my_softmax(z):
+    ez = np.exp(z) # element-wise exponential
+    sm = ez/np.sum(ez)
+    return sm
+```
+
+### Multi-label Classification
+
+classification where each input can be associated with more than one label. For example, an image that has multiple different objects in it.
+
+Possible approaches:
+
+- have separate neural networks for each object
+- have one neural network with an output for each object. Each output unit has sigmoid activations.
+
+### Advanced Optimization
+
+Adam algorithm (adaptive moment estimation) adjusts alpha (learning rate) to reach minimum faster. If parameters keeps moving in same direction, increase alpha. If parameters keep oscillating, decrease alpha.
+
+```py
+# tweak the learning rate to see which performs the best
+model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
+loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True))
+```
+
+### Convolutional Layers
+
+- each neuron looks at part of the previous layers inputs rather than all of them (Dense).
+- faster computation
+- needs less training data and is less prone to overfitting
+
+### Debugging & Evaluation
+
+Regression Evaluation
+
+- split training set into training/test set. Fit params for training. Compute test error and training error. If jtrain is low and jtest is high, you have overfitting.
+
+![Model evaluation](/images/modelevaluation.png)
+
+Classification Evaluation
+
+![Classification evaluation](/images/classificationevaluation.png)
+
+Split training into training, cross-validation, and test sets. Create multiple models and minimize cost on the cross validation set. Use test set to estimate generalization error.
+
+![Cross validation](/images/crossvalidation.png)
+
+If Jtrain and Jcv is high, then model has high bias and underfits
+
+If Jtrain is low and Jcv is high, then model has high variance and overfits
+
+If Jtrain is low and Jcv is low, then model generalizes
+
+If Jtrain is high and Jcv is higher, then model has high bias and high variance. Overfits for part of the data and underfits for part of the data.
+
+![Cost as a function of the polynomial degree](/images/fitbydegree.png)
+
+With regularization, high lambda leads to high bias (model keeps weights ~= 0). Low lambda leads to overfitting. Choose lambda by slowly increasing it and compare Jcv/Jtrain for each execution.
+
+![Cost as a function of lambda](/images/fitbylambda.png)
+
+Establish baseline error rate by comparing to human performance, competing algorithms, or guess based on experience
+
+![Cost as a function of training set size](/images/fitbysize.png)
+
+For high bias, Jtrain error will be higher. Adding more training data will not bring down the error rate by itself.
+
+For high variance, Jtrain will be lower and gap between Jtrain and Jcv will be larger. Adding more train data can improve performance.
+
+Large neural networks for medium sized data sets are low bias machines. Can continue to increase the size of the network to improve training set performance. If it does not do well on the cross-validation set, get more data. A large neural network will usually do as well or better than a smaller one so long as regularization is chosen appropriately.
+
+![Neural Network Debugging](/images/nndebugging.png)
+
+Neural network can be regularized in tensorflow with `kernel_regularizer=L2(0.01)` param for the layer.
+
+Possible Improvements
+
+If high variance:
+
+- Get more training examples
+- Try smaller sets of features
+- increase lambda
+
+If high bias:
+
+- Try adding polynomial features
+- Get additional features
+- decrease lambda
+
+### Development Process
+
+- Choose architecture, model, data, features
+- Train model
+- bias, variance, and error analysis
+- repeat
+
+### Error Analysis
+
+- Look for common traits in misclassified cross validation examples. For example, for spam classification, some categories could be pharma-related, deliberate misspellings, unusual routing, phishing, spam in embedded images
+- use common categories to add features or more data that belongs in certain categories
+
+### Adding Data
+
+- add more data of the types where error analysis has indicated it might help. Go to unlabeled data and find more examples of a specific category
+- modify an existing training example to create a new training example (data augmentation). As an example, distort or transform image/audio of a number to create new examples.
+- use artificial data imputs to create new training examples from scratch (data synthesis). As an example, use different fonts/colors to create new data for an OCR task.
+
 ### Decision Trees
 
 ```py
@@ -316,3 +494,5 @@ print(mean_absolute_error(val_y, melb_preds))
 ### Questions
 
 Why do neural networks use the sigmoid function? why not just raw vaules like linear regression?
+
+How many layers should I use? how many units per layer?
