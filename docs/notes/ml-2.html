@@ -310,13 +310,50 @@ loss<span class="token operator">=</span>tf<span class="token punctuation">.</sp
 <p><img src="/images/classificationevaluation.png" alt="Classification evaluation"></p>
 <p>Split training into training, cross-validation, and test sets. Create multiple models and minimize cost on the cross validation set. Use test set to estimate generalization error.</p>
 <p><img src="/images/crossvalidation.png" alt="Cross validation"></p>
+<p>If Jtrain and Jcv is high, then model has high bias and underfits</p>
+<p>If Jtrain is low and Jcv is high, then model has high variance and overfits</p>
+<p>If Jtrain is low and Jcv is low, then model generalizes</p>
+<p>If Jtrain is high and Jcv is higher, then model has high bias and high variance. Overfits for part of the data and underfits for part of the data.</p>
+<p><img src="/images/fitbydegree.png" alt="Cost as a function of the polynomial degree"></p>
+<p>With regularization, high lambda leads to high bias (model keeps weights ~= 0). Low lambda leads to overfitting. Choose lambda by slowly increasing it and compare Jcv/Jtrain for each execution.</p>
+<p><img src="/images/fitbylambda.png" alt="Cost as a function of lambda"></p>
+<p>Establish baseline error rate by comparing to human performance, competing algorithms, or guess based on experience</p>
+<p><img src="/images/fitbysize.png" alt="Cost as a function of training set size"></p>
+<p>For high bias, Jtrain error will be higher. Adding more training data will not bring down the error rate by itself.</p>
+<p>For high variance, Jtrain will be lower and gap between Jtrain and Jcv will be larger. Adding more train data can improve performance.</p>
+<p>Large neural networks for medium sized data sets are low bias machines. Can continue to increase the size of the network to improve training set performance. If it does not do well on the cross-validation set, get more data. A large neural network will usually do as well or better than a smaller one so long as regularization is chosen appropriately.</p>
+<p><img src="/images/nndebugging.png" alt="Neural Network Debugging"></p>
+<p>Neural network can be regularized in tensorflow with <code>kernel_regularizer=L2(0.01)</code> param for the layer.</p>
 <p>Possible Improvements</p>
+<p>If high variance:</p>
 <ul>
 <li>Get more training examples</li>
 <li>Try smaller sets of features</li>
-<li>Get additional features</li>
+<li>increase lambda</li>
+</ul>
+<p>If high bias:</p>
+<ul>
 <li>Try adding polynomial features</li>
-<li>change lambda</li>
+<li>Get additional features</li>
+<li>decrease lambda</li>
+</ul>
+<h3>Development Process</h3>
+<ul>
+<li>Choose architecture, model, data, features</li>
+<li>Train model</li>
+<li>bias, variance, and error analysis</li>
+<li>repeat</li>
+</ul>
+<h3>Error Analysis</h3>
+<ul>
+<li>Look for common traits in misclassified cross validation examples. For example, for spam classification, some categories could be pharma-related, deliberate misspellings, unusual routing, phishing, spam in embedded images</li>
+<li>use common categories to add features or more data that belongs in certain categories</li>
+</ul>
+<h3>Adding Data</h3>
+<ul>
+<li>add more data of the types where error analysis has indicated it might help. Go to unlabeled data and find more examples of a specific category</li>
+<li>modify an existing training example to create a new training example (data augmentation). As an example, distort or transform image/audio of a number to create new examples.</li>
+<li>use artificial data imputs to create new training examples from scratch (data synthesis). As an example, use different fonts/colors to create new data for an OCR task.</li>
 </ul>
 <h3>Decision Trees</h3>
 <div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> pandas <span class="token keyword">as</span> pd

@@ -186,10 +186,10 @@ w_final<span class="token punctuation">,</span> b_final<span class="token punctu
 </code></pre></div>
 <h5>Multiple Linear Regression</h5>
 <p>Support multiple features</p>
-<p>xj = jth feature
-n = number of features
-x^i = features of the ith training example
-X^ij = value of j feature in ith training example</p>
+<p>xj = jth feature</p>
+<p>n = number of features</p>
+<p>x^i = features of the ith training example</p>
+<p>X^ij = value of j feature in ith training example</p>
 <p>model:
 fwb(x) = w1x1 + w2x2 + ... + wnxn + b</p>
 <p>store weights in a row vector
@@ -308,11 +308,11 @@ x_house_norm <span class="token operator">=</span> <span class="token punctuatio
 x_house_predict <span class="token operator">=</span> np<span class="token punctuation">.</span>dor<span class="token punctuation">(</span>x_house_norm<span class="token punctuation">,</span> w_final<span class="token punctuation">)</span> <span class="token operator">+</span> b_final
 </code></pre></div>
 <p>Normal equation can be used as an alternative to gradient descent for linear regression without iterations. It doesn't generalize to other learning algorithms and it can be slow for a large number of features.</p>
-<h5>Feature Scaling</h5>
+<h3>Feature Scaling</h3>
 <p>some inputs can take a large range of values, others a small range of values (ex sqft vs # of bedrooms). Large inputs will likely have small weights, small values will have larger weights. The contour plot of the cost function will be asymmetric signifying small changes in one dimension can have a large impact - takes longer to find a local minima. Scaling features to operate on a similar scale produces a contour plot that is more circular -> a more direct path to the minima can be found.</p>
-<p>can be scaled by input feature/max(feature across all rows)
-alt: mean normalization - (input feature - mean)/(max - min)
-alt: z-score normalization - (input feature - mean)/stddev. After z-score normalization, all features will have a mean of 0 and a standard deviation of 1.</p>
+<p>can be scaled by input feature/max(feature across all rows)</p>
+<p>alt: mean normalization - (input feature - mean)/(max - min)</p>
+<p>alt: z-score normalization - (input feature - mean)/stddev. After z-score normalization, all features will have a mean of 0 and a standard deviation of 1.</p>
 <p>aim to get features roughly between -1 to 1. Only need to rescale features that are too large or too small.</p>
 <p>Feature scaling will improve the performance of gradient descent since it makes a more direct path to a minimum.</p>
 <h3>Feature Engineering</h3>
@@ -325,9 +325,9 @@ alt: z-score normalization - (input feature - mean)/stddev. After z-score normal
 <span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>preprocessing <span class="token keyword">import</span> StandardScalar
 
 scaler <span class="token operator">=</span> StandardScaler<span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token comment">#z-score normalization</span>
+<span class="token comment"># z-score normalization</span>
 X_norm <span class="token operator">=</span> scaler<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>X_train<span class="token punctuation">)</span>
-<span class="token comment"># selects a sparese subset of features most relevant to the target variable</span>
+<span class="token comment"># selects a sparse subset of features most relevant to the target variable</span>
 sgdr <span class="token operator">=</span> SGDRegressor<span class="token punctuation">(</span>max_iter<span class="token operator">=</span><span class="token number">1000</span><span class="token punctuation">)</span>
 sgdr<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_norm<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span>
 <span class="token comment"># sgdr._n_iter_, sgdr.t_ = number of completed iteration, number of weight updates</span>
@@ -347,7 +347,7 @@ plt<span class="token punctuation">.</span>show<span class="token punctuation">(
 
 <span class="token comment"># alt:</span>
 <span class="token comment"># show the line of best fit in single input variable</span>
-plt<span class="token punctuation">.</span>plot<span class="token punctuation">(</span>x_train<span class="token punctuation">,</span> predicted<span class="token punctuation">,</span> c <span class="token operator">=</span> <span class="token string">'b'</span><span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>plot<span class="token punctuation">(</span>x_train<span class="token punctuation">,</span> y_pred<span class="token punctuation">,</span> c <span class="token operator">=</span> <span class="token string">'b'</span><span class="token punctuation">)</span>
 <span class="token comment"># show a scatter plot of the raw data</span>
 plt<span class="token punctuation">.</span>scatter<span class="token punctuation">(</span>x_train<span class="token punctuation">,</span> y_train<span class="token punctuation">,</span> marker<span class="token operator">=</span><span class="token string">'x'</span><span class="token punctuation">,</span> c<span class="token operator">=</span><span class="token string">'r'</span><span class="token punctuation">)</span>
 </code></pre></div>
@@ -432,7 +432,7 @@ is transaction fraudulent?
 is tumor malignant?</p>
 <p>Linear regression is impacted by outliers which can shift the decision boundary/threshold</p>
 <p><img src="/images/regression-for-classification.png" alt="linear regression for classification"></p>
-<p>Logistic regression is used to classify data into 0 and 1. Can use sigmoid function (1 / (1 + e^-z)). (s curve the has y intercept at 0.5, between 0 and 1). Set z = w dotproduct x + b. Result can be thought of as the probabilit that class is 1.</p>
+<p>Logistic regression is used to classify data into 0 and 1. Can use sigmoid function (1 / (1 + e^-z)). (s curve the has y intercept at 0.5, between 0 and 1). Set z = w dotproduct x + b. Result can be thought of as the probability that class is 1.</p>
 <div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">def</span> <span class="token function">sigmoid</span><span class="token punctuation">(</span>z<span class="token punctuation">)</span><span class="token punctuation">:</span>
   g <span class="token operator">=</span> <span class="token number">1</span><span class="token operator">/</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">+</span> np<span class="token punctuation">.</span>exp<span class="token punctuation">(</span><span class="token operator">-</span>z<span class="token punctuation">)</span><span class="token punctuation">)</span>
   <span class="token keyword">return</span> g
@@ -446,7 +446,7 @@ is tumor malignant?</p>
 <p>Logistic Cost function:
 <img src="/images/logistic-cost.png" alt="Logistic Cost"></p>
 <p>Gradient Descent
-<img src="/images/gradient-descent-logicistic-regression.png" alt="Gradient Descent for Logistic Regression"></p>
+<img src="/images/gradient-descent-logistic-regression.png" alt="Gradient Descent for Logistic Regression"></p>
 <div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">def</span> <span class="token function">compute_gradient_logistic</span><span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> w<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">:</span>
   m<span class="token punctuation">,</span>n <span class="token operator">=</span> X<span class="token punctuation">.</span>shape
   dj_dw <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span>n<span class="token punctuation">,</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
