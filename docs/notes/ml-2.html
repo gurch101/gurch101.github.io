@@ -355,7 +355,34 @@ loss<span class="token operator">=</span>tf<span class="token punctuation">.</sp
 <li>modify an existing training example to create a new training example (data augmentation). As an example, distort or transform image/audio of a number to create new examples.</li>
 <li>use artificial data imputs to create new training examples from scratch (data synthesis). As an example, use different fonts/colors to create new data for an OCR task.</li>
 </ul>
+<h3>Transfer Learning</h3>
+<p>Use a large model trained on something else (supervised pre-training). Keep input and hidden layers and their parameters. Replace output layer (fine tuning).</p>
+<p>Option 1: only train output layer parameters. Works better for small data sets.</p>
+<p>Option 2: train all parameters but initialize them using the original neural network parameters.</p>
+<p>For images, the thought is the hidden layers can recognize edges, corners, curves, and basic shapes which could be useful for other tasks.</p>
+<h3>Skewed Datasets</h3>
+<p>Skewed dataset - ratio to postiive/negative examples is not 1:1.</p>
+<p>IE rare disease classification:</p>
+<ul>
+<li>1% error on test set but in the real world, only 0.5% of patients have disease. 1% error on its own does not indicate good results.</li>
+</ul>
+<p>Compute counts of true positives, true negatives, false positives, false negatives</p>
+<p>Precision - of all examples, what fraction is actually positive? (true positives/(true positives + false positives)). High precision = high confidence of correctness.</p>
+<p>Recall - of all examples that are positive, what fraction were accurately predicted? (true positives/(true positives + false negatives)). High recall = high confidence of not missing positives.</p>
+<p>In an ideal case, we want high precision and high recall.</p>
+<p>For logistic regression, we can alter precision/recall by changing the prediction threshold (ie instead of 0.5, use 0.7). Raising the threshold results in higher precision but lower recall.</p>
+<p><img src="/images/skew.png" alt="Precision vs Recall"></p>
+<p>F1 score (harmonic mean) can be used to choose algorithm with optimal precision/recall. F1 score takes an average while emphasizing the smaller number.</p>
+<p>F1 score = 1/(1/2(1/p + 1/r)) = 2pr/(p+r)</p>
 <h3>Decision Trees</h3>
+<p>For each example, start at root node, go down path based on feature values until leaf node (output variable) is reached</p>
+<p>Decision tree algorithm "learns" the best decision tree of all possible decision trees.</p>
+<p>Learning Process:</p>
+<ol>
+<li>Choose feature for root node based on the feature that maximizes purity (or minimizes impurity)</li>
+<li>split examples based on node</li>
+<li>DFS for each node until examples are appropriately categorized or a maximum depth is reached or the purity score is below a threshold or when the number of examples in a node is below a threshold</li>
+</ol>
 <div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> pandas <span class="token keyword">as</span> pd
 <span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>tree <span class="token keyword">import</span> DecisionTreeRegressor
 <span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>metrics <span class="token keyword">import</span> mean_absolute_error
@@ -379,7 +406,6 @@ X<span class="token punctuation">.</span>head<span class="token punctuation">(</
 
 train_X<span class="token punctuation">,</span> val_X<span class="token punctuation">,</span> train_y<span class="token punctuation">,</span> val_y <span class="token operator">=</span> train_test_split<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> random_state <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">)</span>
 
-
 <span class="token keyword">def</span> <span class="token function">get_mae</span><span class="token punctuation">(</span>max_leaf_nodes<span class="token punctuation">,</span> train_X<span class="token punctuation">,</span> val_X<span class="token punctuation">,</span> train_y<span class="token punctuation">,</span> val_y<span class="token punctuation">)</span><span class="token punctuation">:</span>
     <span class="token comment"># random_state ensures same results for each run, max_leaf_nodes is used to control tree depth</span>
     <span class="token comment"># too deep = overfitting, too shallow = underfitting</span>
@@ -401,7 +427,6 @@ best_tree_size <span class="token operator">=</span> <span class="token builtin"
 final_model <span class="token operator">=</span> DecisionTreeRegressor<span class="token punctuation">(</span>max_leaf_nodes<span class="token operator">=</span>best_tree_size<span class="token punctuation">,</span> random_state<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">)</span>
 
 final_model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">)</span>
-
 </code></pre></div>
 <h3>Random Forests</h3>
 <p>A random forest uses many trees and makes predictions by averaging the prediction of each tree</p>
