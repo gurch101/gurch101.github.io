@@ -426,7 +426,281 @@ If high bias:
 - modify an existing training example to create a new training example (data augmentation). As an example, distort or transform image/audio of a number to create new examples.
 - use artificial data imputs to create new training examples from scratch (data synthesis). As an example, use different fonts/colors to create new data for an OCR task.
 
+### Transfer Learning
+
+Use a large model trained on something else (supervised pre-training). Keep input and hidden layers and their parameters. Replace output layer (fine tuning).
+
+Option 1: only train output layer parameters. Works better for small data sets.
+
+Option 2: train all parameters but initialize them using the original neural network parameters.
+
+For images, the thought is the hidden layers can recognize edges, corners, curves, and basic shapes which could be useful for other tasks.
+
+### Skewed Datasets
+
+Skewed dataset - ratio to postiive/negative examples is not 1:1.
+
+IE rare disease classification:
+
+- 1% error on test set but in the real world, only 0.5% of patients have disease. 1% error on its own does not indicate good results.
+
+Compute counts of true positives, true negatives, false positives, false negatives
+
+Precision - of all examples, what fraction is actually positive? (true positives/(true positives + false positives)). High precision = high confidence of correctness.
+
+Recall - of all examples that are positive, what fraction were accurately predicted? (true positives/(true positives + false negatives)). High recall = high confidence of not missing positives.
+
+In an ideal case, we want high precision and high recall.
+
+For logistic regression, we can alter precision/recall by changing the prediction threshold (ie instead of 0.5, use 0.7). Raising the threshold results in higher precision but lower recall.
+
+![Precision vs Recall](/images/skew.png)
+
+F1 score (harmonic mean) can be used to choose algorithm with optimal precision/recall. F1 score takes an average while emphasizing the smaller number.
+
+F1 score = 1/(1/2(1/p + 1/r)) = 2pr/(p+r)
+
 ### Decision Trees
+
+Works well on tabular/structured data for classification or regression tasks. Not recommended for unstructured data (images, video, audio, text). Very fast to train.
+
+For each example, start at root node, go down path based on feature values until leaf node (output variable) is reached
+
+Decision tree algorithm "learns" the best decision tree of all possible decision trees.
+
+Learning Process:
+
+1. Choose feature for root node based on the feature that maximizes purity (or minimizes impurity)
+2. split examples based on node
+3. DFS for each node until examples are appropriately categorized or a maximum depth is reached or the purity score is below a threshold or when the number of examples in a node is below a threshold
+
+Entropy - measure of impurity
+
+![entropy](/images/entropy.png)
+
+po = 1 - p1
+H(p1) = -p1log2(p1) - p0log2(p0)
+
+```py
+def compute_entropy(y):
+    """
+    Computes the entropy for
+
+    Args:
+       y (ndarray): Numpy array indicating whether each example at a node is
+           edible (`1`) or poisonous (`0`)
+
+    Returns:
+        entropy (float): Entropy at that node
+
+    """
+
+    entropy = 0
+
+    if len(y) != 0:
+        p1 = len(y[y == 1]) / len(y)
+        if p1 != 0 and p1 != 1:
+            entropy = -p1 * np.log2(p1) - (1 - p1) * np.log2(1 - p1)
+        else:
+            entropy = 0
+    return entropy
+```
+
+Information gain
+
+choose a split by maximizing the reduction in the weighted average of the entropy for each possible feature
+
+![Information Gain](/images/infogain.png)
+
+```py
+def split_dataset(X, node_incices, feature):
+    """
+    Splits the data at the given node into
+    left and right branches
+
+    Args:
+        X (ndarray):             Data matrix of shape(n_samples, n_features)
+        node_indices (list):  List containing the active indices. I.e, the samples being considered at this step.
+        feature (int):           Index of feature to split on
+    Returns:
+        left_indices (list): Indices with feature value == 1
+        right_indices (list): Indices with feature value == 0
+    """
+
+    left_indices = []
+    right_indices = []
+
+    ### START CODE HERE ###
+    for i in node_indices:
+        if X[i][feature] == 1:
+            left_indices.append(i)
+        else:
+            right_indices.append(i)
+    ### END CODE HERE ###
+
+    return left_indices, right_indices
+
+def compute_information_gain(X, y, node_indices, feature):
+
+    """
+    Compute the information of splitting the node on a given feature
+
+    Args:
+        X (ndarray):            Data matrix of shape(n_samples, n_features)
+        y (array like):         list or ndarray with n_samples containing the target variable
+        node_indices (ndarray): List containing the active indices. I.e, the samples being considered in this step.
+
+    Returns:
+        cost (float):        Cost computed
+
+    """
+    # Split dataset
+    left_indices, right_indices = split_dataset(X, node_indices, feature)
+
+    # Some useful variables
+    X_node, y_node = X[node_indices], y[node_indices]
+    X_left, y_left = X[left_indices], y[left_indices]
+    X_right, y_right = X[right_indices], y[right_indices]
+
+    # You need to return the following variables correctly
+    information_gain = 0
+
+    node_entropy = compute_entropy(y_node)
+    left_entropy = compute_entropy(y_left)
+    right_entropy = compute_entropy(y_right)
+
+    # Weights
+    w_left = len(X_left) / len(X_node)
+    w_right = len(X_right) / len(X_node)
+
+    #Weighted entropy
+    weighted_entropy = w_left * left_entropy + w_right * right_entropy
+
+    #Information gain
+    information_gain = node_entropy - weighted_entropy
+
+    return information_gain
+
+def get_best_split(X, y, node_indices):
+    """
+    Returns the optimal feature and threshold value
+    to split the node data
+
+    Args:
+        X (ndarray):            Data matrix of shape(n_samples, n_features)
+        y (array like):         list or ndarray with n_samples containing the target variable
+        node_indices (ndarray): List containing the active indices. I.e, the samples being considered in this step.
+
+    Returns:
+        best_feature (int):     The index of the best feature to split
+    """
+
+    # Some useful variables
+    num_features = X.shape[1]
+
+    # You need to return the following variables correctly
+    best_feature = -1
+
+    max_info_gain=0
+    for feature in range(num_features):
+        info_gain = compute_information_gain(X, y, node_indices, feature)
+        if info_gain > max_info_gain:
+            max_info_gain = info_gain
+            best_feature = feature
+
+    return best_feature
+
+tree = []
+
+def build_tree_recursive(X, y, node_indices, branch_name, max_depth, current_depth):
+    """
+    Build a tree using the recursive algorithm that split the dataset into 2 subgroups at each node.
+    This function just prints the tree.
+
+    Args:
+        X (ndarray):            Data matrix of shape(n_samples, n_features)
+        y (array like):         list or ndarray with n_samples containing the target variable
+        node_indices (ndarray): List containing the active indices. I.e, the samples being considered in this step.
+        branch_name (string):   Name of the branch. ['Root', 'Left', 'Right']
+        max_depth (int):        Max depth of the resulting tree.
+        current_depth (int):    Current depth. Parameter used during recursive call.
+
+    """
+
+    # Maximum depth reached - stop splitting
+    if current_depth == max_depth:
+        formatting = " "*current_depth + "-"*current_depth
+        print(formatting, "%s leaf node with indices" % branch_name, node_indices)
+        return
+
+    # Otherwise, get best split and split the data
+    # Get the best feature and threshold at this node
+    best_feature = get_best_split(X, y, node_indices)
+    tree.append((current_depth, branch_name, best_feature, node_indices))
+
+    formatting = "-"*current_depth
+    print("%s Depth %d, %s: Split on feature: %d" % (formatting, current_depth, branch_name, best_feature))
+
+    # Split the dataset at the best feature
+    left_indices, right_indices = split_dataset(X, node_indices, best_feature)
+
+    # continue splitting the left and the right child. Increment current depth
+    build_tree_recursive(X, y, left_indices, "Left", max_depth, current_depth+1)
+    build_tree_recursive(X, y, right_indices, "Right", max_depth, current_depth+1)
+```
+
+### One-Hot Encoding
+
+One-hot encoding is used for features that can take on multiple discrete values.
+
+Make each category its own boolean feature. IE ear shape of pointy, oval, floppy can be three features instead.
+
+If a categorical feature can take on k values, create k binary features (0 or 1)
+
+### Continuous Features
+
+Split based on whether value is <= some value. Consider multiple thresholds and use the one that produces the best information gain.
+
+Algorithm:
+
+- sort by value
+- use midpoint values as possible threshold
+- choose max info gain value
+
+### Regression Trees
+
+use input features to predict a continuous number. Take average of all output values in leaf node. Each node should attempt to maximize reduction in variance of output variable at each split.
+
+![regression tree split](/images/regressiontreesplit.png)
+
+### Tree Ensembles
+
+Decision trees are highly sensitive to small changes of the data. Changing one training example can completely change the tree. Tree ensembles can be used to make the trees more robust. Create multiple trees, run each example through each tree and use the majority result.
+
+Tree ensembles are constructed through sampling with replacement. Take m training examples at random and construct a tree with that data. Repeat this B times (64-128). Also known as a bagged decision tree.
+
+For random forests:
+
+At each node, when choosing a feature to use to split, if n features are available, pick a random subset of k < n features and allow the algorithm to only choose from that subset of features. For a large number of features, use k = sqrt(n).
+
+For boosted trees:
+
+Use sampling with replacement to create a new training set of size m but instead of picking for all examples with equal (1/m) probability, make it more likely to pick examples that the previous trained trees misclassify (deliberate practice analogy).
+
+XGBoost (extreme gradient boosting)
+
+```py
+from xgboost import XGBClassifier
+
+# Classification
+model = XGBClassifier()
+
+# Regression
+model = XGBRegressor()
+
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+```
 
 ```py
 import pandas as pd
@@ -452,7 +726,6 @@ X.head()
 
 train_X, val_X, train_y, val_y = train_test_split(X, y, random_state = 0)
 
-
 def get_mae(max_leaf_nodes, train_X, val_X, train_y, val_y):
     # random_state ensures same results for each run, max_leaf_nodes is used to control tree depth
     # too deep = overfitting, too shallow = underfitting
@@ -474,7 +747,6 @@ best_tree_size = min(scores, key=scores.get)
 final_model = DecisionTreeRegressor(max_leaf_nodes=best_tree_size, random_state=0)
 
 final_model.fit(X, y)
-
 ```
 
 ### Random Forests
