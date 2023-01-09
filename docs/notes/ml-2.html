@@ -375,6 +375,7 @@ loss<span class="token operator">=</span>tf<span class="token punctuation">.</sp
 <p>F1 score (harmonic mean) can be used to choose algorithm with optimal precision/recall. F1 score takes an average while emphasizing the smaller number.</p>
 <p>F1 score = 1/(1/2(1/p + 1/r)) = 2pr/(p+r)</p>
 <h3>Decision Trees</h3>
+<p>Works well on tabular/structured data for classification or regression tasks. Not recommended for unstructured data (images, video, audio, text). Very fast to train.</p>
 <p>For each example, start at root node, go down path based on feature values until leaf node (output variable) is reached</p>
 <p>Decision tree algorithm "learns" the best decision tree of all possible decision trees.</p>
 <p>Learning Process:</p>
@@ -383,6 +384,205 @@ loss<span class="token operator">=</span>tf<span class="token punctuation">.</sp
 <li>split examples based on node</li>
 <li>DFS for each node until examples are appropriately categorized or a maximum depth is reached or the purity score is below a threshold or when the number of examples in a node is below a threshold</li>
 </ol>
+<p>Entropy - measure of impurity</p>
+<p><img src="/images/entropy.png" alt="entropy"></p>
+<p>po = 1 - p1
+H(p1) = -p1log2(p1) - p0log2(p0)</p>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">def</span> <span class="token function">compute_entropy</span><span class="token punctuation">(</span>y<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""</span>
+<span class="token triple-quoted-string string">    Computes the entropy for</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    Args:</span>
+<span class="token triple-quoted-string string">       y (ndarray): Numpy array indicating whether each example at a node is</span>
+<span class="token triple-quoted-string string">           edible (`1`) or poisonous (`0`)</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    Returns:</span>
+<span class="token triple-quoted-string string">        entropy (float): Entropy at that node</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    """</span>
+
+    entropy <span class="token operator">=</span> <span class="token number">0</span>
+
+    <span class="token keyword">if</span> <span class="token builtin">len</span><span class="token punctuation">(</span>y<span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">:</span>
+        p1 <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>y<span class="token punctuation">[</span>y <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>y<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> p1 <span class="token operator">!=</span> <span class="token number">0</span> <span class="token keyword">and</span> p1 <span class="token operator">!=</span> <span class="token number">1</span><span class="token punctuation">:</span>
+            entropy <span class="token operator">=</span> <span class="token operator">-</span>p1 <span class="token operator">*</span> np<span class="token punctuation">.</span>log2<span class="token punctuation">(</span>p1<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> p1<span class="token punctuation">)</span> <span class="token operator">*</span> np<span class="token punctuation">.</span>log2<span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> p1<span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            entropy <span class="token operator">=</span> <span class="token number">0</span>
+    <span class="token keyword">return</span> entropy
+</code></pre></div>
+<p>Information gain</p>
+<p>choose a split by maximizing the reduction in the weighted average of the entropy for each possible feature</p>
+<p><img src="/images/infogain.png" alt="Information Gain"></p>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">def</span> <span class="token function">split_dataset</span><span class="token punctuation">(</span>X<span class="token punctuation">,</span> node_incices<span class="token punctuation">,</span> feature<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""</span>
+<span class="token triple-quoted-string string">    Splits the data at the given node into</span>
+<span class="token triple-quoted-string string">    left and right branches</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    Args:</span>
+<span class="token triple-quoted-string string">        X (ndarray):             Data matrix of shape(n_samples, n_features)</span>
+<span class="token triple-quoted-string string">        node_indices (list):  List containing the active indices. I.e, the samples being considered at this step.</span>
+<span class="token triple-quoted-string string">        feature (int):           Index of feature to split on</span>
+<span class="token triple-quoted-string string">    Returns:</span>
+<span class="token triple-quoted-string string">        left_indices (list): Indices with feature value == 1</span>
+<span class="token triple-quoted-string string">        right_indices (list): Indices with feature value == 0</span>
+<span class="token triple-quoted-string string">    """</span>
+
+    left_indices <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    right_indices <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+    <span class="token comment">### START CODE HERE ###</span>
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> node_indices<span class="token punctuation">:</span>
+        <span class="token keyword">if</span> X<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">[</span>feature<span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">:</span>
+            left_indices<span class="token punctuation">.</span>append<span class="token punctuation">(</span>i<span class="token punctuation">)</span>
+        <span class="token keyword">else</span><span class="token punctuation">:</span>
+            right_indices<span class="token punctuation">.</span>append<span class="token punctuation">(</span>i<span class="token punctuation">)</span>
+    <span class="token comment">### END CODE HERE ###</span>
+
+    <span class="token keyword">return</span> left_indices<span class="token punctuation">,</span> right_indices
+
+<span class="token keyword">def</span> <span class="token function">compute_information_gain</span><span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> node_indices<span class="token punctuation">,</span> feature<span class="token punctuation">)</span><span class="token punctuation">:</span>
+
+    <span class="token triple-quoted-string string">"""</span>
+<span class="token triple-quoted-string string">    Compute the information of splitting the node on a given feature</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    Args:</span>
+<span class="token triple-quoted-string string">        X (ndarray):            Data matrix of shape(n_samples, n_features)</span>
+<span class="token triple-quoted-string string">        y (array like):         list or ndarray with n_samples containing the target variable</span>
+<span class="token triple-quoted-string string">        node_indices (ndarray): List containing the active indices. I.e, the samples being considered in this step.</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    Returns:</span>
+<span class="token triple-quoted-string string">        cost (float):        Cost computed</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    """</span>
+    <span class="token comment"># Split dataset</span>
+    left_indices<span class="token punctuation">,</span> right_indices <span class="token operator">=</span> split_dataset<span class="token punctuation">(</span>X<span class="token punctuation">,</span> node_indices<span class="token punctuation">,</span> feature<span class="token punctuation">)</span>
+
+    <span class="token comment"># Some useful variables</span>
+    X_node<span class="token punctuation">,</span> y_node <span class="token operator">=</span> X<span class="token punctuation">[</span>node_indices<span class="token punctuation">]</span><span class="token punctuation">,</span> y<span class="token punctuation">[</span>node_indices<span class="token punctuation">]</span>
+    X_left<span class="token punctuation">,</span> y_left <span class="token operator">=</span> X<span class="token punctuation">[</span>left_indices<span class="token punctuation">]</span><span class="token punctuation">,</span> y<span class="token punctuation">[</span>left_indices<span class="token punctuation">]</span>
+    X_right<span class="token punctuation">,</span> y_right <span class="token operator">=</span> X<span class="token punctuation">[</span>right_indices<span class="token punctuation">]</span><span class="token punctuation">,</span> y<span class="token punctuation">[</span>right_indices<span class="token punctuation">]</span>
+
+    <span class="token comment"># You need to return the following variables correctly</span>
+    information_gain <span class="token operator">=</span> <span class="token number">0</span>
+
+    node_entropy <span class="token operator">=</span> compute_entropy<span class="token punctuation">(</span>y_node<span class="token punctuation">)</span>
+    left_entropy <span class="token operator">=</span> compute_entropy<span class="token punctuation">(</span>y_left<span class="token punctuation">)</span>
+    right_entropy <span class="token operator">=</span> compute_entropy<span class="token punctuation">(</span>y_right<span class="token punctuation">)</span>
+
+    <span class="token comment"># Weights</span>
+    w_left <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>X_left<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>X_node<span class="token punctuation">)</span>
+    w_right <span class="token operator">=</span> <span class="token builtin">len</span><span class="token punctuation">(</span>X_right<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token builtin">len</span><span class="token punctuation">(</span>X_node<span class="token punctuation">)</span>
+
+    <span class="token comment">#Weighted entropy</span>
+    weighted_entropy <span class="token operator">=</span> w_left <span class="token operator">*</span> left_entropy <span class="token operator">+</span> w_right <span class="token operator">*</span> right_entropy
+
+    <span class="token comment">#Information gain</span>
+    information_gain <span class="token operator">=</span> node_entropy <span class="token operator">-</span> weighted_entropy
+
+    <span class="token keyword">return</span> information_gain
+
+<span class="token keyword">def</span> <span class="token function">get_best_split</span><span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> node_indices<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""</span>
+<span class="token triple-quoted-string string">    Returns the optimal feature and threshold value</span>
+<span class="token triple-quoted-string string">    to split the node data</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    Args:</span>
+<span class="token triple-quoted-string string">        X (ndarray):            Data matrix of shape(n_samples, n_features)</span>
+<span class="token triple-quoted-string string">        y (array like):         list or ndarray with n_samples containing the target variable</span>
+<span class="token triple-quoted-string string">        node_indices (ndarray): List containing the active indices. I.e, the samples being considered in this step.</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    Returns:</span>
+<span class="token triple-quoted-string string">        best_feature (int):     The index of the best feature to split</span>
+<span class="token triple-quoted-string string">    """</span>
+
+    <span class="token comment"># Some useful variables</span>
+    num_features <span class="token operator">=</span> X<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span>
+
+    <span class="token comment"># You need to return the following variables correctly</span>
+    best_feature <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span>
+
+    max_info_gain<span class="token operator">=</span><span class="token number">0</span>
+    <span class="token keyword">for</span> feature <span class="token keyword">in</span> <span class="token builtin">range</span><span class="token punctuation">(</span>num_features<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        info_gain <span class="token operator">=</span> compute_information_gain<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> node_indices<span class="token punctuation">,</span> feature<span class="token punctuation">)</span>
+        <span class="token keyword">if</span> info_gain <span class="token operator">></span> max_info_gain<span class="token punctuation">:</span>
+            max_info_gain <span class="token operator">=</span> info_gain
+            best_feature <span class="token operator">=</span> feature
+
+    <span class="token keyword">return</span> best_feature
+
+tree <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+
+<span class="token keyword">def</span> <span class="token function">build_tree_recursive</span><span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> node_indices<span class="token punctuation">,</span> branch_name<span class="token punctuation">,</span> max_depth<span class="token punctuation">,</span> current_depth<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""</span>
+<span class="token triple-quoted-string string">    Build a tree using the recursive algorithm that split the dataset into 2 subgroups at each node.</span>
+<span class="token triple-quoted-string string">    This function just prints the tree.</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    Args:</span>
+<span class="token triple-quoted-string string">        X (ndarray):            Data matrix of shape(n_samples, n_features)</span>
+<span class="token triple-quoted-string string">        y (array like):         list or ndarray with n_samples containing the target variable</span>
+<span class="token triple-quoted-string string">        node_indices (ndarray): List containing the active indices. I.e, the samples being considered in this step.</span>
+<span class="token triple-quoted-string string">        branch_name (string):   Name of the branch. ['Root', 'Left', 'Right']</span>
+<span class="token triple-quoted-string string">        max_depth (int):        Max depth of the resulting tree.</span>
+<span class="token triple-quoted-string string">        current_depth (int):    Current depth. Parameter used during recursive call.</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    """</span>
+
+    <span class="token comment"># Maximum depth reached - stop splitting</span>
+    <span class="token keyword">if</span> current_depth <span class="token operator">==</span> max_depth<span class="token punctuation">:</span>
+        formatting <span class="token operator">=</span> <span class="token string">" "</span><span class="token operator">*</span>current_depth <span class="token operator">+</span> <span class="token string">"-"</span><span class="token operator">*</span>current_depth
+        <span class="token keyword">print</span><span class="token punctuation">(</span>formatting<span class="token punctuation">,</span> <span class="token string">"%s leaf node with indices"</span> <span class="token operator">%</span> branch_name<span class="token punctuation">,</span> node_indices<span class="token punctuation">)</span>
+        <span class="token keyword">return</span>
+
+    <span class="token comment"># Otherwise, get best split and split the data</span>
+    <span class="token comment"># Get the best feature and threshold at this node</span>
+    best_feature <span class="token operator">=</span> get_best_split<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> node_indices<span class="token punctuation">)</span>
+    tree<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>current_depth<span class="token punctuation">,</span> branch_name<span class="token punctuation">,</span> best_feature<span class="token punctuation">,</span> node_indices<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    formatting <span class="token operator">=</span> <span class="token string">"-"</span><span class="token operator">*</span>current_depth
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"%s Depth %d, %s: Split on feature: %d"</span> <span class="token operator">%</span> <span class="token punctuation">(</span>formatting<span class="token punctuation">,</span> current_depth<span class="token punctuation">,</span> branch_name<span class="token punctuation">,</span> best_feature<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token comment"># Split the dataset at the best feature</span>
+    left_indices<span class="token punctuation">,</span> right_indices <span class="token operator">=</span> split_dataset<span class="token punctuation">(</span>X<span class="token punctuation">,</span> node_indices<span class="token punctuation">,</span> best_feature<span class="token punctuation">)</span>
+
+    <span class="token comment"># continue splitting the left and the right child. Increment current depth</span>
+    build_tree_recursive<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> left_indices<span class="token punctuation">,</span> <span class="token string">"Left"</span><span class="token punctuation">,</span> max_depth<span class="token punctuation">,</span> current_depth<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span>
+    build_tree_recursive<span class="token punctuation">(</span>X<span class="token punctuation">,</span> y<span class="token punctuation">,</span> right_indices<span class="token punctuation">,</span> <span class="token string">"Right"</span><span class="token punctuation">,</span> max_depth<span class="token punctuation">,</span> current_depth<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">)</span>
+</code></pre></div>
+<h3>One-Hot Encoding</h3>
+<p>One-hot encoding is used for features that can take on multiple discrete values.</p>
+<p>Make each category its own boolean feature. IE ear shape of pointy, oval, floppy can be three features instead.</p>
+<p>If a categorical feature can take on k values, create k binary features (0 or 1)</p>
+<h3>Continuous Features</h3>
+<p>Split based on whether value is &#x3C;= some value. Consider multiple thresholds and use the one that produces the best information gain.</p>
+<p>Algorithm:</p>
+<ul>
+<li>sort by value</li>
+<li>use midpoint values as possible threshold</li>
+<li>choose max info gain value</li>
+</ul>
+<h3>Regression Trees</h3>
+<p>use input features to predict a continuous number. Take average of all output values in leaf node. Each node should attempt to maximize reduction in variance of output variable at each split.</p>
+<p><img src="/images/regressiontreesplit.png" alt="regression tree split"></p>
+<h3>Tree Ensembles</h3>
+<p>Decision trees are highly sensitive to small changes of the data. Changing one training example can completely change the tree. Tree ensembles can be used to make the trees more robust. Create multiple trees, run each example through each tree and use the majority result.</p>
+<p>Tree ensembles are constructed through sampling with replacement. Take m training examples at random and construct a tree with that data. Repeat this B times (64-128). Also known as a bagged decision tree.</p>
+<p>For random forests:</p>
+<p>At each node, when choosing a feature to use to split, if n features are available, pick a random subset of k &#x3C; n features and allow the algorithm to only choose from that subset of features. For a large number of features, use k = sqrt(n).</p>
+<p>For boosted trees:</p>
+<p>Use sampling with replacement to create a new training set of size m but instead of picking for all examples with equal (1/m) probability, make it more likely to pick examples that the previous trained trees misclassify (deliberate practice analogy).</p>
+<p>XGBoost (extreme gradient boosting)</p>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">from</span> xgboost <span class="token keyword">import</span> XGBClassifier
+
+<span class="token comment"># Classification</span>
+model <span class="token operator">=</span> XGBClassifier<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token comment"># Regression</span>
+model <span class="token operator">=</span> XGBRegressor<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+model<span class="token punctuation">.</span>fit<span class="token punctuation">(</span>X_train<span class="token punctuation">,</span> y_train<span class="token punctuation">)</span>
+y_pred <span class="token operator">=</span> model<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>X_test<span class="token punctuation">)</span>
+</code></pre></div>
 <div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> pandas <span class="token keyword">as</span> pd
 <span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>tree <span class="token keyword">import</span> DecisionTreeRegressor
 <span class="token keyword">from</span> sklearn<span class="token punctuation">.</span>metrics <span class="token keyword">import</span> mean_absolute_error
