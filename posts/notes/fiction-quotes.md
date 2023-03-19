@@ -6,7 +6,7 @@ category: summary
 type: notes
 ---
 
-# The Midnight Library
+### The Midnight Library
 
 Summary:
 
@@ -20,8 +20,8 @@ To be human was to continually dumb the world down into an understandable story 
 
 In chess, as in life, possibility is the basis of everything. Every hope, every dream, every regret, every moment of living.
 
-We only know what we perceive. Everything we experience is ultimately just our perception of it. It's not what you look at that matters, it's what you see.
-
+We only know what we perceive. Everything we experience is ultimately just our perception of it. It's not what you look at that matters, it's what you see
+.
 Never underestimate the big importance of small things.
 
 Every life contains many millions of decisions. Some big, some small. But every time one decision is taken over another, the outcomes differ. An irreversible variation occurs, which in turn leads to further variations.
@@ -35,3 +35,16 @@ You don't need to understand life. You just have to live it.
 The prison wasn't the place, but the perspective.
 
 Of all the extremely divergent variations of herself she had experienced, the most radical sense of change happened within the exact same life.
+
+### Snow Crash
+
+Summary:
+
+Mad Max in a cyberpunk future. L Bob Rife is the villian trying to spread a virus/idea to control the population. Hiro Protaganist and YT are the heroes that stop them.
+
+Quotes:
+
+We are all susceptible to the pull of viral ideas. Like mass hysteria. Or a tune that gets into your head that you keep humming all day until you spread it to someone else. Jokes. Urban legends. Crackpot religions. Marxism. No matter how smart we get, there is always this deep irrational part that makes us potential hosts for self-replicating information.
+
+“This Snow Crash thing--is it a virus, a drug, or a religion?”
+Juanita shrugs. “What's the difference?”
