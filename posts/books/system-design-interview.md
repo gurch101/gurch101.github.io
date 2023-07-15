@@ -9,24 +9,33 @@ type: books
 ### Chapter 1: Scaling from 1 to a million users
 
 - start with a single server to host static assets, app server, database server
-- vertically scale until you can't
+- vertically scale until you can't - simple but has hard limits and doesn't provide failover/redundancy
 - split db and app server so they can be scaled independently
   - nosql = low latency, unstructured, massive amounts of data
-- horizontally scale - use a load balancer
+- horizontally scale - use a load balancer (lb has 1 public ip and N private ip's)
   - improved availability
-  - stateful architecture requires sticky sessions
+  - stateful architecture requires sticky sessions - harder to scale/add servers/deal with failures
   - stateless - more scalable -> store user state in redis/nosql db/relational db
 - failover/redundancy - db replication with one master db for writes and many read nodes
-- add a cache for data that is read frequently but updated infrequently
+  - most systems have more writes vs reads
+  - better performance because more reads can happen in parallel
+  - nodes can be added/promoted to ensure high availability
+- add a cache for data that is read frequently but updated infrequently or data that is expensive to compute
+  - read-through: read from cache first, if miss then read from db and update cache
+  - write-through: write to both cache and db
   - considerations: expiration, what to cache, consistency, eviction (what to do when full - LRU)
 - use a CDN
   - considerations: cost (only cache frequently used content), expiry, failover, invalidation
-- use multiple data centers and a geoDNS - routes to server closest to user
+- use multiple data centers and a geoDNS to deal with international users and improve availability - routes to server closest to user
   - considerations: automated deployments, monitoring, replication, immutable infrastructure
-- use message queues for long running tasks
+- use message queues for long running tasks that can be done asynchronously
+  - producer can publish messages even when there are no consumers, consumers can read messages even when there are no producers
+  - consumers can be scaled based on workload
 - sharding the db to scale horizontally
-  - considerations: resharding data when shards need to be split further, celebrity problem (certain users are more popular/active than others), leads to denormalization to prevent joins
+  - considerations: resharding data when shards need to be split further, uneven data distribution, celebrity (hotspot key) problem (certain users are more popular/active than others), leads to denormalization to prevent joins
 - split tiers into separate services
+
+![System Architecture](/images/sysdesign1.png)
 
 ### Chapter 2: Back-Of-The-Envelope Estimation
 
