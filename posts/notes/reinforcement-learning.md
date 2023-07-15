@@ -1,3 +1,11 @@
+---
+title: Reinforcement Learning
+date: 2022-05-29
+description: Udemy course notes
+category: summary
+type: notes
+---
+
 Goal: train an agent to make decisions in an environment in order to maximize a reward signal (optimal policy). We are trying to learn a state -> action map.
 
 Learns through exploration and exploitation of the environment.

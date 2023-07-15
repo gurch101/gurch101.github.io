@@ -1,0 +1,229 @@
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>Reinforcement Learning | Gurchet&#x27;s Development Blog</title><meta name="description" content="Udemy course notes"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">Reinforcement Learning</h1><div class="meta"><span>Sat May 28 2022</span><span>summary</span></div><div class="mt25 post"><p>Goal: train an agent to make decisions in an environment in order to maximize a reward signal (optimal policy). We are trying to learn a state -> action map.</p>
+<p>Learns through exploration and exploitation of the environment.</p>
+<p>The return is the sum of rewards the agent gets weighted by some discount factor. This captures temporal differences in rewards by multiplying the reward by a decreasing discount factor with gamma &#x3C; 1. Higher gamma = agent is more patient.</p>
+<div class="remark-highlight"><pre class="language-unknown"><code class="language-unknown">Return = R1 + gammaR2 + gamma^2R3</code></pre></div>
+<p>A policy is a function that takes a state and returns the action to perform.</p>
+<p>Markov decision process</p>
+<ul>
+<li>future only depends on current state, not on how you arrived at current state</li>
+</ul>
+<p>agent takes actions to interact with environment -> receives feedback -> adjusts behavior.</p>
+<p>State-action value (Q) function - Q(s,a) = the return if you start in state s, take action a, then behave optimally after that (max Q(s',a')). Goal is to pick the a that gives the largest Q(s,a).</p>
+<h3>Bellman Equation</h3>
+<p>Q(s,a) = R(s) + gamma(maxa'(s',a'))</p>
+<p>Q(s,a) = What you get right away + what you get later</p>
+<h3>Stochastic Environments</h3>
+<p>need to account for random environments/probability of wrong behavior. Not looking to maximize return but maximizing the average value. Expected return = average(R1 + gammaR2 + gamma^2R3).</p>
+<p>s' is now random in Bellman equation so take average reward of each action at s'.</p>
+<h3>Continuous State Spaces</h3>
+<ul>
+<li>can have many state variables represented as a vector that can take on a continuous range of values</li>
+</ul>
+<h3>Example</h3>
+<p>Lunar lander</p>
+<p>actions: do nothing, left thruster, main thruster, right thruster</p>
+<p>State = [x,y,xdot,ydot,theta,theatadot,l(left leg sitting on ground),r(right leg sitting on ground)]</p>
+<p>reward = 100 - 140 for getting to landing pad
+additional reward for moving toward/away from pad
+crash = -100
+soft landing = +100
+leg grounded = +10
+fire main engine = -.3
+fire side thruster = -.0.3</p>
+<h5>Learning the state-value function</h5>
+<p>Deep RL - 12 inputs (state + actions), 64 unit layer, 64 unit layer, 4 unit output Q(s,a) - one per state</p>
+<p>Use the nn to compute Q(s, an) for all 4 actions. Pick the action a that maximizes Q(s,a)</p>
+<p>To build up a dataset, try random actions and save states (x), compute reward and new state (y)</p>
+<p>Deep Q Network Algorithm:</p>
+<ul>
+<li>initialize nn randomly as a guess of Q(s,a)
+repeat:
+<ul>
+<li>exploration step: take actions - pick action with probability X that maximizes Q(s,a) (exploitation), otherwise pick action randomly (exploration). episilon = greedy policy = 1 - exploration probability. Get (s,a,R(s),s').
+<ul>
+<li>episilon starts high (completely random) and decreases gradually with next training steps (greedy)</li>
+</ul>
+</li>
+<li>Store 10k most recent tuples (replay buffer).</li>
+<li>create training set of 10k examples: x = (s,a), y = R(s) + gamma(max(Q(s',a'))). Y is just random initially.
+<ul>
+<li>experience replay: store the agent's states/actions/rewards in a memory buffer and sample mini-batch</li>
+<li>since y is constantly changing, this leads to instability since MSE constantly varies since the target varies</li>
+<li>use a separate nn for generating y targets</li>
+</ul>
+</li>
+<li>train Qnew such that Qnew(s,a) ~= y</li>
+<li>set Q = Qnew</li>
+</ul>
+</li>
+</ul>
+<p>Mini-batch and soft updates</p>
+<p>Every step of gradient descent requires taking the average over every training example. If the training set is large, this is slow.</p>
+<p>Mini-batch:
+take a subset of the data
+for each iteration, choose a different subset
+Fast but doesn't reliably compute the global minima</p>
+<p>Soft updates:
+Make a more gradual change when updating.
+when setting Q = Qnew, do W = 0.01Wnew + 0.99W, B = 0.01Bnew + 0.99B
+Increases reliability of convergence</p>
+<div class="remark-highlight"><pre class="language-py"><code class="language-py"><span class="token keyword">import</span> time
+<span class="token keyword">from</span> collections <span class="token keyword">import</span> deque<span class="token punctuation">,</span> namedtuple
+
+<span class="token keyword">import</span> gym
+<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">import</span> PIL<span class="token punctuation">.</span>Image
+<span class="token keyword">import</span> tensorflow <span class="token keyword">as</span> tf
+<span class="token keyword">import</span> utils
+
+<span class="token keyword">from</span> pyvirtualdisplay <span class="token keyword">import</span> Display
+<span class="token keyword">from</span> tensorflow<span class="token punctuation">.</span>keras <span class="token keyword">import</span> Sequential
+<span class="token keyword">from</span> tensorflow<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>layers <span class="token keyword">import</span> Dense<span class="token punctuation">,</span> Input
+<span class="token keyword">from</span> tensorflow<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>losses <span class="token keyword">import</span> MSE
+<span class="token keyword">from</span> tensorflow<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>optimizers <span class="token keyword">import</span> Adam
+
+<span class="token comment"># Set up a virtual display to render the Lunar Lander environment.</span>
+Display<span class="token punctuation">(</span>visible<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">,</span> size<span class="token operator">=</span><span class="token punctuation">(</span><span class="token number">840</span><span class="token punctuation">,</span> <span class="token number">480</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>start<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment"># Set the random seed for TensorFlow</span>
+tf<span class="token punctuation">.</span>random<span class="token punctuation">.</span>set_seed<span class="token punctuation">(</span>utils<span class="token punctuation">.</span>SEED<span class="token punctuation">)</span>
+
+<span class="token comment"># Hyperparameters</span>
+MEMORY_SIZE <span class="token operator">=</span> 100_000     <span class="token comment"># size of memory buffer</span>
+GAMMA <span class="token operator">=</span> <span class="token number">0.995</span>             <span class="token comment"># discount factor</span>
+ALPHA <span class="token operator">=</span> <span class="token number">1e</span><span class="token operator">-</span><span class="token number">3</span>              <span class="token comment"># learning rate</span>
+NUM_STEPS_FOR_UPDATE <span class="token operator">=</span> <span class="token number">4</span>  <span class="token comment"># perform a learning update every C time steps</span>
+
+<span class="token comment"># Each action has a corresponding numerical value:</span>
+<span class="token comment"># Do nothing = 0</span>
+<span class="token comment"># Fire right engine = 1</span>
+<span class="token comment"># Fire main engine = 2</span>
+<span class="token comment"># Fire left engine = 3</span>
+
+env <span class="token operator">=</span> gym<span class="token punctuation">.</span>make<span class="token punctuation">(</span><span class="token string">'LunarLander-v2'</span><span class="token punctuation">)</span>
+initial_state <span class="token operator">=</span> env<span class="token punctuation">.</span>reset<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token comment"># show the first frame</span>
+PIL<span class="token punctuation">.</span>Image<span class="token punctuation">.</span>fromarray<span class="token punctuation">(</span>env<span class="token punctuation">.</span>render<span class="token punctuation">(</span>mode<span class="token operator">=</span><span class="token string">'rgb_array'</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+state_size <span class="token operator">=</span> env<span class="token punctuation">.</span>observation_space<span class="token punctuation">.</span>shape
+num_actions <span class="token operator">=</span> env<span class="token punctuation">.</span>action_space<span class="token punctuation">.</span>n
+
+<span class="token comment"># 8</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'State Shape:'</span><span class="token punctuation">,</span> state_size<span class="token punctuation">)</span>
+<span class="token comment"># 4</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">'Number of actions:'</span><span class="token punctuation">,</span> num_actions<span class="token punctuation">)</span>
+
+<span class="token comment"># Select an action</span>
+action <span class="token operator">=</span> <span class="token number">0</span>
+
+<span class="token comment"># Run a single time step of the environment's dynamics with the given action.</span>
+next_state<span class="token punctuation">,</span> reward<span class="token punctuation">,</span> done<span class="token punctuation">,</span> info <span class="token operator">=</span> env<span class="token punctuation">.</span>step<span class="token punctuation">(</span>action<span class="token punctuation">)</span>
+
+<span class="token keyword">with</span> np<span class="token punctuation">.</span>printoptions<span class="token punctuation">(</span>formatter<span class="token operator">=</span><span class="token punctuation">{</span><span class="token string">'float'</span><span class="token punctuation">:</span> <span class="token string">'{:.3f}'</span><span class="token punctuation">.</span><span class="token builtin">format</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Initial State:"</span><span class="token punctuation">,</span> initial_state<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Action:"</span><span class="token punctuation">,</span> action<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Next State:"</span><span class="token punctuation">,</span> next_state<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Reward Received:"</span><span class="token punctuation">,</span> reward<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Episode Terminated:"</span><span class="token punctuation">,</span> done<span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"Info:"</span><span class="token punctuation">,</span> info<span class="token punctuation">)</span>
+
+<span class="token comment"># Create the Q-Network</span>
+q_network <span class="token operator">=</span> Sequential<span class="token punctuation">(</span><span class="token punctuation">[</span>
+    Input<span class="token punctuation">(</span>shape<span class="token operator">=</span>state_size<span class="token punctuation">)</span><span class="token punctuation">,</span>
+    Dense<span class="token punctuation">(</span>units<span class="token operator">=</span><span class="token number">64</span><span class="token punctuation">,</span> activation<span class="token operator">=</span><span class="token string">'relu'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    Dense<span class="token punctuation">(</span>units<span class="token operator">=</span><span class="token number">64</span><span class="token punctuation">,</span> activation<span class="token operator">=</span><span class="token string">'relu'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    Dense<span class="token punctuation">(</span>units<span class="token operator">=</span>num_actions<span class="token punctuation">,</span> activation<span class="token operator">=</span><span class="token string">'linear'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+<span class="token comment"># Create the target Q^-Network</span>
+target_q_network <span class="token operator">=</span> Sequential<span class="token punctuation">(</span><span class="token punctuation">[</span>
+    Input<span class="token punctuation">(</span>shape<span class="token operator">=</span>state_size<span class="token punctuation">)</span><span class="token punctuation">,</span>
+    Dense<span class="token punctuation">(</span>units<span class="token operator">=</span><span class="token number">64</span><span class="token punctuation">,</span> activation<span class="token operator">=</span><span class="token string">'relu'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    Dense<span class="token punctuation">(</span>units<span class="token operator">=</span><span class="token number">64</span><span class="token punctuation">,</span> activation<span class="token operator">=</span><span class="token string">'relu'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    Dense<span class="token punctuation">(</span>units<span class="token operator">=</span>num_actions<span class="token punctuation">,</span> activation<span class="token operator">=</span><span class="token string">'linear'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+optimizer <span class="token operator">=</span> Adam<span class="token punctuation">(</span>learning_rate<span class="token operator">=</span>ALPHA<span class="token punctuation">)</span>
+
+experience <span class="token operator">=</span> namedtuple<span class="token punctuation">(</span><span class="token string">"Experience"</span><span class="token punctuation">,</span> field_names<span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">"state"</span><span class="token punctuation">,</span> <span class="token string">"action"</span><span class="token punctuation">,</span> <span class="token string">"reward"</span><span class="token punctuation">,</span> <span class="token string">"next_state"</span><span class="token punctuation">,</span> <span class="token string">"done"</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+<span class="token keyword">def</span> <span class="token function">compute_loss</span><span class="token punctuation">(</span>experiences<span class="token punctuation">,</span> gamma<span class="token punctuation">,</span> q_network<span class="token punctuation">,</span> target_q_network<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""</span>
+<span class="token triple-quoted-string string">    Calculates the loss.</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    Args:</span>
+<span class="token triple-quoted-string string">      experiences: (tuple) tuple of ["state", "action", "reward", "next_state", "done"] namedtuples</span>
+<span class="token triple-quoted-string string">      gamma: (float) The discount factor.</span>
+<span class="token triple-quoted-string string">      q_network: (tf.keras.Sequential) Keras model for predicting the q_values</span>
+<span class="token triple-quoted-string string">      target_q_network: (tf.keras.Sequential) Karas model for predicting the targets</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    Returns:</span>
+<span class="token triple-quoted-string string">      loss: (TensorFlow Tensor(shape=(0,), dtype=int32)) the Mean-Squared Error between</span>
+<span class="token triple-quoted-string string">            the y targets and the Q(s,a) values.</span>
+<span class="token triple-quoted-string string">    """</span>
+
+    <span class="token comment"># Unpack the mini-batch of experience tuples</span>
+    states<span class="token punctuation">,</span> actions<span class="token punctuation">,</span> rewards<span class="token punctuation">,</span> next_states<span class="token punctuation">,</span> done_vals <span class="token operator">=</span> experiences
+
+    <span class="token comment"># Compute max Q^(s,a)</span>
+    max_qsa <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_max<span class="token punctuation">(</span>target_q_network<span class="token punctuation">(</span>next_states<span class="token punctuation">)</span><span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+
+    <span class="token comment"># Set y = R if episode terminates, otherwise set y = R + γ max Q^(s,a).</span>
+    <span class="token comment">### START CODE HERE ###</span>
+    y_targets <span class="token operator">=</span> rewards <span class="token operator">+</span> <span class="token punctuation">(</span>gamma <span class="token operator">*</span> max_qsa <span class="token operator">*</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">-</span> done_vals<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token comment">### END CODE HERE ###</span>
+
+    <span class="token comment"># Get the q_values</span>
+    q_values <span class="token operator">=</span> q_network<span class="token punctuation">(</span>states<span class="token punctuation">)</span>
+    q_values <span class="token operator">=</span> tf<span class="token punctuation">.</span>gather_nd<span class="token punctuation">(</span>q_values<span class="token punctuation">,</span> tf<span class="token punctuation">.</span>stack<span class="token punctuation">(</span><span class="token punctuation">[</span>tf<span class="token punctuation">.</span><span class="token builtin">range</span><span class="token punctuation">(</span>q_values<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                                                tf<span class="token punctuation">.</span>cast<span class="token punctuation">(</span>actions<span class="token punctuation">,</span> tf<span class="token punctuation">.</span>int32<span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token comment"># Compute the loss</span>
+    <span class="token comment">### START CODE HERE ###</span>
+    loss <span class="token operator">=</span> MSE<span class="token punctuation">(</span>y_targets<span class="token punctuation">,</span> q_values<span class="token punctuation">)</span>
+    <span class="token comment">### END CODE HERE ###</span>
+
+    <span class="token keyword">return</span> loss
+
+<span class="token decorator annotation punctuation">@tf<span class="token punctuation">.</span>function</span>
+<span class="token keyword">def</span> <span class="token function">agent_learn</span><span class="token punctuation">(</span>experiences<span class="token punctuation">,</span> gamma<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""</span>
+<span class="token triple-quoted-string string">    Updates the weights of the Q networks.</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    Args:</span>
+<span class="token triple-quoted-string string">      experiences: (tuple) tuple of ["state", "action", "reward", "next_state", "done"] namedtuples</span>
+<span class="token triple-quoted-string string">      gamma: (float) The discount factor.</span>
+<span class="token triple-quoted-string string"></span>
+<span class="token triple-quoted-string string">    """</span>
+
+    <span class="token comment"># Calculate the loss</span>
+    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>GradientTape<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> tape<span class="token punctuation">:</span>
+        loss <span class="token operator">=</span> compute_loss<span class="token punctuation">(</span>experiences<span class="token punctuation">,</span> gamma<span class="token punctuation">,</span> q_network<span class="token punctuation">,</span> target_q_network<span class="token punctuation">)</span>
+
+    <span class="token comment"># Get the gradients of the loss with respect to the weights.</span>
+    gradients <span class="token operator">=</span> tape<span class="token punctuation">.</span>gradient<span class="token punctuation">(</span>loss<span class="token punctuation">,</span> q_network<span class="token punctuation">.</span>trainable_variables<span class="token punctuation">)</span>
+
+    <span class="token comment"># Update the weights of the q_network.</span>
+    optimizer<span class="token punctuation">.</span>apply_gradients<span class="token punctuation">(</span><span class="token builtin">zip</span><span class="token punctuation">(</span>gradients<span class="token punctuation">,</span> q_network<span class="token punctuation">.</span>trainable_variables<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token comment"># update the weights of target q_network</span>
+    utils<span class="token punctuation">.</span>update_target_network<span class="token punctuation">(</span>q_network<span class="token punctuation">,</span> target_q_network<span class="token punctuation">)</span>
+</code></pre></div>
+<h3>Limitations</h3>
+<ul>
+<li>Most research has been in simulations. Much harder to get working in real world</li>
+<li>Far fewer applications than supervised/unsupervised learning</li>
+</ul>
+<h3>Usage</h3>
+<ul>
+<li>game playing</li>
+<li>teach robots</li>
+<li>autonomous driving</li>
+<li>recommendation systems</li>
+</ul>
+<h3>Questions</h3>
+<p>What happens if you don't know the terminal states? is this considered unsupervised RL?
+How do you come up with reward values?</p>
+<h3>Goals</h3>
+<p>Use RL to solve NES Punch Out</p>
+</div></div></div></div></body></html>

@@ -1,22 +1,30 @@
 <!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><title>System Design Interview | Gurchet&#x27;s Development Blog</title><meta name="description" content="System Design Interview Summary"/><link rel="icon" href="/favicon.ico"/><meta name="next-head-count" content="5"/><link rel="preload" href="/_next/static/css/549468e6bf83b511.css" as="style"/><link rel="stylesheet" href="/_next/static/css/549468e6bf83b511.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4634d28b7f97c8b5.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4634d28b7f97c8b5.css" data-n-p=""/><noscript data-n-css=""></noscript></head><body><div id="__next"><div class="container"><div><h1 class="mb3">System Design Interview</h1><div class="meta"><span>Sat Oct 09 2021</span><span>book summary</span></div><div class="mt25 post"><h3>Chapter 1: Scaling from 1 to a million users</h3>
 <ul>
 <li>start with a single server to host static assets, app server, database server</li>
-<li>vertically scale until you can't</li>
+<li>vertically scale until you can't - simple but has hard limits and doesn't provide failover/redundancy</li>
 <li>split db and app server so they can be scaled independently
 <ul>
 <li>nosql = low latency, unstructured, massive amounts of data</li>
 </ul>
 </li>
-<li>horizontally scale - use a load balancer
+<li>horizontally scale - use a load balancer (lb has 1 public ip and N private ip's)
 <ul>
 <li>improved availability</li>
-<li>stateful architecture requires sticky sessions</li>
+<li>stateful architecture requires sticky sessions - harder to scale/add servers/deal with failures</li>
 <li>stateless - more scalable -> store user state in redis/nosql db/relational db</li>
 </ul>
 </li>
-<li>failover/redundancy - db replication with one master db for writes and many read nodes</li>
-<li>add a cache for data that is read frequently but updated infrequently
+<li>failover/redundancy - db replication with one master db for writes and many read nodes
 <ul>
+<li>most systems have more writes vs reads</li>
+<li>better performance because more reads can happen in parallel</li>
+<li>nodes can be added/promoted to ensure high availability</li>
+</ul>
+</li>
+<li>add a cache for data that is read frequently but updated infrequently or data that is expensive to compute
+<ul>
+<li>read-through: read from cache first, if miss then read from db and update cache</li>
+<li>write-through: write to both cache and db</li>
 <li>considerations: expiration, what to cache, consistency, eviction (what to do when full - LRU)</li>
 </ul>
 </li>
@@ -25,19 +33,25 @@
 <li>considerations: cost (only cache frequently used content), expiry, failover, invalidation</li>
 </ul>
 </li>
-<li>use multiple data centers and a geoDNS - routes to server closest to user
+<li>use multiple data centers and a geoDNS to deal with international users and improve availability - routes to server closest to user
 <ul>
 <li>considerations: automated deployments, monitoring, replication, immutable infrastructure</li>
 </ul>
 </li>
-<li>use message queues for long running tasks</li>
+<li>use message queues for long running tasks that can be done asynchronously
+<ul>
+<li>producer can publish messages even when there are no consumers, consumers can read messages even when there are no producers</li>
+<li>consumers can be scaled based on workload</li>
+</ul>
+</li>
 <li>sharding the db to scale horizontally
 <ul>
-<li>considerations: resharding data when shards need to be split further, celebrity problem (certain users are more popular/active than others), leads to denormalization to prevent joins</li>
+<li>considerations: resharding data when shards need to be split further, uneven data distribution, celebrity (hotspot key) problem (certain users are more popular/active than others), leads to denormalization to prevent joins</li>
 </ul>
 </li>
 <li>split tiers into separate services</li>
 </ul>
+<p><img src="/images/sysdesign1.png" alt="System Architecture"></p>
 <h3>Chapter 2: Back-Of-The-Envelope Estimation</h3>
 <p>2^10 = 1024 = 1 kb - thousands
 2^20 = 1048576 = 1 mb - millions
